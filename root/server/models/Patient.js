@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
-const doctorSchema = new Schema({
+const patientSchema = new Schema({
   Username: {
     type: String,
     required: true,
@@ -28,23 +28,33 @@ const doctorSchema = new Schema({
     type: Date,
     required: true,
   },
-  EducationalBackground: {
+  Gender: {
+    type: String,
+    required: true,
+    enum: ["male", "female"],
+  },
+  PhoneNum: {
     type: String,
     required: true,
   },
-  HourlyRate: {
-    type: Number,
-    required: true,
+  EmergencyContact: {
+    phoneNum: {
+      type: String,
+      required: true,
+    },
+    fName: {
+      type: String,
+      required: true,
+    },
+    lName: {
+      type: String,
+      required: true,
+    },
   },
-  Affiliation: {
-    type: String,
-    required: true,
-  },
-  Specialty: {
-    type: String,
-    required: true,
+  MedicalHistory: {
+    type: Array,
   },
 });
 
-const Doctor = mongoose.model("Doctor", doctorSchema);
-export default Doctor;
+const Patient = mongoose.model("Patient", patientSchema);
+export default Patient;
