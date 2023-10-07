@@ -12,9 +12,13 @@ const adminSchema = new Schema({
     required: true,
   },
   email: {
-    type: Number,
+    type: String,
     required: true,
     unique: true,
+  },
+  isAccepted: {
+    type: Boolean,
+    default: false,
   },
 });
 
