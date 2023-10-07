@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import express from "express";
 import patientRoutes from "./routes/patientRoutes.js";
-dotenv.config({ path: "../.env" });
+dotenv.config({ path: "./.env" });
 
 let uri = process.env.MONGODB_URI;
 let port = process.env.PORT;
