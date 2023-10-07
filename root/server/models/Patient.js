@@ -51,42 +51,45 @@ const patientSchema = new Schema({
       required: true,
     },
   },
-  FamilyMembers: [
-    {
-      email: {
-        type: String,
-        required: true,
-        unique: true,
+  FamilyMembers: {
+    type: [
+      {
+        email: {
+          type: String,
+          required: true,
+          unique: true,
+        },
+        fName: {
+          type: String,
+          required: true,
+        },
+        lName: {
+          type: String,
+          required: true,
+        },
+        nationalID: {
+          type: String,
+          required: true,
+          unique: true,
+        },
+        gender: {
+          type: String,
+          required: true,
+          enum: ["male", "female"],
+        },
+        dateOfBirth: {
+          type: Date,
+          required: true,
+        },
+        relationship: {
+          type: String,
+          required: true,
+          enum: ["father", "mother", "brother", "sister", "son", "daughter"],
+        },
       },
-      fName: {
-        type: String,
-        required: true,
-      },
-      lName: {
-        type: String,
-        required: true,
-      },
-      nationalID: {
-        type: String,
-        required: true,
-        unique: true,
-      },
-      gender: {
-        type: String,
-        required: true,
-        enum: ["male", "female"],
-      },
-      dateOfBirth: {
-        type: Date,
-        required: true,
-      },
-      relationship: {
-        type: String,
-        required: true,
-        enum: ["father", "mother", "brother", "sister", "son", "daughter"],
-      },
-    },
-  ],
+    ],
+    default: [],
+  },
   MedicalHistory: {
     type: Array,
     default: [],
