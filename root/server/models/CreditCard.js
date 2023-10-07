@@ -2,23 +2,23 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const creditcardSchema = new Schema({
-  Patient: {
+  patient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Patient",
   },
-  CardNumber: {
+  cardNumber: {
     type: String,
     required: true,
   },
-  ExpirationDate: {
+  expirationDate: {
     type: Date,
     required: true,
   },
-  SecurityCode: {
+  securityCode: {
     type: String,
     required: true,
   },
-  Name: {
+  name: {
     type: String,
     required: true,
   },

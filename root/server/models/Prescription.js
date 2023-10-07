@@ -3,31 +3,31 @@ import { boolean } from "webidl-conversions";
 const Schema = mongoose.Schema;
 
 const prescriptionSchema = new Schema({
-  Patient: {
+  patient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Patient",
   },
-  Doctor: {
+  doctor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Doctor",
   },
-  Medication: {
+  medication: {
     type: String,
     required: true,
   },
-  Dosage: {
+  dosage: {
     type: String,
     required: true,
   },
-  IsFilled: {
+  isFilled: {
     type: boolean,
     required: true,
   },
-  Date: {
+  date: {
     type: Date,
     required: true,
   },
-  Notes: {
+  notes: {
     type: String,
     required: true,
   },

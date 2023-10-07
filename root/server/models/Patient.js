@@ -2,16 +2,16 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const patientSchema = new Schema({
-  Username: {
+  username: {
     type: String,
     required: true,
     unique: true,
   },
-  Password: {
+  password: {
     type: String,
     required: true,
   },
-  Email: {
+  email: {
     type: String,
     required: true,
     unique: true,
@@ -24,20 +24,20 @@ const patientSchema = new Schema({
     type: String,
     required: true,
   },
-  DateOfBirth: {
+  dateOfBirth: {
     type: Date,
     required: true,
   },
-  Gender: {
+  gender: {
     type: String,
     required: true,
     enum: ["male", "female"],
   },
-  PhoneNum: {
+  phoneNum: {
     type: String,
     required: true,
   },
-  EmergencyContact: {
+  emergencyContact: {
     phoneNum: {
       type: String,
       required: true,
@@ -51,7 +51,7 @@ const patientSchema = new Schema({
       required: true,
     },
   },
-  FamilyMembers: {
+  familyMembers: {
     type: [
       {
         email: {
@@ -90,11 +90,11 @@ const patientSchema = new Schema({
     ],
     default: [],
   },
-  MedicalHistory: {
+  medicalHistory: {
     type: Array,
     default: [],
   },
-  Wallet: {
+  wallet: {
     type: Number,
     default: 0,
   },

@@ -2,16 +2,16 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const doctorSchema = new Schema({
-  Username: {
+  username: {
     type: String,
     required: true,
     unique: true,
   },
-  Password: {
+  password: {
     type: String,
     required: true,
   },
-  Email: {
+  email: {
     type: String,
     required: true,
     unique: true,
@@ -24,23 +24,23 @@ const doctorSchema = new Schema({
     type: String,
     required: true,
   },
-  DateOfBirth: {
+  dateOfBirth: {
     type: Date,
     required: true,
   },
-  EducationalBackground: {
+  educationalBackground: {
     type: String,
     required: true,
   },
-  HourlyRate: {
+  hourlyRate: {
     type: Number,
     required: true,
   },
-  Affiliation: {
+  affiliation: {
     type: String,
     required: true,
   },
-  Specialty: {
+  specialty: {
     type: String,
     required: true,
   },

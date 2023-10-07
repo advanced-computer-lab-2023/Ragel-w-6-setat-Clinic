@@ -2,23 +2,23 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const notificationSchema = new Schema({
-  Patient: {
+  patient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Patient",
   },
-  Title: {
+  title: {
     type: String,
     required: true,
   },
-  Message: {
+  message: {
     type: String,
     required: true,
   },
-  Date: {
+  date: {
     type: Date,
     required: true,
   },
-  Read: {
+  read: {
     type: Boolean,
     default: false,
   },

@@ -2,32 +2,32 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const packageSchema = new Schema({
-  Name: {
+  name: {
     type: String,
     required: true,
     enum: ["Silver", "Gold", "Platinum"],
   },
-  Price: {
+  price: {
     type: Number,
     required: true,
   },
-  Description: {
+  description: {
     type: String,
     required: true,
   },
-  SessionDiscount: {
+  sessionDiscount: {
     type: Number,
     required: true,
   },
-  MedicineDiscount: {
+  medicineDiscount: {
     type: Number,
     required: true,
   },
-  SubscriptionDiscount: {
+  subscriptionDiscount: {
     type: Number,
     required: true,
   },
-  Status: {
+  status: {
     type: String,
     default: "Unsubscribed",
   },

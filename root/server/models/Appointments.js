@@ -2,15 +2,15 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const appointmentSchema = new Schema({
-  Patient: {
+  patient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Patient",
   },
-  Doctor: {
+  doctor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Doctor",
   },
-  Date: {
+  date: {
     type: Date,
     required: true,
   },
@@ -18,11 +18,11 @@ const appointmentSchema = new Schema({
     type: Boolean,
     required: true,
   },
-  Type: {
+  type: {
     type: String,
     required: false,
   },
-  Status: {
+  status: {
     type: String,
     required: true,
     enum: ["upcoming", "completed", "cancelled", "rescheduled"],
