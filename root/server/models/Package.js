@@ -27,10 +27,10 @@ const packageSchema = new Schema({
     type: Number,
     required: true,
   },
-  status: {
-    type: String,
-    default: "Unsubscribed",
-  },
+  // status: {
+  //   type: String,
+  //   default: "Unsubscribed",
+  // },
 });
 
 const Package = mongoose.model("Package", packageSchema);
