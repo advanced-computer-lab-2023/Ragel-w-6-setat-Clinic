@@ -1,5 +1,11 @@
-import express from "express";
-import doctorController from "../controllers/doctorController";
-import { body, validationResult } from "express-validator";
+  import express from "express";
+  import {searchForPatient} from "../controllers/doctorController.js";
 
-const router = express.Router();
+  import { body, validationResult } from "express-validator";
+
+  const router = express.Router();
+
+  // Search for a patient by name
+  router.get('/patients/search', searchForPatient)
+
+  export default router;

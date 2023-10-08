@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import express from "express";
 import patientRoutes from "./routes/patientRoutes.js";
+import doctorRoutes from "./routes/doctorRoutes.js";
 dotenv.config({ path: "./.env" });
 
 let uri = process.env.MONGODB_URI;
@@ -14,8 +15,8 @@ const app = express();
 app.use(express.json());
 
 app.use("/patients", patientRoutes);
+app.use('/doctors', doctorRoutes);
 
-// connect to mongodb & listen for requests
 
 mongoose
   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
