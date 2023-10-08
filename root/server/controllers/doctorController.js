@@ -19,4 +19,26 @@ const createDoctor = async (req, res) => {
   }
 };
 
-export { createDoctor };
+const updateDoctorProfile = async (req, res) => {
+  try {
+    const doctor = await Doctor.findByIdAndUpdate(
+      { _id: req.params.id },
+      {
+        ...req.body,
+      }
+    );
+    res.status(201).json({
+      status: "success",
+      data: {
+        doctor,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+export { createDoctor, updateDoctorProfile };

@@ -61,7 +61,7 @@ const deletePackage = async (req, res) => {
 const updatePackage = async (req, res) => {
   try {
     const pack = await Package.findOneAndUpdate(
-      { _id: id },
+      { _id: req.params.id },
       {
         ...req.body,
       }
@@ -80,4 +80,4 @@ const updatePackage = async (req, res) => {
   }
 };
 
-export { createAdmin, createPackage };
+export { createAdmin, createPackage, deletePackage, updatePackage };
