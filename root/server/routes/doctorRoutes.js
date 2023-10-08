@@ -6,6 +6,6 @@
   const router = express.Router();
 
   // Search for a patient by name
-  router.get('/patients/search', searchForPatient)
+  router.get('/searchForPatients', searchForPatient)
 
   export default router;
