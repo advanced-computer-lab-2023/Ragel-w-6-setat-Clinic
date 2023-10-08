@@ -1,5 +1,5 @@
 import express from "express";
-import { createPatient,viewPrescription,filteredPresc } from "../controllers/patientController.js";
+import { createPatient,viewPrescription,filteredPresc,addFamMem ,selectPres} from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
@@ -8,6 +8,8 @@ const router = express.Router();
 router.post("/registeration", createPatient);
 router.get("/viewPrescription/:id",viewPrescription);
 router.get("/filteredPresc",filteredPresc);
+router.post("/addFamMem/:id",addFamMem);
+router.get("/selectPres/:id",selectPres);
 
 
 
