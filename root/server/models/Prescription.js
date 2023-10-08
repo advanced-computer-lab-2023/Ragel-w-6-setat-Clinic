@@ -20,8 +20,8 @@ const prescriptionSchema = new Schema({
     required: true,
   },
   isFilled: {
-    type: boolean,
-    required: true,
+    type: Boolean,
+    default: false
   },
   date: {
     type: Date,

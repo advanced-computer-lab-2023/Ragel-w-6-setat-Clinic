@@ -1,1 +1,2 @@
-import Doctor from "../models/doctorModel.js";
+import Doctor from "../models/Doctor.js";
+
