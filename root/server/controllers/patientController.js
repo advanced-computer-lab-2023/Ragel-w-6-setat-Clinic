@@ -1,5 +1,6 @@
 import Patient from "../models/Patient.js";
 import Doctor from "../models/Doctor.js";
+import Appointments from "../models/Appointments.js";
 
 // create (register) a patient
 
@@ -36,6 +37,79 @@ const createPatient = async (req, res) => {
      }
  }
 
+ const filterAvailableAppointments = async(req, res) =>{
 
-export { createPatient };
-export { searchForDoctor };
+  const { status, date } = req.query;
+
+  try {
+    const filter = {};
+    if (status) {
+      filter.status = status;
+    }
+    if (date) {
+      filter.date = new Date(date);
+    }
+
+    const appointments = await Appointments.find(filter);
+
+    res.json(appointments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+  
+ };
+
+  const filtermyAppointments = async(req,res) =>{
+    const { date, status } = req.query;
+
+    try {
+      const userId = req.user.id; 
+      const filter = { patient: userId };
+  
+      if (date) {
+        filter.date = new Date(date);
+      }
+      if (status) {
+        filter.status = status;
+      }
+  
+      const appointments = await Appointments.find(filter);
+      res.json(appointments);
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  }
+const filterDoctors = async(req, res) =>{
+  try {
+    const { specialty, date, time } = req.query;
+
+    // Create a filter object based on query parameters
+    const filter = {};
+
+    if (specialty) {
+      filter.specialty = specialty;
+    }
+
+    if (date) {
+      filter.availability.date = new Date(date);
+    }
+
+    if (time) {
+      filter.availability.time = time;
+    }
+
+    // Query the database to find doctors that match the filter criteria
+    const doctors = await Doctor.find(filter);
+
+    res.json(doctors);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
+
+export { createPatient, searchForDoctor ,filterAvailableAppointments , filtermyAppointments, filterDoctors};

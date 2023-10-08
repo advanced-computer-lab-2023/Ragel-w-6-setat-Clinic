@@ -1,5 +1,5 @@
 import express from "express";
-import { createPatient,  searchForDoctor} from "../controllers/patientController.js";
+import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors} from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
@@ -10,6 +10,13 @@ router.post("/registeration", createPatient);
 // Search for a doctor by name/specialty
 router.get("/searchForDoctors" , searchForDoctor);
 
+// Filter available appointments by date and status
+router.get("/filterAvailableAppointments", filterAvailableAppointments);
 
+// Filter my appointments by date and status
+router.get("/filtermyAppointments", filtermyAppointments);
+
+//filter  a doctor by speciality and/or availability on a certain date and at a specific time
+router.get("/filterDoctors",filterDoctors);
 
 export default router;
