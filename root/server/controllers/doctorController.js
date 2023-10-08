@@ -1,4 +1,5 @@
 import Doctor from "../models/Doctor.js";
+import Patient from "../models/Patient.js";
 
 // submit a request to register as a doctor
 const createDoctor = async (req, res) => {
@@ -41,4 +42,25 @@ const updateDoctorProfile = async (req, res) => {
   }
 };
 
-export { createDoctor, updateDoctorProfile };
+const getAllPatients = async (req, res) => {
+ 
+  try {
+    const { email } = req.body;
+    const registration = req.body.isRegistered;
+    
+    if(registration == false ){
+      return res.status(403).json({ message: 'Doctor not authorized to view patients' });
+    }
+    // Find all patients associated with this doctor
+    const patients = await Patient.find({ 'email': email});
+
+    res.json(patients);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+  
+
+export { createDoctor, updateDoctorProfile , getAllPatients};

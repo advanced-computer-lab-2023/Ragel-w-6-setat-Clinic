@@ -19,4 +19,27 @@ const createPatient = async (req, res) => {
   }
 };
 
-export { createPatient };
+const getFamilyMembers = async (req, res) => {
+  try {
+    const { email } = req.body; // Get patient's email from the request body
+
+    // Find the patient using the provided email in the familyMembers array
+    const patient = await Patient.findOne({ 'familyMembers.email': email });
+
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    // Extract family members from the patient object
+    const familyMembers = patient.familyMembers.filter(member => member.email === email);
+
+    res.json(familyMembers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+}
+
+export { createPatient,getFamilyMembers };
+
+

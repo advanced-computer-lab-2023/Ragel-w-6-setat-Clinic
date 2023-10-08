@@ -19,6 +19,10 @@ app.use("/patients", patientRoutes);
 app.use("/doctors", doctorRoutes);
 app.use("/admins", adminRoutes);
 
+app.get("/", (req, res) =>{
+  res.send("cool")
+})
+
 // connect to mongodb & listen for requests
 
 mongoose
