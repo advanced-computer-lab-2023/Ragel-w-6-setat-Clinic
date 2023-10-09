@@ -98,6 +98,11 @@ const patientSchema = new Schema({
     type: Number,
     default: 0,
   },
+  subscribedPackage: {
+    type: String,
+    enum: ["silver", "gold", "platinium"],
+    required: false,
+  }
 });
 
 const Patient = mongoose.model("Patient", patientSchema);

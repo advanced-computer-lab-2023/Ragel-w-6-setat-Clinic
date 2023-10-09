@@ -52,7 +52,7 @@ const getAllPatients = async (req, res) => {
       return res.status(403).json({ message: 'Doctor not authorized to view patients' });
     }
     // Find all patients associated with this doctor
-    const patients = await Patient.find({ 'email': email});
+    const patients = await Patient.find({});
 
     res.json(patients);
   } catch (error) {
@@ -61,6 +61,29 @@ const getAllPatients = async (req, res) => {
   }
 };
 
+const getSinglePatient = async (req, res) => {
+
+  const  patientUsername  = req.params.id;
+  try {
+    // const doctorId = req.body.username; // Assuming you have doctor ID in req.user after authentication
+     // Get patient username from the request body
+
+    // Check if the doctor is authorized to view the patient
+    const patient = await Patient.findById(patientUsername);
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    // Send patient information back to the doctor
+    res.json(patient);
+    
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
   
 
-export { createDoctor, updateDoctorProfile , getAllPatients};
+export { createDoctor, updateDoctorProfile , getAllPatients, getSinglePatient};

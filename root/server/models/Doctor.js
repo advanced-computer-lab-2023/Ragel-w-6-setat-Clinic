@@ -36,6 +36,10 @@ const doctorSchema = new Schema({
     type: Number,
     required: true,
   },
+  sessionPrice :{
+    type: Number,
+    required : true,
+  },
   affiliation: {
     type: String,
     required: true,
