@@ -1,27 +1,37 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import {
+  BodyContainer,
+  Form,
+  LoginContainer,
+  Label,
+  Input,
+  Button,
+  StyledLink,
+} from "../styles/loginStyle.js";
 
 function Login() {
   console.log("Login.js");
   return (
-    <div>
-      <h1>Login</h1>
-      <form>
-        <label>
-          Email:
-          <input type="email" name="email" />
-        </label>
-        <br />
-        <label>
-          Password:
-          <input type="password" name="password" />
-        </label>
-        <br />
-        <button type="submit">Login</button>
-      </form>
-      <br />
-      <Link to="/registration">Don't have an account? Register here.</Link>
-    </div>
+    <BodyContainer>
+      <LoginContainer>
+        <h1>Login</h1>
+        <Form>
+          <Label>
+            Email:
+            <Input type="email" name="email" />
+          </Label>
+          <Label>
+            Password:
+            <Input type="password" name="password" />
+          </Label>
+          <Button type="submit">Login</Button>
+        </Form>
+
+        <StyledLink to="/registration">
+          Don't have an account? Register here.
+        </StyledLink>
+      </LoginContainer>
+    </BodyContainer>
   );
 }
 
