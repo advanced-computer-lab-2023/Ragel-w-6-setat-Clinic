@@ -15,9 +15,6 @@ function RegistrationOptions() {
         <Header1>Registration Options</Header1>
         <UnorderedList>
           <ListItem>
-            <StyledLink to="/registration/admin">Register as Admin</StyledLink>
-          </ListItem>
-          <ListItem>
             <StyledLink to="/registration/doctor">
               Register as Doctor
             </StyledLink>
