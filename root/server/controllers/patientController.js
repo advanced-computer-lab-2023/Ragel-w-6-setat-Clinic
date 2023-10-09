@@ -51,7 +51,28 @@ const getAllDoctors = async (req,res) => {
 
   };
 
+  const getSingleDoctor = async (req, res) => {
 
-export { createPatient, getFamilyMembers, getAllDoctors };
+    const  doctorUsername  = req.params.id;
+    try {
+      
+      const doctor = await Doctor.findById(doctorUsername);
+      if (!doctor) {
+        return res.status(404).json({ message: 'doctor not found' });
+      }
+  
+      // Send patient information back to the doctor
+      res.json(doctor);
+      
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  };
+  
+
+
+export { createPatient, getFamilyMembers, getAllDoctors, getSingleDoctor };
 
 
