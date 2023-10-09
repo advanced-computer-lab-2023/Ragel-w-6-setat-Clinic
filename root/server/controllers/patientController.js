@@ -62,26 +62,27 @@ const createPatient = async (req, res) => {
 
   const filtermyAppointments = async(req,res) =>{
     const { date, status } = req.query;
+    const { patientId } = req.params; 
 
-    try {
-      const userId = req.user.id; 
-      const filter = { patient: userId };
-  
-      if (date) {
-        filter.date = new Date(date);
-      }
-      if (status) {
-        filter.status = status;
-      }
-  
-      const appointments = await Appointments.find(filter);
-      res.json(appointments);
+  try {
+    const filter = { patient: patientId };
 
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Server error' });
+    if (date) {
+      filter.date = new Date(date);
     }
+    if (status) {
+      filter.status = status;
+    }
+
+    const appointments = await Appointments.find(filter);
+    res.json(appointments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
   }
+  }
+
+
 const filterDoctors = async(req, res) =>{
   try {
     const { specialty, date, time } = req.query;

@@ -36,22 +36,16 @@ const addAppointment = async (req, res) => {
   }
 };
 
-const filterMyAppointments = async(req, res) => {
+
+const filterMyAppointments = async (req, res) => {
   const { date, status } = req.query;
+  const { doctorId } = req.params; // Get doctorId from URL parameter
 
   try {
-    console.log('req.user:', req.user); // Add this line for debugging
-
-    if (!req.user || !req.user.id) {
-      console.log('Unauthorized user:', req.user); // Add this line for debugging
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const userId = req.user.id;
-    const filter = { doctor: userId };
+    const filter = { doctor: doctorId };
 
     if (date) {
-      filter.date = new Date(date);
+      filter.date = new Date(date).toISOString;
     }
     if (status) {
       filter.status = status;
@@ -62,9 +56,10 @@ const filterMyAppointments = async(req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
-
   }
 };
+
+
 
 const upcomingAppointments = async(req, res) =>{
   const  doctorId  = req.body.doctor;
