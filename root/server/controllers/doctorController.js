@@ -42,17 +42,15 @@ const filterMyAppointments = async (req, res) => {
   const { doctorId } = req.params; // Get doctorId from URL parameter
 
   try {
-    const filter = { doctor: doctorId };
-
-    if (date) {
-      filter.date = new Date(date).toISOString;
+    const appointments = await Appointment.find({doctorId});
+    if(appointments.length === 0)
+    {
+      res.status(404).json({ error: 'not found ' });
     }
-    if (status) {
-      filter.status = status;
+    else
+    {
+      res.status(200).json(appointments)
     }
-
-    const appointments = await Appointment.find(filter);
-    res.json(appointments);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });

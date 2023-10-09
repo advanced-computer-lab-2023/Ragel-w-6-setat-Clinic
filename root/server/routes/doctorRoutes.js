@@ -12,7 +12,7 @@
   router.post("/addAppointment", addAppointment);
 
   //Filter my appointments by date and status
-  router.get("/filterMyAppointments", filterMyAppointments);
+  router.get("/filterMyAppointments/:id", filterMyAppointments);
 
   // Filter patients based on upcoming appointments with the doctor
   router.get("/upcomingappointments", upcomingAppointments)

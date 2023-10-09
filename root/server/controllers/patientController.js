@@ -62,25 +62,23 @@ const createPatient = async (req, res) => {
 
   const filtermyAppointments = async(req,res) =>{
     const { date, status } = req.query;
-    const { patientId } = req.params; 
-
-  try {
-    const filter = { patient: patientId };
-
-    if (date) {
-      filter.date = new Date(date);
+    const { patientId } = req.params; // Get patientId from URL parameter
+  
+    try {
+      const appointments = await Appointments.find({patientId});
+      if(appointments.length === 0)
+      {
+        res.status(404).json({ error: 'not found ' });
+      }
+      else
+      {
+        res.status(200).json(appointments)
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Server error' });
     }
-    if (status) {
-      filter.status = status;
-    }
-
-    const appointments = await Appointments.find(filter);
-    res.json(appointments);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error' });
-  }
-  }
+ };
 
 
 const filterDoctors = async(req, res) =>{

@@ -14,7 +14,7 @@ router.get("/searchForDoctors" , searchForDoctor);
 router.get("/filterAvailableAppointments", filterAvailableAppointments);
 
 // Filter my appointments by date and status
-router.get("/filtermyAppointments", filtermyAppointments);
+router.get("/filtermyAppointments/:id", filtermyAppointments);
 
 //filter  a doctor by speciality and/or availability on a certain date and at a specific time
 router.get("/filterDoctors",filterDoctors);
