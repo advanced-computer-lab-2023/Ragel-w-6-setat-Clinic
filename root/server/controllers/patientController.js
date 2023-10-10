@@ -21,40 +21,30 @@ const createPatient = async (req, res) => {
 };
 
  const searchForDoctor = async (req, res) =>{
-    /* const { name } = req.query;
-     const { speciality } = req.query;
-
-     try{
-      const doctors = await Doctor.find({
-       ...req.body
-      });
-      res.json(doctors);
-     }catch(error){
-      console.error(error);
-      res.status(500).json({ error: 'Server error' });
-     }*/
-       const { name } = req.body; // Get the patient's name from the request body
+  const { name, specialty } = req.query; 
 
   try {
-    if (!name) {
-      return res.status(400).json({ error: 'Name is required in the request body' });
+    const filter = {}; 
+
+    if (name) {
+      // If a name is provided, add a regex filter for first name and last name
+      filter.$or = [
+        { fName: { $regex: name, $options: 'i' } }, 
+        { lName: { $regex: name, $options: 'i' } }, 
+      ];
     }
+    if (specialty) {
+      filter.specialty = { $regex: specialty, $options: 'i' }; 
+    }
+    const doctors = await Doctor.find(filter);
 
-    // Use Mongoose to search for patients with a matching first name or last name
-    const patients = await Patient.find({
-      $or: [
-        { fName: { $regex: name, $options: 'i' } }, // Case-insensitive search
-        { lName: { $regex: name, $options: 'i' } }, // Case-insensitive search
-      ],
-    });
-
-    res.json(patients);
+    res.json(doctors);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
   }
- }
-
+};
+ 
  const filterAvailableAppointments = async(req, res) =>{
   const { status, date } = req.query;
 
