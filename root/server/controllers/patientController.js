@@ -81,34 +81,41 @@ const createPatient = async (req, res) => {
  };
 
 
-const filterDoctors = async(req, res) =>{
+ const filterDoctors = async(req, res) =>{
   try {
-    const { specialty, date, time } = req.query;
 
-    // Create a filter object based on query parameters
+    const { specialty, date, time} = req.body;
+
+    // Construct the filter based on the provided query parameters
     const filter = {};
+   
+    if (specialty) filter.specialty = specialty;
+   
+    if (date) filter.date = date;
 
-    if (specialty) {
-      filter.specialty = specialty;
-    }
+    if(time) filter.time = time;
+    
+    // Retrieve all doctors from the database
+   
+    const doctor = await Doctor.find(filter);
+    console.log(filter.specialty + filter.date + filter.time);
 
-    if (date) {
-      filter.availability.date = new Date(date);
-    }
-
-    if (time) {
-      filter.availability.time = time;
-    }
-
-    // Query the database to find doctors that match the filter criteria
-    const doctors = await Doctor.find(filter);
-
-    res.json(doctors);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error' });
+    // Send the list of doctors as a JSON response
+    res.status(200).json({
+      status: 'success',
+      data: {
+        doctor: doctor,
+      },
+    });
+  } catch (err) {
+    // Handle errors, for example, database connection issues
+    res.status(500).json({
+      status: 'error',
+      message: err.message,
+    });
   }
-}
+};
 
+ 
 
 export { createPatient, searchForDoctor ,filterAvailableAppointments , filtermyAppointments, filterDoctors};

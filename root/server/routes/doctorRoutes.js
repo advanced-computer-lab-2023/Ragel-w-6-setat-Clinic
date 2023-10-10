@@ -15,6 +15,6 @@
   router.get("/filterMyAppointments/:id", filterMyAppointments);
 
   // Filter patients based on upcoming appointments with the doctor
-  router.get("/upcomingappointments", upcomingAppointments)
+  router.get("/upcomingappointments/:id", upcomingAppointments)
 
   export default router;

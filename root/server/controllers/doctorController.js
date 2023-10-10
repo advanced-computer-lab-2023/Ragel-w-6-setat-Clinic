@@ -1,6 +1,7 @@
 import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
 import Appointment from "../models/Appointments.js";
+import mongoose from 'mongoose'
 
 const searchForPatient =  async( req , res ) =>{
   
@@ -58,23 +59,30 @@ const filterMyAppointments = async (req, res) => {
 };
 
 
-
+//---//
 const upcomingAppointments = async(req, res) =>{
-  const  doctorId  = req.body.doctor;
+  //jwt token //
+  const  doctorId  = req.params.id;
   try{
     const upcomingAppointments = await Appointment.find({
       doctor: doctorId,
       status: 'upcoming',
     //  date: { $gte: new Date() }, // Filter for appointments with dates in the future
     });
-    // Extract patient IDs from upcoming appointments
-    const patientIds = upcomingAppointments.map((Appointment) => Appointment.patient);
+    const patientIds = upcomingAppointments.map((Appointment) => {
+      return Appointment.patient; // Just return the patient ID
+    });
 
-    // Find patients based on their IDs
-    const patientsWithUpcomingAppointments = await Patient.find({ _id: { $in: patientIds } });
+    // Find patients based on their IDs using Promise.all
+    const patientsWithUpcomingAppointments = await Promise.all(
+      patientIds.map(async (patientId) => {
+        return await Patient.findById(patientId);
+      })
+    );
 
-    res.json(patientsWithUpcomingAppointments);
-
+    res.json({
+      data: patientsWithUpcomingAppointments, // Send the actual patient data
+    });
   }catch(error){    
     console.error(error);
     res.status(500).json({ error: 'Server error' });
