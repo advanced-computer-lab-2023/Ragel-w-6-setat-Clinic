@@ -3,7 +3,6 @@ import Doctor from "../models/Doctor.js";
 import Appointments from "../models/Appointments.js";
 
 // create (register) a patient
-
 const createPatient = async (req, res) => {
   try {
     const patient = await Patient.create(req.body);
@@ -30,7 +29,6 @@ const createPatient = async (req, res) => {
        ...req.body
       });
       res.json(doctors);
-
      }catch(error){
       console.error(error);
       res.status(500).json({ error: 'Server error' });
@@ -38,7 +36,6 @@ const createPatient = async (req, res) => {
  }
 
  const filterAvailableAppointments = async(req, res) =>{
-
   const { status, date } = req.query;
 
   try {
@@ -57,7 +54,6 @@ const createPatient = async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
   }
-  
  };
 
   const filtermyAppointments = async(req,res) =>{
@@ -83,10 +79,7 @@ const createPatient = async (req, res) => {
 
  const filterDoctors = async(req, res) =>{
   try {
-
     const { specialty, date, time} = req.body;
-
-    // Construct the filter based on the provided query parameters
     const filter = {};
    
     if (specialty) filter.specialty = specialty;
@@ -96,11 +89,9 @@ const createPatient = async (req, res) => {
     if(time) filter.time = time;
     
     // Retrieve all doctors from the database
-   
     const doctor = await Doctor.find(filter);
     console.log(filter.specialty + filter.date + filter.time);
 
-    // Send the list of doctors as a JSON response
     res.status(200).json({
       status: 'success',
       data: {
@@ -108,7 +99,6 @@ const createPatient = async (req, res) => {
       },
     });
   } catch (err) {
-    // Handle errors, for example, database connection issues
     res.status(500).json({
       status: 'error',
       message: err.message,
@@ -116,6 +106,19 @@ const createPatient = async (req, res) => {
   }
 };
 
- 
+const selectDoctor = async (req, res) => {
+  const doctorUsername = req.params.id;
+  try {
+    
+    const doctor = await Doctor.findById(doctorUsername);
+    if(!doctor){
+      return res.status(404).json({message: "Doctor not found"});
+    }
+    res.json(doctor);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};;
 
-export { createPatient, searchForDoctor ,filterAvailableAppointments , filtermyAppointments, filterDoctors};
+export { createPatient, searchForDoctor ,filterAvailableAppointments , filtermyAppointments, filterDoctors ,selectDoctor };

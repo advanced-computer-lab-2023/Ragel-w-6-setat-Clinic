@@ -4,7 +4,6 @@ import Appointment from "../models/Appointments.js";
 import mongoose from 'mongoose'
 
 const searchForPatient =  async( req , res ) =>{
-  
   try{
     const patients = await Patient.find({
      ...req.body
@@ -19,7 +18,6 @@ const searchForPatient =  async( req , res ) =>{
 //add an appointment
 const addAppointment = async (req, res) => {
   try {
-
      const appointment = await Appointment.create({
       ...req.body,
     });
@@ -36,7 +34,6 @@ const addAppointment = async (req, res) => {
     });
   }
 };
-
 
 const filterMyAppointments = async (req, res) => {
   const { date, status } = req.query;
@@ -58,11 +55,10 @@ const filterMyAppointments = async (req, res) => {
   }
 };
 
-
-//---//
 const upcomingAppointments = async(req, res) =>{
   //jwt token //
   const  doctorId  = req.params.id;
+
   try{
     const upcomingAppointments = await Appointment.find({
       doctor: doctorId,
@@ -79,7 +75,6 @@ const upcomingAppointments = async(req, res) =>{
         return await Patient.findById(patientId);
       })
     );
-
     res.json({
       data: patientsWithUpcomingAppointments, // Send the actual patient data
     });
@@ -88,7 +83,5 @@ const upcomingAppointments = async(req, res) =>{
     res.status(500).json({ error: 'Server error' });
   }
 }
-
-
 
 export {searchForPatient, addAppointment, filterMyAppointments, upcomingAppointments};
