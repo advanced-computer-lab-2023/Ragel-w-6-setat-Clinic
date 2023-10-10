@@ -56,7 +56,7 @@ const patientSchema = new Schema({
       {
         email: {
           type: String,
-          required: true,
+          required: false,
           unique: true,
         },
         fName: {
@@ -83,8 +83,8 @@ const patientSchema = new Schema({
         },
         relationship: {
           type: String,
-          required: true,
-          enum: ["father", "mother", "brother", "sister", "son", "daughter"],
+          required: false,
+          enum: ["father", "mother", "brother", "sister", "son", "daughter","wife","husband"],
         },
       },
     ],

@@ -1,13 +1,13 @@
 import express from "express";
 import { body, validationResult } from "express-validator";
-import { deleteAdmin,deleteDoctor,deletePatient,viewDoctors } from "../controllers/adminController.js";
+import { deleteAdmin,deleteDoctor,deletePatient,viewUnregisteredDoctors } from "../controllers/adminController.js";
 
 const router = express.Router();
 
 
-router.delete("/deletePatient", deletePatient);
+router.delete("/deleteAdmin", deleteAdmin);
 router.delete("/deletePatient", deletePatient);
 router.delete("/deleteDoctor", deleteDoctor);
-router.get("/viewDoctors", viewDoctors);
+router.get("/viewUnregisteredDoctors", viewUnregisteredDoctors);
 
 export default router;

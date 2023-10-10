@@ -5,23 +5,23 @@ import Doctor from "../models/Doctor.js";
 // delete Admin 
 const deleteAdmin = async (req, res) => {
     try {
-      // Assuming req.body contains an object with the patient ID to be deleted, for example: { id: "patientIdHere" }
+
       
-      // Use findByIdAndDelete to delete a patient by their ID
-      const deleteAdmin = await Admin.deleteMany(req.body);
+
+      const deleteAdmin = await Admin.deleteMany(req.body.username);
   
       if (!deleteAdmin) {
         // If patient with the given ID is not found, return 404 Not Found status
         return res.status(404).json({
           status: "fail",
-          message: "Patient not found",
+          message: "Admin not found",
         });
       }
   
       res.status(200).json({
         status: "success",
         data: {
-          patient: deleteAdmin,
+          admin: deleteAdmin,
         },
       });
     } catch (err) {
@@ -36,10 +36,8 @@ const deleteAdmin = async (req, res) => {
   // delete patient 
 const deletePatient = async (req, res) => {
     try {
-      // Assuming req.body contains an object with the patient ID to be deleted, for example: { id: "patientIdHere" }
-      
-      // Use findByIdAndDelete to delete a patient by their ID
-      const deletedPatient = await Patient.deleteMany(req.body);
+  
+      const deletedPatient = await Patient.deleteMany(req.body.username);
   
       if (!deletedPatient) {
         // If patient with the given ID is not found, return 404 Not Found status
@@ -52,7 +50,7 @@ const deletePatient = async (req, res) => {
       res.status(200).json({
         status: "success",
         data: {
-          patient: deletedPatient,
+          deleted: deletedPatient,
         },
       });
     } catch (err) {
@@ -67,10 +65,8 @@ const deletePatient = async (req, res) => {
   // delete doctor 
 const deleteDoctor = async (req, res) => {
     try {
-      // Assuming req.body contains an object with the patient ID to be deleted, for example: { id: "patientIdHere" }
-      
-      // Use findByIdAndDelete to delete a patient by their ID
-      const deleteDoctor = await Doctor.deleteMany(req.body);
+    
+      const deleteDoctor = await Doctor.deleteMany(req.body.username);
   
       if (!deleteDoctor) {
         // If patient with the given ID is not found, return 404 Not Found status
@@ -95,29 +91,21 @@ const deleteDoctor = async (req, res) => {
     }
   };
 
-// view doctors
-const viewDoctors =  async (req, res) => {
+// view doctors name
+const viewUnregisteredDoctors =  async (req, res) => {
   try {
 
-    const { fName, lName, specialty } = req.query;
-
-    // Construct the filter based on the provided query parameters
-    const filter = {};
-    if (fName) filter.fName = fName;
-    if (lName) filter.lName = lName;
-    if (specialty) filter.specialty = specialty;
-    // Retrieve all doctors from the database
-    const doctors = await Doctor.find(filter);
+     const doctor = await Doctor.find({isRegistered : false});
 
     // Send the list of doctors as a JSON response
     res.status(200).json({
       status: 'success',
       data: {
-        doctors: doctors,
+        doctor: doctor,
       },
     });
   } catch (err) {
-    // Handle errors, for example, database connection issues
+   
     res.status(500).json({
       status: 'error',
       message: err.message,
@@ -125,4 +113,4 @@ const viewDoctors =  async (req, res) => {
   }
 };
 
-  export {deleteAdmin,deletePatient,deleteDoctor,viewDoctors};
+  export {deleteAdmin,deletePatient,deleteDoctor,viewUnregisteredDoctors};
