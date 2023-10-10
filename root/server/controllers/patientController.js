@@ -21,7 +21,7 @@ const createPatient = async (req, res) => {
 };
 
  const searchForDoctor = async (req, res) =>{
-     const { name } = req.query;
+    /* const { name } = req.query;
      const { speciality } = req.query;
 
      try{
@@ -32,7 +32,27 @@ const createPatient = async (req, res) => {
      }catch(error){
       console.error(error);
       res.status(500).json({ error: 'Server error' });
-     }
+     }*/
+       const { name } = req.body; // Get the patient's name from the request body
+
+  try {
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required in the request body' });
+    }
+
+    // Use Mongoose to search for patients with a matching first name or last name
+    const patients = await Patient.find({
+      $or: [
+        { fName: { $regex: name, $options: 'i' } }, // Case-insensitive search
+        { lName: { $regex: name, $options: 'i' } }, // Case-insensitive search
+      ],
+    });
+
+    res.json(patients);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
  }
 
  const filterAvailableAppointments = async(req, res) =>{
@@ -57,23 +77,37 @@ const createPatient = async (req, res) => {
  };
 
   const filtermyAppointments = async(req,res) =>{
-    const { date, status } = req.query;
-    const { patientId } = req.params; // Get patientId from URL parameter
-  
+   const  patientId  = req.params.id; // Get patientId from URL parameter
+
     try {
-      const appointments = await Appointments.find({patientId});
-      if(appointments.length === 0)
+      const filter = {};
+
+      if(req.body.date)
       {
-        res.status(404).json({ error: 'not found ' });
+        filter.date = req.body.date;
       }
-      else
+
+      if(req.body.status)
       {
+        filter.status = req.body.status;
+      }
+
+      if(req.params.id)
+      {
+        filter.patient = req.params.id;
+      }
+
+      const patient = await Patient.findById(patientId);
+
+      const appointments = await Appointments.find(filter);
+      
         res.status(200).json(appointments)
-      }
+      
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Server error' });
     }
+
  };
 
 
@@ -107,10 +141,11 @@ const createPatient = async (req, res) => {
 };
 
 const selectDoctor = async (req, res) => {
-  const doctorUsername = req.params.id;
+  // const patiendID = req.params.id;
+  const doctorUsername = req.body.username;
   try {
     
-    const doctor = await Doctor.findById(doctorUsername);
+    const doctor = await Doctor.find({username : doctorUsername});
     if(!doctor){
       return res.status(404).json({message: "Doctor not found"});
     }

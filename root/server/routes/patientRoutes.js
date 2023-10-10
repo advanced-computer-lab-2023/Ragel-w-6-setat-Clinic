@@ -20,6 +20,6 @@ router.get("/filtermyAppointments/:id", filtermyAppointments);
 router.get("/filterDoctors",filterDoctors);
 
 //select a doctor from the search/filter results (dependent on 37)
-router.get("/selectDoctor/:id",selectDoctor);
+router.get("/selectDoctor",selectDoctor);
 
 export default router;
