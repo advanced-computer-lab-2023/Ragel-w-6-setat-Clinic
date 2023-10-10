@@ -100,7 +100,6 @@ const patientSchema = new Schema({
   },
   subscribedPackage: {
     type: String,
-    enum: ["silver", "gold", "platinium"],
     required: false,
   }
 });

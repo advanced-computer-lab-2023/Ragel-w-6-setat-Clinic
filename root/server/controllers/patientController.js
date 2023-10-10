@@ -1,5 +1,6 @@
 import Patient from "../models/Patient.js";
 import Doctor from "../models/Doctor.js";
+import Package from "../models/Package.js";
 // create (register) a patient
 
 const createPatient = async (req, res) => {
@@ -21,13 +22,13 @@ const createPatient = async (req, res) => {
 
 const getFamilyMembers = async (req, res) => {
   try {
-    const { email } = req.body; // Get patient's email from the request body
+    const patientID = req.params.id; // Get patient's email from the request body
 
     // Find the patient using the provided email in the familyMembers array
-    const patient = await Patient.findOne({ email : email});
+    const patient = await Patient.findById(patientID);
 
     if (!patient) {
-      return res.status(404).json({ message: 'Patient not found' });
+      return res.status(404).json({ message: 'There are no Family Members registered' });
     }
 
     // Extract family members from the patient object
@@ -40,29 +41,69 @@ const getFamilyMembers = async (req, res) => {
   }
 }
 
-const getAllDoctors = async (req,res) => {
+const getAllDoctors = async (req, res) => {
   try {
-    const doctors = await Doctor.find({});
-    res.json(doctors);
+    const patientID = req.params.id;
+    const patient = await Patient.findById(patientID);
+    const patientPackage = patient.subscribedPackage;
+    
+    let sessionDiscount = 0;
+    if (patientPackage) {
+      const packageOffered = await Package.findOne({ name: patientPackage });
+      if (packageOffered) {
+        sessionDiscount = packageOffered.sessionDiscount || 0;
+      }
+    }
+
+    const doctors = await Doctor.find().lean();
+
+    const doctorsDisplay = doctors.map((doctor) => {
+      const originalSessionPrice = doctor.sessionPrice;
+      const discountedPrice = originalSessionPrice - (originalSessionPrice * (sessionDiscount / 100));
+      return {
+        name: doctor.fName + " " + doctor.lName,
+        specialty: doctor.specialty,
+        sessionPrice: discountedPrice,
+      };
+    });
+
+    res.json(doctorsDisplay);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
+};
 
-  };
+
 
   const getSingleDoctor = async (req, res) => {
-
-    const  doctorUsername  = req.params.id;
     try {
       
-      const doctor = await Doctor.findById(doctorUsername);
+      const  doctorID  = req.body.id;
+      const patientID = req.params.id;
+      const patient = await Patient.findById(patientID);
+      const patientPackage = patient.subscribedPackage;
+      
+      let sessionDiscount = 0;
+      if (patientPackage) {
+        const packageOffered = await Package.findOne({ name: patientPackage });
+        if (packageOffered) {
+          sessionDiscount = packageOffered.sessionDiscount || 0;
+        }
+      }
+      const doctor = await Doctor.findById(doctorID);
+      const originalSessionPrice = doctor.sessionPrice;
+      const discountedPrice = originalSessionPrice - (originalSessionPrice * (sessionDiscount / 100));
       if (!doctor) {
         return res.status(404).json({ message: 'doctor not found' });
       }
-  
-      // Send patient information back to the doctor
-      res.json(doctor);
+      const modifiedDoctor = {
+        ...doctor.toObject(), // Convert Mongoose document to plain JavaScript object
+        sessionPrice: discountedPrice // Replace sessionPrice with discountedPrice
+    };
+    
+    res.json(modifiedDoctor);
+    
       
   
     } catch (error) {

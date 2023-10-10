@@ -1,5 +1,7 @@
+import Appointment from "../models/Appointments.js";
 import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
+
 
 // submit a request to register as a doctor
 const createDoctor = async (req, res) => {
@@ -42,42 +44,50 @@ const updateDoctorProfile = async (req, res) => {
   }
 };
 
-const getAllPatients = async (req, res) => {
- 
+ const getMyPatients = async (req, res) => {
   try {
-    const { email } = req.body;
-    const registration = req.body.isRegistered;
+    const doctorId = req.params.id;
+    const appointments = await Appointment.find({ doctor: doctorId }).populate('patient');
+    const doctorPatients = [];
     
-    if(registration == false ){
-      return res.status(403).json({ message: 'Doctor not authorized to view patients' });
+    for (const appointment of appointments) {
+      if (appointment.patient !== null) {
+        const patientId = appointment.patient;
+        try {
+          const patient = await Patient.findById(patientId).exec();
+          doctorPatients.push(patient);
+        } catch (error) {
+          console.error('Error finding patient:', error);
+          // Handle error if necessary
+        }
+      }
     }
-    // Find all patients associated with this doctor
-    const patients = await Patient.find({});
 
-    res.json(patients);
+    res.json(doctorPatients);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
 };
 
+
 const getSinglePatient = async (req, res) => {
-
-  const  patientUsername  = req.params.id;
+  const  doctorID  = req.params.id;
+  const patientID = req.body.pid;
   try {
-    // const doctorId = req.body.username; // Assuming you have doctor ID in req.user after authentication
-     // Get patient username from the request body
-
-    // Check if the doctor is authorized to view the patient
-    const patient = await Patient.findById(patientUsername);
-    if (!patient) {
+    
+    const appointment = await Appointment.findOne({doctor: doctorID, patient: patientID}).populate('patient');
+    if (!appointment) {
       return res.status(404).json({ message: 'Patient not found' });
     }
+
+    if(appointment!=null){
+    const patient = await Patient.findById(patientID).exec();
 
     // Send patient information back to the doctor
     res.json(patient);
     
-
+}
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
@@ -86,4 +96,4 @@ const getSinglePatient = async (req, res) => {
 
   
 
-export { createDoctor, updateDoctorProfile , getAllPatients, getSinglePatient};
+export { createDoctor, updateDoctorProfile , getMyPatients, getSinglePatient};

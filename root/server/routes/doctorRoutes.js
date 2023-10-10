@@ -2,7 +2,7 @@ import express from "express";
 import {
   createDoctor,
   updateDoctorProfile,
-  getAllPatients,
+  getMyPatients,
   getSinglePatient,
 
 } from "../controllers/doctorController.js";
@@ -16,7 +16,7 @@ const router = express.Router();
 // select only one patient 
 router.get('/selectpatient/:id',getSinglePatient);
 // view all mypatients 
-router.get('/viewpatients', getAllPatients);
+router.get('/viewMypatients/:id', getMyPatients);
 
 router.post("/registeration", createDoctor);
 

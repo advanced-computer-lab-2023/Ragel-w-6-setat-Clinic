@@ -7,8 +7,7 @@ const router = express.Router();
 
 // post request to create a patient
 router.post("/registeration", createPatient);
-
-router.get('/familyMembers',getFamilyMembers );
-router.get('/viewDoctors', getAllDoctors);
+router.get('/familyMembers/:id',getFamilyMembers );
+router.get('/viewDoctors/:id', getAllDoctors);
 router.get('/selectdoctor/:id',getSingleDoctor);
 export default router;
