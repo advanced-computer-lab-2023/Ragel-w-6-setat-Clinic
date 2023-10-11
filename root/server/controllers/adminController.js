@@ -99,11 +99,11 @@ const updatePackage = async (req, res) => {
         ...req.body,
       }
     );
-    res.status(201).json({
-      status: "success",
-      data: {
-        pack,
-      },
+    const packages = await Package.find({});
+    const adminId = req.params.userid;
+    res.render("packageManagement", {
+      userId: adminId,
+      healthPackages: packages,
     });
   } catch (err) {
     res.status(400).json({
