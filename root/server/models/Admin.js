@@ -11,10 +11,6 @@ const adminSchema = new Schema({
     type: String,
     required: true,
   },
-  isAccepted: {
-    type: Boolean,
-    default: true,
-  },
 });
 
 const Admin = mongoose.model("Admin", adminSchema);

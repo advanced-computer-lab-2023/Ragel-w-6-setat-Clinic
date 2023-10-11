@@ -14,18 +14,22 @@ const getAllAdmins = async (req, res) => {
 };
 
 const renderHomePage = function (req, res) {
-  res.render("adminHome");
+  const adminId = req.params.id;
+  res.render("adminHome", { userId: adminId });
 };
+
+const renderAddAdminPage = function (req, res) {
+  const adminId = req.params.id;
+  res.render("addAdmin", { userId: adminId });
+};
+
 // create an admin
 const createAdmin = async (req, res) => {
   try {
+    const adminId = req.params.id;
     const admin = await Admin.create(req.body);
-    res.status(201).json({
-      status: "success",
-      data: {
-        admin,
-      },
-    });
+    const message = "Admin successfully added.";
+    res.render("addAdmin", { userId: adminId, message: message });
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -102,4 +106,5 @@ export {
   updatePackage,
   getAllAdmins,
   renderHomePage,
+  renderAddAdminPage,
 };

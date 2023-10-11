@@ -6,13 +6,15 @@ import {
   updatePackage,
   getAllAdmins,
   renderHomePage,
+  renderAddAdminPage,
 } from "../controllers/adminController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
 
 // post request to create an admin
-router.post("/registeration", createAdmin);
+router.get("/addAdmin/:id", renderAddAdminPage);
+router.post("/addAdmin", createAdmin);
 router.post("/package", createPackage);
 router.delete("/package/:id", deletePackage);
 router.patch("/package/:id", updatePackage);
