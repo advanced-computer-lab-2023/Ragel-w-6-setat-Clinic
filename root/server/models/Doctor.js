@@ -48,10 +48,6 @@ const doctorSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  availability: {
-    date: Date,
-    time: String,
-  },
 });
 
 const Doctor = mongoose.model("Doctor", doctorSchema);
