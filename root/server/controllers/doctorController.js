@@ -15,7 +15,13 @@ const getAllDoctors = async (req, res) => {
 };
 
 const renderHomePage = function (req, res) {
-  res.render("doctorHome");
+  res.render("doctorHome", { userId: req.params.id });
+};
+
+const renderProfilePage = async function (req, res) {
+  const doctorid = req.params.id;
+  const doctor = await Doctor.findById(doctorid);
+  res.render("doctorProfile", { userId: req.params.id, doctor: doctor });
 };
 
 const renderRegisterationPage = function (req, res) {
@@ -45,11 +51,10 @@ const updateDoctorProfile = async (req, res) => {
         ...req.body,
       }
     );
-    res.status(201).json({
-      status: "success",
-      data: {
-        doctor,
-      },
+    const doctorid = req.params.userid;
+    res.render("packageManagement", {
+      userId: doctorid,
+      doctor: doctor,
     });
   } catch (err) {
     res.status(400).json({
@@ -65,4 +70,5 @@ export {
   getAllDoctors,
   renderHomePage,
   renderRegisterationPage,
+  renderProfilePage,
 };
