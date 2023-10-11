@@ -5,7 +5,6 @@ const packageSchema = new Schema({
   name: {
     type: String,
     required: true,
-    enum: ["Silver", "Gold", "Platinum"],
   },
   price: {
     type: Number,
@@ -27,10 +26,6 @@ const packageSchema = new Schema({
     type: Number,
     required: true,
   },
-  // status: {
-  //   type: String,
-  //   default: "Unsubscribed",
-  // },
 });
 
 const Package = mongoose.model("Package", packageSchema);

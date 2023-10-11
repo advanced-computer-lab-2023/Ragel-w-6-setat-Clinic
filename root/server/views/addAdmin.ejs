@@ -58,7 +58,7 @@
             </h3>
             <%}%>
 
-                <form action="/admins/addAdmin" method="post">
+                <form action="/admins/addAdmin/<%= userId %>" method="post">
                     <div class="form-group">
                         <label for="username">Username:</label>
                         <input type="text" id="username" name="username" required>

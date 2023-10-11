@@ -23,6 +23,20 @@ const renderAddAdminPage = function (req, res) {
   res.render("addAdmin", { userId: adminId });
 };
 
+const renderPackagePage = async (req, res) => {
+  try {
+    const packages = await Package.find({});
+    const adminId = req.params.id;
+    res.render("packageManagement", {
+      userId: adminId,
+      healthPackages: packages,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 // create an admin
 const createAdmin = async (req, res) => {
   try {
@@ -42,11 +56,11 @@ const createAdmin = async (req, res) => {
 const createPackage = async (req, res) => {
   try {
     const pack = await Package.create(req.body);
-    res.status(201).json({
-      status: "success",
-      data: {
-        pack,
-      },
+    const packages = await Package.find({});
+    const adminId = req.params.id;
+    res.render("packageManagement", {
+      userId: adminId,
+      healthPackages: packages,
     });
   } catch (err) {
     res.status(400).json({
@@ -60,12 +74,12 @@ const createPackage = async (req, res) => {
 
 const deletePackage = async (req, res) => {
   try {
-    const pack = await Package.findByIdAndDelete(req.params.id);
-    res.status(201).json({
-      status: "success",
-      data: {
-        pack,
-      },
+    const pack = await Package.findByIdAndDelete(req.params.packageid);
+    const packages = await Package.find({});
+    const adminId = req.params.userid;
+    res.render("packageManagement", {
+      userId: adminId,
+      healthPackages: packages,
     });
   } catch (err) {
     res.status(400).json({
@@ -80,7 +94,7 @@ const deletePackage = async (req, res) => {
 const updatePackage = async (req, res) => {
   try {
     const pack = await Package.findOneAndUpdate(
-      { _id: req.params.id },
+      { _id: req.params.packageid },
       {
         ...req.body,
       }
@@ -107,4 +121,5 @@ export {
   getAllAdmins,
   renderHomePage,
   renderAddAdminPage,
+  renderPackagePage,
 };
