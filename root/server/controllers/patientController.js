@@ -21,24 +21,30 @@ const createPatient = async (req, res) => {
 };
 
  const searchForDoctor = async (req, res) =>{
-  const { name, specialty } = req.query; 
+  const { name, specialty } = req.body;
 
   try {
-    const filter = {}; 
-
+    const query = {};
+    
     if (name) {
-      // If a name is provided, add a regex filter for first name and last name
-      filter.$or = [
-        { fName: { $regex: name, $options: 'i' } }, 
-        { lName: { $regex: name, $options: 'i' } }, 
+      query.$or = [
+        { fName: { $regex: new RegExp(name, 'i') } },
+        { lName: { $regex: new RegExp(name, 'i') } }
       ];
     }
-    if (specialty) {
-      filter.specialty = { $regex: specialty, $options: 'i' }; 
-    }
-    const doctors = await Doctor.find(filter);
 
-    res.json(doctors);
+    if (specialty) {
+      query.specialty = { $regex: new RegExp(specialty, 'i') };
+    }
+
+    const doctors = await Doctor.find(query);
+    console.log(doctors);
+
+    if (doctors.length === 0) {
+      res.status(404).json({ error: 'Doctors not found' });
+    } else {
+      res.status(200).json(doctors);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
