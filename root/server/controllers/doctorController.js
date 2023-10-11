@@ -18,15 +18,16 @@ const renderHomePage = function (req, res) {
   res.render("doctorHome");
 };
 
+const renderRegisterationPage = function (req, res) {
+  res.render("doctorRegister");
+};
+
 const createDoctor = async (req, res) => {
   console.log(req.body);
   try {
     const doctor = await Doctor.create(req.body);
-    res.status(201).json({
-      status: "success",
-      data: {
-        doctor,
-      },
+    res.render("login", {
+      submittedSuccessfully: true,
     });
   } catch (err) {
     res.status(400).json({
@@ -58,4 +59,10 @@ const updateDoctorProfile = async (req, res) => {
   }
 };
 
-export { createDoctor, updateDoctorProfile, getAllDoctors, renderHomePage };
+export {
+  createDoctor,
+  updateDoctorProfile,
+  getAllDoctors,
+  renderHomePage,
+  renderRegisterationPage,
+};

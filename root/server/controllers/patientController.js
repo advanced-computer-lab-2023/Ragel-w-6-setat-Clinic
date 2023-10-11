@@ -18,14 +18,29 @@ const renderHomePage = function (req, res) {
   res.render("patientHome");
 };
 
+const renderRegisterationPage = function (req, res) {
+  res.render("patientRegister");
+};
+
 const createPatient = async (req, res) => {
   try {
-    const patient = await Patient.create(req.body);
-    res.status(201).json({
-      status: "success",
-      data: {
-        patient,
+    const patient = await Patient.create({
+      username: req.body.username,
+      password: req.body.password,
+      fName: req.body.fName,
+      lName: req.body.lName,
+      email: req.body.email,
+      dateOfBirth: req.body.dateOfBirth,
+      gender: req.body.gender,
+      phoneNum: req.body.phoneNum,
+      emergencyContact: {
+        phoneNum: req.body.emergencyMobile,
+        fName: req.body.emergencyFName,
+        lName: req.body.emergencyLName,
       },
+    });
+    res.render("login", {
+      registeredSuccessfully: true,
     });
   } catch (err) {
     res.status(400).json({
@@ -66,4 +81,10 @@ const viewPrescription = async (req, res) => {
   }
 };
 
-export { createPatient, viewPrescription, getAllPatients, renderHomePage };
+export {
+  createPatient,
+  viewPrescription,
+  getAllPatients,
+  renderHomePage,
+  renderRegisterationPage,
+};

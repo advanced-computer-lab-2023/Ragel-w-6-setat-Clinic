@@ -1,6 +1,38 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
+const familyMemberSchema = new Schema({
+  email: {
+    type: String,
+    required: true,
+  },
+  fName: {
+    type: String,
+    required: true,
+  },
+  lName: {
+    type: String,
+    required: true,
+  },
+  nationalID: {
+    type: String,
+    required: true,
+  },
+  gender: {
+    type: String,
+    required: true,
+    enum: ["male", "female"],
+  },
+  dateOfBirth: {
+    type: Date,
+    required: true,
+  },
+  relationship: {
+    type: String,
+    required: true,
+  },
+});
+
 const patientSchema = new Schema({
   username: {
     type: String,
@@ -52,42 +84,7 @@ const patientSchema = new Schema({
     },
   },
   familyMembers: {
-    type: [
-      {
-        email: {
-          type: String,
-          required: true,
-          unique: true,
-        },
-        fName: {
-          type: String,
-          required: true,
-        },
-        lName: {
-          type: String,
-          required: true,
-        },
-        nationalID: {
-          type: String,
-          required: true,
-          unique: true,
-        },
-        gender: {
-          type: String,
-          required: true,
-          enum: ["male", "female"],
-        },
-        dateOfBirth: {
-          type: Date,
-          required: true,
-        },
-        relationship: {
-          type: String,
-          required: true,
-          enum: ["father", "mother", "brother", "sister", "son", "daughter"],
-        },
-      },
-    ],
+    type: [familyMemberSchema],
     default: [],
   },
   medicalHistory: {

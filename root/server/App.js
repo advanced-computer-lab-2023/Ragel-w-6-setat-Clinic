@@ -72,7 +72,7 @@ app.post("/login", async function (req, res) {
 
     if (patient) {
       res.redirect(`patients/patientHome/${patient._id}`);
-    } else if (doctor) {
+    } else if (doctor && doctor.isAccepted) {
       res.redirect(`doctors/doctorHome/${doctor._id}`);
     } else if (admin && admin.isAccepted) {
       res.redirect(`admins/adminHome/${admin._id}`);
