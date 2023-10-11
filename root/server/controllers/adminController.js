@@ -2,102 +2,105 @@ import Admin from "../models/Admin.js";
 import Patient from "../models/Patient.js";
 import Doctor from "../models/Doctor.js";
 
-// delete Admin 
+// Admin deletes admins from system by username reqID #8
 const deleteAdmin = async (req, res) => {
-    try {
+  try {
+    const filter = {
+      username: req.body.username
+    };
+    const deleteAdminResult = await Admin.deleteMany(filter);
 
-      
-
-      const deleteAdmin = await Admin.deleteMany(req.body.username);
-  
-      if (!deleteAdmin) {
-        // If patient with the given ID is not found, return 404 Not Found status
-        return res.status(404).json({
-          status: "fail",
-          message: "Admin not found",
-        });
-      }
-  
-      res.status(200).json({
-        status: "success",
-        data: {
-          admin: deleteAdmin,
-        },
-      });
-    } catch (err) {
-      // Handle other errors (e.g., invalid request, server error)
-      res.status(500).json({
-        status: "error",
-        message: err.message,
+    if (deleteAdminResult.deletedCount == 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Admin not found",
       });
     }
-  };
 
-  // delete patient 
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        admin: deleteAdminResult,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+// Admin deletes patient from system by username reqID #8 
 const deletePatient = async (req, res) => {
-    try {
-  
-      const deletedPatient = await Patient.deleteMany(req.body.username);
-  
-      if (!deletedPatient) {
-        // If patient with the given ID is not found, return 404 Not Found status
-        return res.status(404).json({
-          status: "fail",
-          message: "Patient not found",
-        });
-      }
-  
-      res.status(200).json({
-        status: "success",
-        data: {
-          deleted: deletedPatient,
-        },
-      });
-    } catch (err) {
-      // Handle other errors (e.g., invalid request, server error)
-      res.status(500).json({
-        status: "error",
-        message: err.message,
-      });
-    }
-  };
-
-  // delete doctor 
-const deleteDoctor = async (req, res) => {
-    try {
-    
-      const deleteDoctor = await Doctor.deleteMany(req.body.username);
-  
-      if (!deleteDoctor) {
-        // If patient with the given ID is not found, return 404 Not Found status
-        return res.status(404).json({
-          status: "fail",
-          message: "Doctor not found",
-        });
-      }
-  
-      res.status(200).json({
-        status: "success",
-        data: {
-          patient: deleteDoctor,
-        },
-      });
-    } catch (err) {
-      // Handle other errors (e.g., invalid request, server error)
-      res.status(500).json({
-        status: "error",
-        message: err.message,
-      });
-    }
-  };
-
-// view doctors name
-const viewUnregisteredDoctors =  async (req, res) => {
   try {
 
-     const doctor = await Doctor.find({isRegistered : false});
+    const filter = {
+      username: req.body.username
+    };
+    const deletedPatientResult = await Patient.deleteMany(filter);
 
-    // Send the list of doctors as a JSON response
+    if (deletedPatientResult.deletedCount == 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Patient not found",
+      });
+    }
+
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        deleted: deletedPatientResult,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+// Admin deletes doctor from system by username reqID #8 
+const deleteDoctor = async (req, res) => {
+  try {
+
+    const filter = {
+      username: req.body.username
+    };
+    const deleteDoctorResult = await Doctor.deleteMany(filter);
+
+    if (deleteDoctorResult.deletedCount == 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Doctor not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        patient: deleteDoctorResult,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+// View all the doctors that are not registered (only requets)
+const viewUnregisteredDoctors = async (req, res) => {
+  try {
+
+    const doctor = await Doctor.find({
+      isRegistered: false
+    });
+
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -105,7 +108,7 @@ const viewUnregisteredDoctors =  async (req, res) => {
       },
     });
   } catch (err) {
-   
+
     res.status(500).json({
       status: 'error',
       message: err.message,
@@ -113,4 +116,9 @@ const viewUnregisteredDoctors =  async (req, res) => {
   }
 };
 
-  export {deleteAdmin,deletePatient,deleteDoctor,viewUnregisteredDoctors};
+export {
+  deleteAdmin,
+  deletePatient,
+  deleteDoctor,
+  viewUnregisteredDoctors
+};

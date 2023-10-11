@@ -22,84 +22,21 @@ const createPatient = async (req, res) => {
 };
 
 
-// Route to get all prescriptions of a specific patient
-const viewPrescription =  async (req, res) => {
+
+// Patient adds a family member using certain attributes req #14
+const addFamMem = async (req, res) => {
   const patientId = req.params.id;
+  const {
+    fName,
+    lName,
+    nationalID,
+    gender,
+    dateOfBirth,
+    relationship
+  } = req.body;
+  const validRelationships = ["wife", "husband", "son", "daughter"];
 
   try {
-    // Check if the patient exists
-    const patient = await Patient.findById(patientId);
-    if (!patient) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Patient not found',
-      });
-    }
-
-
-    // Retrieve prescriptions for the specific patient
-const prescriptions = await Prescription.find({patient : patientId});  
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        prescriptions: prescriptions,
-      },
-    });
-  } catch (err) {
-    // Handle errors, for example, database connection issues
-    res.status(500).json({
-      status: 'error',
-      message: err.message,
-    });
-  }
-};
-
-
-
-const filterthepresc =  async (req, res) => {
-  const patientId = req.params.id; 
-  try {
-  
-    const patient = await Patient.findById(patientId);
-    console.log("IS " + req.body.date + req.body.doctor + req.body.isFilled + patientId);
-    const prescription = await Prescription.find({
-      $or: [
-        { doctor: req.body.doctor },
-        { date: req.body.date },
-        { patient: patientId },
-        { isFilled: req.body.isFilled }
-      ]
-    });
-        res.status(200).json({
-      status: 'success',
-      data: {
-        prescription: prescription,
-      },
-    });
-  } catch (err) {
-    // Handle errors, for example, database connection issues
-    res.status(500).json({
-      status: 'error',
-      message: err.message,
-    });
-  }
-};
-
-
-
-
-//add family member
-
-
-// Route to add a new family member to a patient
-const addFamMem =  async (req, res) => {
-  const patientId = req.params.id;
-  const { fName, lName, nationalID, gender, dateOfBirth,relationship } = req.body;
-  const validRelationships = ["wife", "husband", "son","daughter"];
-
-  try {
-    // Find the patient by ID
     const patient = await Patient.findById(patientId);
 
     if (!patient) {
@@ -146,7 +83,6 @@ const addFamMem =  async (req, res) => {
       },
     });
   } catch (err) {
-    // Handle errors, for example, database connection issues
     res.status(500).json({
       status: 'error',
       message: err.message,
@@ -155,14 +91,92 @@ const addFamMem =  async (req, res) => {
 };
 
 
-// select prescription
-const selectPres =  async (req, res) => {
+// Patient can view list of all prescriptions req #54
+const viewPrescription = async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'Patient not found',
+      });
+    }
+
+
+
+    const prescriptions = await Prescription.find({
+      patient: patientId
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        prescriptions: prescriptions,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: err.message,
+    });
+  }
+};
+
+
+// Filter Prescriptions based on date or doctor or filled or unfilled req #55
+const filterthepresc = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+
+    const filter = {};
+
+    if (req.body.doctor) {
+      filter.doctor = req.body.doctor;
+    }
+
+    if (req.body.date) {
+      filter.date = req.body.date;
+    }
+
+    if (req.body.isFilled) {
+      filter.isFilled = req.body.isFilled;
+    }
+
+    if (req.params.id) {
+      filter.patient = req.params.id;
+    }
+    const patient = await Patient.findById(patientId);
+    console.log("IS " + req.body.date + req.body.doctor + req.body.isFilled + patientId);
+    const prescription = await Prescription.find(filter);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        prescription: prescription,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: err.message,
+    });
+  }
+};
+
+
+
+// Patient can select a prescription from his/her list of prescriptions req #56
+const selectPres = async (req, res) => {
   const prescriptionId = req.body.id;
   const patiendID = req.params.id;
 
   try {
-    // Find the prescription by ID
-    const prescription = await Prescription.find({_id:prescriptionId, patient: patiendID});
+    const prescription = await Prescription.find({
+      _id: prescriptionId,
+      patient: patiendID
+    });
 
     if (!prescription) {
       return res.status(404).json({
@@ -178,7 +192,6 @@ const selectPres =  async (req, res) => {
       },
     });
   } catch (err) {
-    // Handle errors, for example, database connection issues
     res.status(500).json({
       status: 'error',
       message: err.message,
@@ -188,22 +201,26 @@ const selectPres =  async (req, res) => {
 
 
 //mariams
-const filterDoctors = async(req, res) =>{
+const filterDoctors = async (req, res) => {
   try {
 
-    const { specialty, date, time} = req.body;
+    const {
+      specialty,
+      date,
+      time
+    } = req.body;
 
     // Construct the filter based on the provided query parameters
     const filter = {};
-   
+
     if (specialty) filter.specialty = specialty;
-   
+
     if (date) filter.date = date;
 
-    if(time) filter.time = time;
-    
+    if (time) filter.time = time;
+
     // Retrieve all doctors from the database
-   
+
     const doctor = await Doctor.find(filter);
     console.log(filter.specialty + filter.date + filter.time);
 
@@ -222,4 +239,11 @@ const filterDoctors = async(req, res) =>{
     });
   }
 }
-export { createPatient, viewPrescription,addFamMem,selectPres,filterDoctors,filterthepresc};
+export {
+  createPatient,
+  addFamMem,
+  viewPrescription,
+  filterthepresc,
+  selectPres,
+  filterDoctors,
+};
