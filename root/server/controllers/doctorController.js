@@ -1,6 +1,23 @@
 import Doctor from "../models/Doctor.js";
 
 // submit a request to register as a doctor
+
+const getAllDoctors = async (req, res) => {
+  async (req, res) => {
+    try {
+      const doctors = await Doctor.find({}, "username password"); // Retrieve only username and password fields
+      res.json(doctors);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+};
+
+const renderHomePage = function (req, res) {
+  res.render("doctorHome");
+};
+
 const createDoctor = async (req, res) => {
   console.log(req.body);
   try {
@@ -41,4 +58,4 @@ const updateDoctorProfile = async (req, res) => {
   }
 };
 
-export { createDoctor, updateDoctorProfile };
+export { createDoctor, updateDoctorProfile, getAllDoctors, renderHomePage };

@@ -1,6 +1,21 @@
 import Admin from "../models/Admin.js";
 import Package from "../models/Package.js";
 
+const getAllAdmins = async (req, res) => {
+  async (req, res) => {
+    try {
+      const admins = await Admin.find({}, "username password"); // Retrieve only username and password fields
+      res.json(admins);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+};
+
+const renderHomePage = function (req, res) {
+  res.render("adminHome");
+};
 // create an admin
 const createAdmin = async (req, res) => {
   try {
@@ -80,4 +95,11 @@ const updatePackage = async (req, res) => {
   }
 };
 
-export { createAdmin, createPackage, deletePackage, updatePackage };
+export {
+  createAdmin,
+  createPackage,
+  deletePackage,
+  updatePackage,
+  getAllAdmins,
+  renderHomePage,
+};

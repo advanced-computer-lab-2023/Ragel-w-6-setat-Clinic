@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Home</title>
+    <style>
+        body {
+            background-color: #0288D1;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .button {
+            background-color: #03a9f4;
+            color: #ffffff;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #448aff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome, Doctor!</h1>
+    <div class="button-container">
+        <button class="button" onclick="window.location.href='/edit-profile'">Edit My Profile</button>
+        <button class="button" onclick="window.location.href='/my-appointments'">My Appointments</button>
+        <button class="button" onclick="window.location.href='/my-patients'">My Patients</button>
+    </div>
+</body>
+
+</html>

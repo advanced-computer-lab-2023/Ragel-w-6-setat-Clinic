@@ -64,9 +64,15 @@ const StyledLink = styled(Link)`
   }
 `;
 
+const Header1 = styled.h1`
+  color: #ffffff; /* Text/Icons Color */
+  margin-bottom: 20px;
+`;
+
 export {
   BodyContainer,
   LoginContainer,
+  Header1,
   Form,
   Label,
   Input,

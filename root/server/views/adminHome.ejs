@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Home</title>
+    <style>
+        body {
+            background-color: #0288D1;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .button {
+            background-color: #03a9f4;
+            color: #ffffff;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #448aff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome, Admin!</h1>
+    <div class="button-container">
+        <button class="button" onclick="window.location.href='/add-admin'">Add Admin</button>
+        <button class="button" onclick="window.location.href='/remove-user'">Remove a User</button>
+        <button class="button" onclick="window.location.href='/view-doctor-applications'">View Doctor
+            Applications</button>
+        <button class="button" onclick="window.location.href='/package-management'">Package Management</button>
+    </div>
+</body>
+
+</html>

@@ -2,6 +2,7 @@ import React from "react";
 import {
   BodyContainer,
   Form,
+  Header1,
   LoginContainer,
   Label,
   Input,
@@ -14,7 +15,7 @@ function Login() {
   return (
     <BodyContainer>
       <LoginContainer>
-        <h1>Login</h1>
+        <Header1>Login</Header1>
         <Form>
           <Label>
             Email:
