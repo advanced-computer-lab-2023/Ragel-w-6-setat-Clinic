@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Details</title>
+    <style>
+        body {
+            background-color: #0288D1;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+
+        .doctor-details {
+            background-color: #B3E5FC;
+            color: #212121;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+        }
+
+        .divider {
+            border-top: 1px solid #bdbdbd;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="doctor-details">
+        <h1>Doctor Details</h1>
+
+        <h2><%= doctor.fName %> <%= doctor.lName %></h2>
+        <p><strong>Username:</strong> <%= doctor.username %></p>
+        <p><strong>Email:</strong> <%= doctor.email %></p>
+        <p><strong>Date of Birth:</strong> <%= doctor.dateOfBirth.toDateString() %></p>
+        <p><strong>Educational Background:</strong> <%= doctor.educationalBackground %></p>
+        <p><strong>Hourly Rate:</strong> $<%= doctor.hourlyRate %></p>
+        <p><strong>Session Price:</strong> $<%= doctor.sessionPrice %></p>
+        <p><strong>Affiliation:</strong> <%= doctor.affiliation %></p>
+        <p><strong>Specialty:</strong> <%= doctor.specialty %></p>
+        <p><strong>Registered:</strong> <%= doctor.isRegistered ? 'Yes' : 'No' %></p>
+    </div>
+</body>
+
+</html>

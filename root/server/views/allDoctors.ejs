@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Doctors</title>
+    <style>
+        body {
+            background-color: #0288D1;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+
+        .doctor-item {
+            background-color: #B3E5FC;
+            color: #212121;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+
+        .divider {
+            border-top: 1px solid #bdbdbd;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>List of Doctors</h1>
+
+    <% if (locals.doctors && doctors.length > 0) { %>
+        <ul>
+            <% doctors.forEach(doctor => { %>
+                <li class="doctor-item">
+                    <h2><%= doctor.name %></h2>
+                    <p><strong>Session Price:</strong> $<%= doctor.sessionPrice %></p>
+                     <p><strong>Specialty:</strong> <%= doctor.specialty %></p>
+                    
+                </li>
+                <div class="divider"></div>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>No doctors found in the database.</p>
+    <% } %>
+
+</body>
+
+</html>

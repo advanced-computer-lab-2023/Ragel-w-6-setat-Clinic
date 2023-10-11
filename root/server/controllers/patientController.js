@@ -3,6 +3,18 @@ import Doctor from "../models/Doctor.js";
 import Package from "../models/Package.js";
 // create (register) a patient
 
+
+const renderViewAllDoctors = function (req,res) {
+  const patientID = req.params.id;
+  
+};
+
+const renderSelectedDoctor = function (req,res){
+  const patientID = req.params.id;
+  res.render("selectedDoctor",{userID:patientID});
+};
+
+
 const createPatient = async (req, res) => {
   try {
     const patient = await Patient.create(req.body);
@@ -24,6 +36,7 @@ const getFamilyMembers = async (req, res) => {
   try {
     const patientID = req.params.id; // Get patient's email from the request body
 
+
     // Find the patient using the provided email in the familyMembers array
     const patient = await Patient.findById(patientID);
 
@@ -34,7 +47,7 @@ const getFamilyMembers = async (req, res) => {
     // Extract family members from the patient object
     const familyMembers = patient.familyMembers;
 
-    res.json(familyMembers);
+    res.render('viewFamily.ejs', {userID: patientID, patientFamily: familyMembers});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
@@ -67,7 +80,7 @@ const getAllDoctors = async (req, res) => {
       };
     });
 
-    res.json(doctorsDisplay);
+    res.render("allDoctors", {userID: patientID , doctors: doctorsDisplay});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });

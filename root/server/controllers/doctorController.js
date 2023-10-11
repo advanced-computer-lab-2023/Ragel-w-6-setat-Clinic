@@ -3,6 +3,16 @@ import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
 
 
+const renderMyPatients = function (req,res) {
+  const doctorID = req.params.id;
+  res.render("selectAPatient", {userID: doctorID});
+};
+
+const renderSelectedPatient = function (req,res) {
+  const doctorID = req.params.id;
+  res.render("selectedPatient", {userID: doctorID});
+};
+
 // submit a request to register as a doctor
 const createDoctor = async (req, res) => {
   console.log(req.body);

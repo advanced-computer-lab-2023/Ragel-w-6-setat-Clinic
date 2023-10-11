@@ -11,3 +11,6 @@ router.get('/familyMembers/:id',getFamilyMembers );
 router.get('/viewDoctors/:id', getAllDoctors);
 router.get('/selectdoctor/:id',getSingleDoctor);
 export default router;
+
+
+

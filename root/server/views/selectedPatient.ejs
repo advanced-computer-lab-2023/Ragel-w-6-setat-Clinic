@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details</title>
+    <style>
+        body {
+            background-color: #0288D1;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+
+        .patient-details {
+            background-color: #B3E5FC;
+            color: #212121;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+        }
+
+        .divider {
+            border-top: 1px solid #bdbdbd;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="patient-details">
+        <h1>Patient Details</h1>
+
+        <h2><%= patient.fName %> <%= patient.lName %></h2>
+        <p><strong>Username:</strong> <%= patient.username %></p>
+        <p><strong>Email:</strong> <%= patient.email %></p>
+        <p><strong>Date of Birth:</strong> <%= patient.dateOfBirth.toDateString() %></p>
+        <p><strong>Gender:</strong> <%= patient.gender %></p>
+        <p><strong>Phone Number:</strong> <%= patient.phoneNum %></p>
+        
+        <h3>Emergency Contact</h3>
+        <p><strong>Name:</strong> <%= patient.emergencyContact.fName %> <%= patient.emergencyContact.lName %></p>
+        <p><strong>Phone Number:</strong> <%= patient.emergencyContact.phoneNum %></p>
+        
+        <h3>Family Members</h3>
+        <% patient.familyMembers.forEach(member => { %>
+            <p><strong>Name:</strong> <%= member.fName %> <%= member.lName %></p>
+            <p><strong>Relationship:</strong> <%= member.relationship %></p>
+            <div class="divider"></div>
+        <% }); %>
+        
+        <h3>Medical History</h3>
+        <% patient.medicalHistory.forEach(history => { %>
+            <p><%= history %></p>
+            <div class="divider"></div>
+        <% }); %>
+        
+        <h3>Wallet Balance</h3>
+        <p><%= patient.wallet %> USD</p>
+        
+        <h3>Subscribed Package</h3>
+        <p><%= patient.subscribedPackage ? patient.subscribedPackage : 'Not subscribed to any package' %></p>
+    </div>
+</body>
+
+</html>
