@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patients with Upcoming Appointments</title>
+    <style>
+        body {
+            background-color: #B3E5FC;
+            color: #212121;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .date-filter {
+            margin-right: 20px;
+        }
+        .filter-button {
+            background-color: #0288D1;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .patient-list {
+            background-color: #ffffff;
+            border: 1px solid #448aff;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        .patient-item {
+            background-color: #03a9f4;
+            color: #ffffff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .divider {
+            background-color: #bdbdbd;
+            height: 1px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Patients with Upcoming Appointments</h1>
+        <div class="filter-bar">
+            <div class="date-filter">
+                <label for="date">Upcoming Appointments Date:</label>
+                <input type="date" id="date">
+            </div>
+            <button class="filter-button">Filter</button>
+        </div>
+        <div class="patient-list">
+            <div class="patient-item">Patient 1</div>
+            <div class="divider"></div>
+            <div class="patient-item">Patient 2</div>
+            <div class="divider"></div>
+            <div class="patient-item">Patient 3</div>
+        </div>
+    </div>
+</body>
+</html>

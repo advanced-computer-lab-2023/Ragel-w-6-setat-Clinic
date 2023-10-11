@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Search</title>
+    <style>
+        body {
+            background-color: #B3E5FC;
+            color: #212121;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #448aff;
+            border-radius: 5px;
+        }
+        .search-button {
+            background-color: #0288D1;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .patient-list {
+            margin-top: 20px;
+        }
+        .patient-item {
+            background-color: #03a9f4;
+            color: #ffffff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .divider {
+            background-color: #bdbdbd;
+            height: 1px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Patient Search</h1>
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search by Name">
+            <button class="search-button">Search</button>
+        </div>
+        <div class="patient-list">
+            <div class="patient-item">Patient 1</div>
+            <div class="divider"></div>
+            <div class="patient-item">Patient 2</div>
+            <div class="divider"></div>
+            <div class="patient-item">Patient 3</div>
+        </div>
+    </div>
+</body>
+</html>

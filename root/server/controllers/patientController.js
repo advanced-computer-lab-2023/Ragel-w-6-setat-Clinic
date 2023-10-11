@@ -2,6 +2,26 @@ import Patient from "../models/Patient.js";
 import Doctor from "../models/Doctor.js";
 import Appointments from "../models/Appointments.js";
 
+const renderSearchDoctors = function(req,res){
+  const patientId = req.params.id;
+  res.render("searchForDoctors",{userID: patientId})
+}
+
+const renderpatientAppointment = function(req,res){
+  const patientId = req.params.id;
+  res.render("pateintAppointments",{userID: patientId})
+}
+
+const renderSelectDoctor = function(req,res){
+  const patientId = req.params.id;
+  res.render("selectDoctor",{userID: patientId})
+}
+
+const renderFilterDoctor = function(req,res){
+  const patientId = req.params.id;
+  res.render("filterDoctors",{userID: patientId})
+}
+
 // create (register) a patient
 const createPatient = async (req, res) => {
   try {
@@ -168,4 +188,11 @@ const selectDoctor = async (req, res) => {
   }
 };;
 
-export { createPatient, searchForDoctor ,filterAvailableAppointments , filtermyAppointments, filterDoctors ,selectDoctor };
+export { 
+  createPatient, 
+  searchForDoctor,
+  filterAvailableAppointments,
+  filtermyAppointments,
+  filterDoctors,
+  selectDoctor
+ };

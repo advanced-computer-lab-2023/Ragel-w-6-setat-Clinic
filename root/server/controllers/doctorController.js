@@ -3,6 +3,21 @@ import Patient from "../models/Patient.js";
 import Appointment from "../models/Appointments.js";
 import mongoose from 'mongoose'
 
+const renderSearchPatient = function(req,res){
+  const doctorId = req.params.id;
+  res.render("searchForPatient",{userID: doctorId})
+}
+
+const renderDoctorsAppointment = function(req,res){
+  const doctorId = req.params.id;
+  res.render("doctorAppointments",{userID: doctorId})
+}
+
+const renderUpcomingAppointments = function(req,res){
+  const doctorId = req.params.id;
+  res.render("upcomingappointments",{userID: doctorId})
+}
+
 const searchForPatient =  async( req , res ) =>{
   const { fname, lname } = req.body;
 
@@ -26,6 +41,7 @@ const searchForPatient =  async( req , res ) =>{
   }
 };
 
+//--sprint 2
 //add an appointment
 const addAppointment = async (req, res) => {
   try {
@@ -56,21 +72,16 @@ const filterMyAppointments = async (req, res) => {
     {
       filter.date = req.body.date;
     }
-
     if(req.body.status)
     {
       filter.status = req.body.status;
     }
-
     if(req.params.id)
     {
       filter.doctor = req.params.id;
     }
-
     const doctor = await Patient.findById(doctorId);
-
     const appointments = await Appointment.find(filter);
-    
       res.status(200).json(appointments)
     
   } catch (error) {
@@ -108,4 +119,9 @@ const upcomingAppointments = async(req, res) =>{
   }
 }
 
-export {searchForPatient, addAppointment, filterMyAppointments, upcomingAppointments};
+export {
+   searchForPatient,
+   addAppointment, 
+   filterMyAppointments, 
+   upcomingAppointments
+  };
