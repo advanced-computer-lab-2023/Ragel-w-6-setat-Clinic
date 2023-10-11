@@ -9,12 +9,13 @@ const searchForPatient =  async( req , res ) =>{
   try {
     const patients = await Patient.find({
       $or: [
-        { fname: fname },
-        { lname: lname },
+        { fName: { $regex: new RegExp(fname, 'i') }},
+        { lName: { $regex: new RegExp(lname, 'i') }},
       ],
     });
+    console.log(patients);
 
-    if (patients.length == 0) {
+    if (patients.length === 0) {
       res.status(404).json({ error: 'Patients not found' });
     } else {
       res.status(200).json(patients);
