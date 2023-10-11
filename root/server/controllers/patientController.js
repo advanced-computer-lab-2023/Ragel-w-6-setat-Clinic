@@ -100,35 +100,64 @@ const createPatient = async (req, res) => {
 
  };
 
-
- const filterDoctors = async(req, res) =>{
+ const filterDoctors = async (req, res) => {
   try {
-    const { specialty, date, time} = req.body;
-    const filter = {};
-   
-    if (specialty) filter.specialty = specialty;
-   
-    if (date) filter.date = date;
+    const { specialty, date } = req.body;
 
-    if(time) filter.time = time;
+    // Assuming you have a "Doctor" and "Appointment" model
+    // Fetch doctors and appointments from your database
+
+    let filteredDoctors = [];
     
-    // Retrieve all doctors from the database
-    const doctor = await Doctor.find(filter);
-    console.log(filter.specialty + filter.date + filter.time);
+    // Filtering by specialty
+    if (specialty) {
+      filteredDoctors = await Doctor.find({ specialty });
+    }
 
-    res.status(200).json({
-      status: 'success',
-      data: {
-        doctor: doctor,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: 'error',
-      message: err.message,
-    });
+    // Filtering by date
+    if (date) {
+      const availableAppointments = await Appointment.find({
+        date: new Date(date),
+        isAvailable: true,
+      });
+
+      const availableDoctorIds = availableAppointments.map(appointment => appointment.doctor);
+
+      // Fetch doctors with matching IDs
+      const matchingDoctors = await Doctor.find({ _id: { $in: availableDoctorIds } });
+
+      // Merge filteredDoctors and matchingDoctors to ensure both filters are applied
+      filteredDoctors = filteredDoctors.concat(matchingDoctors);
+    }
+
+    // Return the filtered doctors
+    res.status(200).json(filteredDoctors);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
   }
 };
+
+
+//  const filterDoctors = async(req, res) =>{
+//   const { specialty, date } = req.body;
+//   try {
+//     const doctors = await Doctor.find({ specialty });
+//     if (!date) {
+//       return res.status(200).json(doctors);
+//     }
+//     const appointments = await Appointments.find({
+//       date: date,
+//       isAvailable: true,
+//     });
+//     const availableDoctorIds = appointments.map(appointments => appointments.doctor);
+//     const availableDoctors = doctors.filter(doctor => availableDoctorIds.includes(doctor._id.toString()));
+//     res.status(200).json(availableDoctors);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// };
 
 const selectDoctor = async (req, res) => {
   // const patiendID = req.params.id;

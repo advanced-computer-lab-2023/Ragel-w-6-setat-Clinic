@@ -4,13 +4,17 @@ import Appointment from "../models/Appointments.js";
 import mongoose from 'mongoose'
 
 const searchForPatient =  async( req , res ) =>{
-  const { fName, lName } = req.body;
+  const { fname, lname } = req.body;
+
   try {
     const patients = await Patient.find({
-      fName: { $regex: new RegExp(fName, 'i') }, // Case-insensitive match
-      lName: { $regex: new RegExp(lName, 'i') }, // Case-insensitive match
+      $or: [
+        { fname: fname },
+        { lname: lname },
+      ],
     });
-    if (patients.length === 0) {
+
+    if (patients.length == 0) {
       res.status(404).json({ error: 'Patients not found' });
     } else {
       res.status(200).json(patients);
@@ -19,7 +23,7 @@ const searchForPatient =  async( req , res ) =>{
     console.error(error);
     res.status(500).json({ error: 'Server error' });
   }
-}
+};
 
 //add an appointment
 const addAppointment = async (req, res) => {
