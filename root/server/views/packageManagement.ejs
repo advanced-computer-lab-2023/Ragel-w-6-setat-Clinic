@@ -82,183 +82,184 @@
 </head>
 
 <body>
-    <div class="container">
-        <% if(locals.healthPackages) { %>
-            <div class="package-list">
-                <% healthPackages.forEach(function(package) { %>
-                    <div class="package-item" id="<%= package._id %>">
-                        <span><strong>Name:</strong>
-                            <div class="name">
-                                <%= package.name %>
-                            </div>
-                        </span>
-                        <span><strong>Description:</strong>
-                            <div class="description">
-                                <%= package.description %>
-                            </div>
-                        </span>
-                        <span><strong>Price:</strong>
-                            <div class="price">
-                                <%= package.price %>
-                            </div>
-                        </span>
-                        <span><strong>Session Discount:</strong>
-                            <div class="sessionDiscount">
-                                <%= package.sessionDiscount %>
-                            </div>
-                        </span>
-                        <span><strong>Medicine Discount:</strong>
-                            <div class="medicineDiscount">
-                                <%= package.medicineDiscount %>
-                            </div>
-                        </span>
-                        <span><strong>Subscription Discount:</strong>
-                            <div class="subscriptionDiscount">
-                                <%= package.subscriptionDiscount %>
-                            </div>
-                        </span>
+    <%- include("adminNavBar", {adminId: userId}) %>
+        <div class="container">
+            <% if(locals.healthPackages) { %>
+                <div class="package-list">
+                    <% healthPackages.forEach(function(package) { %>
+                        <div class="package-item" id="<%= package._id %>">
+                            <span><strong>Name:</strong>
+                                <div class="name">
+                                    <%= package.name %>
+                                </div>
+                            </span>
+                            <span><strong>Description:</strong>
+                                <div class="description">
+                                    <%= package.description %>
+                                </div>
+                            </span>
+                            <span><strong>Price:</strong>
+                                <div class="price">
+                                    <%= package.price %>
+                                </div>
+                            </span>
+                            <span><strong>Session Discount:</strong>
+                                <div class="sessionDiscount">
+                                    <%= package.sessionDiscount %>
+                                </div>
+                            </span>
+                            <span><strong>Medicine Discount:</strong>
+                                <div class="medicineDiscount">
+                                    <%= package.medicineDiscount %>
+                                </div>
+                            </span>
+                            <span><strong>Subscription Discount:</strong>
+                                <div class="subscriptionDiscount">
+                                    <%= package.subscriptionDiscount %>
+                                </div>
+                            </span>
 
-                        <div>
-                            <button class="button update-button"
-                                onclick="updatePackage('<%= package._id %>', '<%= userId%>')">Update</button>
-                            <button class="button delete-button"
-                                onclick="deletePackage('<%= package._id %>', '<%= userId%>')">Delete</button>
-                            <button class="button done-button" style="display: none;">Done</button>
+                            <div>
+                                <button class="button update-button"
+                                    onclick="updatePackage('<%= package._id %>', '<%= userId%>')">Update</button>
+                                <button class="button delete-button"
+                                    onclick="deletePackage('<%= package._id %>', '<%= userId%>')">Delete</button>
+                                <button class="button done-button" style="display: none;">Done</button>
+                            </div>
                         </div>
-                    </div>
-                    <% }); %>
+                        <% }); %>
 
-            </div>
+                </div>
 
-            <% } else %>
+                <% } else %>
 
-                <h2>Add New Health Package</h2>
-                <form id="packageForm" action="/admins/packageManagement/<%= userId %>" method="post">
-                    <div class="form-group">
-                        <label for="name">Package Name:</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Package Description</label>
-                        <input type="text" id="description" name="description" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="price">Package Price:</label>
-                        <input type="number" id="price" name="price" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sessionDiscount">The Session Discount:</label>
-                        <input type="number" id="sessionDiscount" name="sessionDiscount" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="medicineDiscount">The Medicine Discount:</label>
-                        <input type="number" id="medicineDiscount" name="medicineDiscount" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="subscriptionDiscount">The Subscription Discount:</label>
-                        <input type="number" id="subscriptionDiscount" name="subscriptionDiscount" required>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="button">Add Package</button>
-                    </div>
-                </form>
-    </div>
+                    <h2>Add New Health Package</h2>
+                    <form id="packageForm" action="/admins/packageManagement/<%= userId %>" method="post">
+                        <div class="form-group">
+                            <label for="name">Package Name:</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Package Description</label>
+                            <input type="text" id="description" name="description" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Package Price:</label>
+                            <input type="number" id="price" name="price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sessionDiscount">The Session Discount:</label>
+                            <input type="number" id="sessionDiscount" name="sessionDiscount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="medicineDiscount">The Medicine Discount:</label>
+                            <input type="number" id="medicineDiscount" name="medicineDiscount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subscriptionDiscount">The Subscription Discount:</label>
+                            <input type="number" id="subscriptionDiscount" name="subscriptionDiscount" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="button">Add Package</button>
+                        </div>
+                    </form>
+        </div>
 
-    <script>
-        function deletePackage(packageId, userId) {
-            fetch(`/admins/packageManagement/${userId}/${packageId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        // Redirect to the updated page after successful deletion
-                        window.location.href = `/admins/packageManagement/${userId}`;
-                    } else {
-                        throw new Error('Failed to delete package');
-                    }
-                })
-                .catch(error => {
-                    // Handle errors
-                    console.error(error);
-                });
-        }
-
-        function updatePackage(packageId, userId) {
-            var packageItem = document.getElementById(packageId);
-            var nameElement = packageItem.querySelector('.name');
-            var descriptionElement = packageItem.querySelector('.description');
-            var priceElement = packageItem.querySelector('.price');
-            var sessionDiscountElement = packageItem.querySelector('.sessionDiscount');
-            var medicineDiscountElement = packageItem.querySelector('.medicineDiscount');
-            var subscriptionDiscountElement = packageItem.querySelector('.subscriptionDiscount');
-
-            // Make fields editable
-            nameElement.contentEditable = true;
-            descriptionElement.contentEditable = true;
-            priceElement.contentEditable = true;
-            sessionDiscountElement.contentEditable = true;
-            medicineDiscountElement.contentEditable = true;
-            subscriptionDiscountElement.contentEditable = true;
-
-            // Hide update and delete buttons, show done button
-            packageItem.querySelector('.update-button').style.display = 'none';
-            packageItem.querySelector('.delete-button').style.display = 'none';
-            packageItem.querySelector('.done-button').style.display = 'block';
-
-            // Add event listener to the done button
-            packageItem.querySelector('.done-button').addEventListener('click', function () {
-                // Prepare data for patch request
-                var updatedPackage = {
-                    name: nameElement.innerText,
-                    description: descriptionElement.innerText,
-                    price: parseFloat(priceElement.innerText),
-                    sessionDiscount: parseFloat(sessionDiscountElement.innerText),
-                    medicineDiscount: parseFloat(medicineDiscountElement.innerText),
-                    subscriptionDiscount: parseFloat(subscriptionDiscountElement.innerText)
-                };
-
-                // Perform the patch request using updatedPackage and packageId
-                // Example: You can use fetch API to send a patch request to your server
+        <script>
+            function deletePackage(packageId, userId) {
                 fetch(`/admins/packageManagement/${userId}/${packageId}`, {
-                    method: 'PATCH',
+                    method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedPackage)
+                    }
                 })
-
                     .then(response => {
                         if (response.ok) {
+                            // Redirect to the updated page after successful deletion
                             window.location.href = `/admins/packageManagement/${userId}`;
                         } else {
-                            throw new Error('Failed to update package');
+                            throw new Error('Failed to delete package');
                         }
                     })
                     .catch(error => {
                         // Handle errors
                         console.error(error);
                     });
+            }
 
-                // Make fields non-editable again
-                nameElement.contentEditable = false;
-                descriptionElement.contentEditable = false;
-                priceElement.contentEditable = false;
-                sessionDiscountElement.contentEditable = false;
-                medicineDiscountElement.contentEditable = false;
-                subscriptionDiscountElement.contentEditable = false;
+            function updatePackage(packageId, userId) {
+                var packageItem = document.getElementById(packageId);
+                var nameElement = packageItem.querySelector('.name');
+                var descriptionElement = packageItem.querySelector('.description');
+                var priceElement = packageItem.querySelector('.price');
+                var sessionDiscountElement = packageItem.querySelector('.sessionDiscount');
+                var medicineDiscountElement = packageItem.querySelector('.medicineDiscount');
+                var subscriptionDiscountElement = packageItem.querySelector('.subscriptionDiscount');
 
-                // Hide done button, show update and delete buttons
-                packageItem.querySelector('.done-button').style.display = 'none';
-                packageItem.querySelector('.update-button').style.display = 'block';
-                packageItem.querySelector('.delete-button').style.display = 'block';
-            });
-        }
+                // Make fields editable
+                nameElement.contentEditable = true;
+                descriptionElement.contentEditable = true;
+                priceElement.contentEditable = true;
+                sessionDiscountElement.contentEditable = true;
+                medicineDiscountElement.contentEditable = true;
+                subscriptionDiscountElement.contentEditable = true;
+
+                // Hide update and delete buttons, show done button
+                packageItem.querySelector('.update-button').style.display = 'none';
+                packageItem.querySelector('.delete-button').style.display = 'none';
+                packageItem.querySelector('.done-button').style.display = 'block';
+
+                // Add event listener to the done button
+                packageItem.querySelector('.done-button').addEventListener('click', function () {
+                    // Prepare data for patch request
+                    var updatedPackage = {
+                        name: nameElement.innerText,
+                        description: descriptionElement.innerText,
+                        price: parseFloat(priceElement.innerText),
+                        sessionDiscount: parseFloat(sessionDiscountElement.innerText),
+                        medicineDiscount: parseFloat(medicineDiscountElement.innerText),
+                        subscriptionDiscount: parseFloat(subscriptionDiscountElement.innerText)
+                    };
+
+                    // Perform the patch request using updatedPackage and packageId
+                    // Example: You can use fetch API to send a patch request to your server
+                    fetch(`/admins/packageManagement/${userId}/${packageId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedPackage)
+                    })
+
+                        .then(response => {
+                            if (response.ok) {
+                                window.location.href = `/admins/packageManagement/${userId}`;
+                            } else {
+                                throw new Error('Failed to update package');
+                            }
+                        })
+                        .catch(error => {
+                            // Handle errors
+                            console.error(error);
+                        });
+
+                    // Make fields non-editable again
+                    nameElement.contentEditable = false;
+                    descriptionElement.contentEditable = false;
+                    priceElement.contentEditable = false;
+                    sessionDiscountElement.contentEditable = false;
+                    medicineDiscountElement.contentEditable = false;
+                    subscriptionDiscountElement.contentEditable = false;
+
+                    // Hide done button, show update and delete buttons
+                    packageItem.querySelector('.done-button').style.display = 'none';
+                    packageItem.querySelector('.update-button').style.display = 'block';
+                    packageItem.querySelector('.delete-button').style.display = 'block';
+                });
+            }
 
 
-    </script>
+        </script>
 
 </body>
 

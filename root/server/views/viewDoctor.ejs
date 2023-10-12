@@ -37,37 +37,38 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="details-item">
-            <span class="details-label">Email:</span>
-            <%= doctor.email %>
+    <%- include("patientNavBar", {patientId: userId}) %>
+        <div class="container">
+            <div class="details-item">
+                <span class="details-label">Email:</span>
+                <%= doctor.email %>
+            </div>
+            <div class="details-item">
+                <span class="details-label">First Name:</span>
+                <%= doctor.fName %>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Last Name:</span>
+                <%= doctor.lName %>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Educational Background:</span>
+                <%= doctor.educationalBackground %>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Session Price:</span>
+                $<%= doctor.sessionPrice %>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Affiliation:</span>
+                <%= doctor.affiliation %>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Specialty:</span>
+                <%= doctor.specialty %>
+            </div>
+            <div class="divider"></div>
         </div>
-        <div class="details-item">
-            <span class="details-label">First Name:</span>
-            <%= doctor.fName %>
-        </div>
-        <div class="details-item">
-            <span class="details-label">Last Name:</span>
-            <%= doctor.lName %>
-        </div>
-        <div class="details-item">
-            <span class="details-label">Educational Background:</span>
-            <%= doctor.educationalBackground %>
-        </div>
-        <div class="details-item">
-            <span class="details-label">Session Price:</span>
-            $<%= doctor.sessionPrice %>
-        </div>
-        <div class="details-item">
-            <span class="details-label">Affiliation:</span>
-            <%= doctor.affiliation %>
-        </div>
-        <div class="details-item">
-            <span class="details-label">Specialty:</span>
-            <%= doctor.specialty %>
-        </div>
-        <div class="divider"></div>
-    </div>
 </body>
 
 </html>

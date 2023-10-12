@@ -83,71 +83,72 @@
 </head>
 
 <body>
-    <h1>List of Doctors</h1>
+    <%- include("patientNavBar", {patientId: userId}) %>
+        <h1>List of Doctors</h1>
 
-    <div class="search-bar">
-        <form action="/patients/searchForDoctors/<%= userId %>" method="get">
-            <div class="search-input-group">
-                <label for="fName">Search by First Name:</label>
-                <input type="text" id="fName" name="fName" class="search-input">
-            </div>
+        <div class="search-bar">
+            <form action="/patients/searchForDoctors/<%= userId %>" method="get">
+                <div class="search-input-group">
+                    <label for="fName">Search by First Name:</label>
+                    <input type="text" id="fName" name="fName" class="search-input">
+                </div>
 
-            <div class="search-input-group">
-                <label for="lName">Search by Last Name:</label>
-                <input type="text" id="lName" name="lName" class="search-input">
-            </div>
+                <div class="search-input-group">
+                    <label for="lName">Search by Last Name:</label>
+                    <input type="text" id="lName" name="lName" class="search-input">
+                </div>
 
-            <div class="search-input-group">
-                <label for="specialty">Search by Specialty:</label>
-                <input type="text" id="specialty" name="specialty" class="search-input">
-            </div>
-            <button type="submit" class="search-button">Search</button>
-        </form>
+                <div class="search-input-group">
+                    <label for="specialty">Search by Specialty:</label>
+                    <input type="text" id="specialty" name="specialty" class="search-input">
+                </div>
+                <button type="submit" class="search-button">Search</button>
+            </form>
 
-        <form action="/patients/filterDoctors/<%= userId %>" method="get">
-            <div class="search-input-group">
-                <label for="specialty">Filter by Specialty:</label>
-                <select id="specialtyFilter" name="specialty" class="search-input">
-                    <option value="">All</option>
-                    <% uniqueSpecialties.forEach(doctorSpecialty=> { %>
-                        <option value="<%= doctorSpecialty %>">
-                            <%= doctorSpecialty %>
-                        </option>
-                        <% }); %>
-                </select>
-            </div>
+            <form action="/patients/filterDoctors/<%= userId %>" method="get">
+                <div class="search-input-group">
+                    <label for="specialty">Filter by Specialty:</label>
+                    <select id="specialtyFilter" name="specialty" class="search-input">
+                        <option value="">All</option>
+                        <% uniqueSpecialties.forEach(doctorSpecialty=> { %>
+                            <option value="<%= doctorSpecialty %>">
+                                <%= doctorSpecialty %>
+                            </option>
+                            <% }); %>
+                    </select>
+                </div>
 
-            <div class="search-input-group">
-                <label for="date">On Date:</label>
-                <input type="date" id="date" name="date" class="search-input">
-            </div>
-            <button type="submit" class="search-button">Filter</button>
+                <div class="search-input-group">
+                    <label for="date">Available On Date:</label>
+                    <input type="datetime-local" id="date" name="date" class="search-input">
+                </div>
+                <button type="submit" class="search-button">Filter</button>
 
-        </form>
-    </div>
+            </form>
+        </div>
 
 
-    <% if (locals.doctors && doctors.length> 0) { %>
-        <ul>
-            <% doctors.forEach(doctor=> { %>
-                <li class="doctor-item">
-                    <a href="/patients/doctorDetails/<%= userId %>/<%= doctor._id %>">
-                        <h2>
-                            <%= doctor.name %>
-                        </h2>
-                        <p><strong>Session Price:</strong> $<%= doctor.sessionPrice %>
-                        </p>
-                        <p><strong>Specialty:</strong>
-                            <%= doctor.specialty %>
-                        </p>
-                    </a>
-                </li>
-                <div class="divider"></div>
-                <% }); %>
-        </ul>
-        <% } else { %>
-            <p>No doctors found in the database.</p>
-            <% } %>
+        <% if (locals.doctors && doctors.length> 0) { %>
+            <ul>
+                <% doctors.forEach(doctor=> { %>
+                    <li class="doctor-item">
+                        <a href="/patients/doctorDetails/<%= userId %>/<%= doctor._id %>">
+                            <h2>
+                                <%= doctor.name %>
+                            </h2>
+                            <p><strong>Session Price:</strong> $<%= doctor.sessionPrice %>
+                            </p>
+                            <p><strong>Specialty:</strong>
+                                <%= doctor.specialty %>
+                            </p>
+                        </a>
+                    </li>
+                    <div class="divider"></div>
+                    <% }); %>
+            </ul>
+            <% } else { %>
+                <p>No doctors found in the database.</p>
+                <% } %>
 
 </body>
 

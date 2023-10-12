@@ -42,52 +42,53 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>Patient Information</h1>
-        <div class="divider"></div>
-        <div class="label">Username:</div>
-        <div class="primary-text">
-            <%= patient.username %>
+    <%- include("doctorNavBar", {doctorId: userId}) %>
+        <div class="container">
+            <h1>Patient Information</h1>
+            <div class="divider"></div>
+            <div class="label">Username:</div>
+            <div class="primary-text">
+                <%= patient.username %>
+            </div>
+            <div class="label">Email:</div>
+            <div class="primary-text">
+                <%= patient.email %>
+            </div>
+            <div class="label">Full Name:</div>
+            <div class="primary-text">
+                <%= patient.fName %>
+                    <%= patient.lName %>
+            </div>
+            <div class="label">Date of Birth:</div>
+            <div class="primary-text">
+                <%= patient.dateOfBirth.toDateString() %>
+            </div>
+            <div class="label">Gender:</div>
+            <div class="primary-text">
+                <%= patient.gender %>
+            </div>
+            <div class="label">Phone Number:</div>
+            <div class="primary-text">
+                <%= patient.phoneNum %>
+            </div>
+            <div class="label">Emergency Contact:</div>
+            <div class="primary-text">
+                <%= patient.emergencyContact.fName %>
+                    <%= patient.emergencyContact.lName %> (<%= patient.emergencyContact.phoneNum %>)
+            </div>
+            <div class="label">Family Members:</div>
+            <ul class="primary-text">
+                <% patient.familyMembers.forEach(member=> { %>
+                    <li>
+                        <%= member.fName %>
+                            <%= member.lName %> - Relationship: <%= member.relationship %>
+                    </li>
+                    <% }); %>
+            </ul>
+            <div class="label">Wallet Balance:</div>
+            <div class="primary-text">$<%= patient.wallet %>
+            </div>
         </div>
-        <div class="label">Email:</div>
-        <div class="primary-text">
-            <%= patient.email %>
-        </div>
-        <div class="label">Full Name:</div>
-        <div class="primary-text">
-            <%= patient.fName %>
-                <%= patient.lName %>
-        </div>
-        <div class="label">Date of Birth:</div>
-        <div class="primary-text">
-            <%= patient.dateOfBirth.toDateString() %>
-        </div>
-        <div class="label">Gender:</div>
-        <div class="primary-text">
-            <%= patient.gender %>
-        </div>
-        <div class="label">Phone Number:</div>
-        <div class="primary-text">
-            <%= patient.phoneNum %>
-        </div>
-        <div class="label">Emergency Contact:</div>
-        <div class="primary-text">
-            <%= patient.emergencyContact.fName %>
-                <%= patient.emergencyContact.lName %> (<%= patient.emergencyContact.phoneNum %>)
-        </div>
-        <div class="label">Family Members:</div>
-        <ul class="primary-text">
-            <% patient.familyMembers.forEach(member=> { %>
-                <li>
-                    <%= member.fName %>
-                        <%= member.lName %> - Relationship: <%= member.relationship %>
-                </li>
-                <% }); %>
-        </ul>
-        <div class="label">Wallet Balance:</div>
-        <div class="primary-text">$<%= patient.wallet %>
-        </div>
-    </div>
 </body>
 
 </html>

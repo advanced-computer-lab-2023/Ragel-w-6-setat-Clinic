@@ -53,51 +53,54 @@
 </head>
 
 <body>
-    <h1>List of Patients</h1>
+    <%- include("doctorNavBar", {doctorId: userId}) %>
+        <h1>List of Patients</h1>
 
-    <form action="/doctors/searchForPatients/<%= userId %>" method="get">
-        <div class="search-container">
-            <input class="search-input" name="fName" type="text" id="searchInput" placeholder="Search by first name...">
-            <input class="search-input" name="lName" type="text" id="searchInput" placeholder="Search by last name...">
-            <button type="submit" class="search-button">Search</button>
-        </div>
-    </form>
-
-    <form action="/doctors/upcomingappointments/<%= userId %>" method="get">
-        <button type="submit" class="search-button">Show Patients With Upcoming Appointments</button>
-    </form>
-
-    <% if (patients && patients.length> 0) { %>
-        <% patients.forEach(patient=> { %>
-            <div class="patient-item">
-                <a href="/doctors/selectedPatient/<%= userId %>/<%= patient._id %>">
-                    <h2>
-                        <%= patient.fName %>
-                            <%= patient.lName %>
-                    </h2>
-                    <p><strong>Email:</strong>
-                        <%= patient.email %>
-                    </p>
-                    <p><strong>Date of Birth:</strong>
-                        <%= patient.dateOfBirth.toDateString() %>
-                    </p>
-                    <p><strong>Gender:</strong>
-                        <%= patient.gender %>
-                    </p>
-                    <p><strong>Phone Number:</strong>
-                        <%= patient.phoneNum %>
-                    </p>
-                    <p><strong>Emergency Contact:</strong>
-                        <%= patient.emergencyContact.fName %>
-                            <%= patient.emergencyContact.lName %> (<%= patient.emergencyContact.phoneNum %>)
-                    </p>
-                </a>
-                <div class="divider"></div>
+        <form action="/doctors/searchForPatients/<%= userId %>" method="get">
+            <div class="search-container">
+                <input class="search-input" name="fName" type="text" id="searchInput"
+                    placeholder="Search by first name...">
+                <input class="search-input" name="lName" type="text" id="searchInput"
+                    placeholder="Search by last name...">
+                <button type="submit" class="search-button">Search</button>
             </div>
-            <% }); %>
-                <% } else { %>
-                    <p>No patients found in the database.</p>
-                    <% } %>
+        </form>
+
+        <form action="/doctors/upcomingappointments/<%= userId %>" method="get">
+            <button type="submit" class="search-button">Show Patients With Upcoming Appointments</button>
+        </form>
+
+        <% if (patients && patients.length> 0) { %>
+            <% patients.forEach(patient=> { %>
+                <div class="patient-item">
+                    <a href="/doctors/selectedPatient/<%= userId %>/<%= patient._id %>">
+                        <h2>
+                            <%= patient.fName %>
+                                <%= patient.lName %>
+                        </h2>
+                        <p><strong>Email:</strong>
+                            <%= patient.email %>
+                        </p>
+                        <p><strong>Date of Birth:</strong>
+                            <%= patient.dateOfBirth.toDateString() %>
+                        </p>
+                        <p><strong>Gender:</strong>
+                            <%= patient.gender %>
+                        </p>
+                        <p><strong>Phone Number:</strong>
+                            <%= patient.phoneNum %>
+                        </p>
+                        <p><strong>Emergency Contact:</strong>
+                            <%= patient.emergencyContact.fName %>
+                                <%= patient.emergencyContact.lName %> (<%= patient.emergencyContact.phoneNum %>)
+                        </p>
+                    </a>
+                    <div class="divider"></div>
+                </div>
+                <% }); %>
+                    <% } else { %>
+                        <p>No patients found in the database.</p>
+                        <% } %>
 
 
 </body>

@@ -28,35 +28,36 @@
 </head>
 
 <body>
-    <h1>Registered Family Members</h1>
+    <%- include("patientNavBar", {patientId: userId}) %>
+        <h1>Registered Family Members</h1>
 
-    <% if (locals.patientFamily && locals.patientFamily.length> 0) { %>
-        <ul>
-            <% patientFamily.forEach(familyMembers=> { %>
-                <li class="family-member">
-                    <h2>
-                        <%= familyMembers.fName %>
-                            <%= familyMembers.lName %>
-                    </h2>
-                    <p><strong>National ID:</strong>
-                        <%= familyMembers.nationalID %>
-                    </p>
-                    <p><strong>Gender:</strong>
-                        <%= familyMembers.gender %>
-                    </p>
-                    <p><strong>Date of Birth:</strong>
-                        <%= familyMembers.dateOfBirth.toDateString() %>
-                    </p>
-                    <p><strong>Relationship:</strong>
-                        <%= familyMembers.relationship %>
-                    </p>
-                </li>
-                <div class="divider"></div>
-                <% }); %>
-        </ul>
-        <% } else { %>
-            <p>No registered family members found.</p>
-            <% } %>
+        <% if (locals.patientFamily && locals.patientFamily.length> 0) { %>
+            <ul>
+                <% patientFamily.forEach(familyMembers=> { %>
+                    <li class="family-member">
+                        <h2>
+                            <%= familyMembers.fName %>
+                                <%= familyMembers.lName %>
+                        </h2>
+                        <p><strong>National ID:</strong>
+                            <%= familyMembers.nationalID %>
+                        </p>
+                        <p><strong>Gender:</strong>
+                            <%= familyMembers.gender %>
+                        </p>
+                        <p><strong>Date of Birth:</strong>
+                            <%= familyMembers.dateOfBirth.toDateString() %>
+                        </p>
+                        <p><strong>Relationship:</strong>
+                            <%= familyMembers.relationship %>
+                        </p>
+                    </li>
+                    <div class="divider"></div>
+                    <% }); %>
+            </ul>
+            <% } else { %>
+                <p>No registered family members found.</p>
+                <% } %>
 
 </body>
 

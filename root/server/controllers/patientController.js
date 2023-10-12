@@ -293,10 +293,11 @@ const filterDoctors = async (req, res) => {
     const date = req.query.date;
     const filter = {};
     const doctorIDS = [];
+    const specificDate = new Date(date.toString() + ":00.000+00:00");
 
     if (date) {
       const appointmentsByDate = await Appointments.find({
-        date: date,
+        date: specificDate,
         isAvailable: true,
       });
       appointmentsByDate.forEach((appointment) => {
@@ -324,11 +325,8 @@ const filterDoctors = async (req, res) => {
       });
       const uniqueSpecialties = [...uniqueSpecialtiesSet];
 
-      console.log(filter);
-
       const doctors = await Doctor.find(filter).exec();
 
-      console.log(doctors);
       const doctorsToDisplay = await doctorDisplay(patientId, doctors);
       if (doctors.length === 0) {
         res.render("searchForDoctors", {
@@ -406,7 +404,7 @@ const selectDoctor = async (req, res) => {
       return res.status(404).json({ message: "Doctor not found" });
     }
     console.log(doctor);
-    res.render("viewDoctor", { doctor: doctor });
+    res.render("viewDoctor", { userId: patientId, doctor: doctor });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });

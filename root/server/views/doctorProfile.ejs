@@ -45,157 +45,158 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>Doctor Information</h1>
+    <%- include("doctorNavBar", {doctorId: userId}) %>
+        <div class="container">
+            <h1>Doctor Information</h1>
 
-        <ul>
-            <li><strong>Username:</strong>
-                <div class="username">
-                    <%= doctor.username %>
-                </div>
+            <ul>
+                <li><strong>Username:</strong>
+                    <div class="username">
+                        <%= doctor.username %>
+                    </div>
 
-            </li>
-            <li><strong>Email:</strong>
-                <div class="email">
-                    <%= doctor.email %>
-                </div>
-            </li>
-            <li><strong>First Name:</strong>
-                <div class="fName">
-                    <%= doctor.fName %>
-                </div>
-            </li>
-            <li><strong>Last Name:</strong>
-                <div class="lName">
-                    <%= doctor.lName %>
-                </div>
-            </li>
-            <li><strong>Date of Birth:</strong>
-                <div class="dateOfBirth">
-                    <%= doctor.dateOfBirth.toDateString() %>
-                </div>
+                </li>
+                <li><strong>Email:</strong>
+                    <div class="email">
+                        <%= doctor.email %>
+                    </div>
+                </li>
+                <li><strong>First Name:</strong>
+                    <div class="fName">
+                        <%= doctor.fName %>
+                    </div>
+                </li>
+                <li><strong>Last Name:</strong>
+                    <div class="lName">
+                        <%= doctor.lName %>
+                    </div>
+                </li>
+                <li><strong>Date of Birth:</strong>
+                    <div class="dateOfBirth">
+                        <%= doctor.dateOfBirth.toDateString() %>
+                    </div>
 
-            </li>
-            <li><strong>Educational Background:</strong>
-                <div class="educationalBackground">
-                    <%= doctor.educationalBackground %>
-                </div>
-            </li>
-            <li><strong>Hourly Rate:</strong>
-                <div class="hourlyRate">
-                    <%= doctor.hourlyRate %>
-                </div>
+                </li>
+                <li><strong>Educational Background:</strong>
+                    <div class="educationalBackground">
+                        <%= doctor.educationalBackground %>
+                    </div>
+                </li>
+                <li><strong>Hourly Rate:</strong>
+                    <div class="hourlyRate">
+                        <%= doctor.hourlyRate %>
+                    </div>
 
-            </li>
-            <li><strong>Session Price:</strong>
-                <div class="sessionPrice">
-                    <%= doctor.sessionPrice %>
-                </div>
-            </li>
-            <li><strong>Affiliation:</strong>
-                <div class="affiliation">
-                    <%= doctor.affiliation %>
-                </div>
-            </li>
-            <li><strong>Specialty:</strong>
-                <div class="specialty">
-                    <%= doctor.specialty %>
-                </div>
-            </li>
-        </ul>
+                </li>
+                <li><strong>Session Price:</strong>
+                    <div class="sessionPrice">
+                        <%= doctor.sessionPrice %>
+                    </div>
+                </li>
+                <li><strong>Affiliation:</strong>
+                    <div class="affiliation">
+                        <%= doctor.affiliation %>
+                    </div>
+                </li>
+                <li><strong>Specialty:</strong>
+                    <div class="specialty">
+                        <%= doctor.specialty %>
+                    </div>
+                </li>
+            </ul>
 
-        <button class="button edit-button" onclick="editDoctor(`<%= doctor._id %>`);">Edit</button>
-        <button class="button done-button" style="display: none;">Done</button>
-    </div>
+            <button class="button edit-button" onclick="editDoctor(`<%= doctor._id %>`);">Edit</button>
+            <button class="button done-button" style="display: none;">Done</button>
+        </div>
 
-    <script>
-        function editDoctor(doctorId) {
-            // Redirect to the edit page with the doctorId, or perform any other edit action here
-            var usernameElement = document.querySelector('.username');
-            var emailElement = document.querySelector('.email');
-            var fNameElement = document.querySelector('.fName');
-            var lNameElement = document.querySelector('.lName');
-            var dateOfBirthElement = document.querySelector('.dateOfBirth');
-            var educationalBackgroundElement = document.querySelector('.educationalBackground');
-            var hourlyRateElement = document.querySelector('.hourlyRate');
-            var sessionPriceElement = document.querySelector('.sessionPrice');
-            var affiliationElement = document.querySelector('.affiliation');
-            var specialtyElement = document.querySelector('.specialty');
+        <script>
+            function editDoctor(doctorId) {
+                // Redirect to the edit page with the doctorId, or perform any other edit action here
+                var usernameElement = document.querySelector('.username');
+                var emailElement = document.querySelector('.email');
+                var fNameElement = document.querySelector('.fName');
+                var lNameElement = document.querySelector('.lName');
+                var dateOfBirthElement = document.querySelector('.dateOfBirth');
+                var educationalBackgroundElement = document.querySelector('.educationalBackground');
+                var hourlyRateElement = document.querySelector('.hourlyRate');
+                var sessionPriceElement = document.querySelector('.sessionPrice');
+                var affiliationElement = document.querySelector('.affiliation');
+                var specialtyElement = document.querySelector('.specialty');
 
-            usernameElement.contentEditable = true;
-            emailElement.contentEditable = true;
-            fNameElement.contentEditable = true;
-            lNameElement.contentEditable = true;
-            dateOfBirthElement.contentEditable = true;
-            educationalBackgroundElement.contentEditable = true;
-            hourlyRateElement.contentEditable = true;
-            sessionPriceElement.contentEditable = true;
-            affiliationElement.contentEditable = true;
-            specialtyElement.contentEditable = true;
+                usernameElement.contentEditable = true;
+                emailElement.contentEditable = true;
+                fNameElement.contentEditable = true;
+                lNameElement.contentEditable = true;
+                dateOfBirthElement.contentEditable = true;
+                educationalBackgroundElement.contentEditable = true;
+                hourlyRateElement.contentEditable = true;
+                sessionPriceElement.contentEditable = true;
+                affiliationElement.contentEditable = true;
+                specialtyElement.contentEditable = true;
 
-            var dateOfBirthPicker = flatpickr(dateOfBirthElement, {
-                dateFormat: 'Y-m-d', // Set the desired date format
-                disableMobile: true // Disable mobile-friendly interface (optional)
-            });
+                var dateOfBirthPicker = flatpickr(dateOfBirthElement, {
+                    dateFormat: 'Y-m-d', // Set the desired date format
+                    disableMobile: true // Disable mobile-friendly interface (optional)
+                });
 
 
-            document.querySelector('.edit-button').style.display = 'none';
-            document.querySelector('.done-button').style.display = 'block';
+                document.querySelector('.edit-button').style.display = 'none';
+                document.querySelector('.done-button').style.display = 'block';
 
-            // Add event listener to the done button
-            document.querySelector('.done-button').addEventListener('click', function () {
-                // Prepare data for patch request
-                var updatedDoctor = {
-                    username: usernameElement.innerText,
-                    email: emailElement.innerText,
-                    fName: fNameElement.innerText,
-                    lName: lNameElement.innerText,
-                    dateOfBirth: dateOfBirthPicker.selectedDates[0],
-                    educationalBackground: educationalBackgroundElement.innerText,
-                    hourlyRate: hourlyRateElement.innerText,
-                    sessionPrice: sessionPriceElement.innerText,
-                    affiliation: affiliationElement.innerText,
-                    specialty: specialtyElement.innerText
-                };
+                // Add event listener to the done button
+                document.querySelector('.done-button').addEventListener('click', function () {
+                    // Prepare data for patch request
+                    var updatedDoctor = {
+                        username: usernameElement.innerText,
+                        email: emailElement.innerText,
+                        fName: fNameElement.innerText,
+                        lName: lNameElement.innerText,
+                        dateOfBirth: dateOfBirthPicker.selectedDates[0],
+                        educationalBackground: educationalBackgroundElement.innerText,
+                        hourlyRate: hourlyRateElement.innerText,
+                        sessionPrice: sessionPriceElement.innerText,
+                        affiliation: affiliationElement.innerText,
+                        specialty: specialtyElement.innerText
+                    };
 
-                fetch(`/doctors/doctorProfile/${doctorId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedDoctor)
-                })
-
-                    .then(response => {
-                        if (response.ok) {
-                            window.location.href = `/doctors/doctorProfile/${doctorId}`;
-                        } else {
-                            throw new Error('Failed to update package');
-                        }
+                    fetch(`/doctors/doctorProfile/${doctorId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updatedDoctor)
                     })
-                    .catch(error => {
-                        // Handle errors
-                        console.error(error);
-                    });
 
-                // Make the elements non-editable again
-                usernameElement.contentEditable = false;
-                emailElement.contentEditable = false;
-                fNameElement.contentEditable = false;
-                lNameElement.contentEditable = false;
-                dateOfBirthElement.contentEditable = false;
-                educationalBackgroundElement.contentEditable = false;
-                hourlyRateElement.contentEditable = false;
-                sessionPriceElement.contentEditable = false;
-                affiliationElement.contentEditable = false;
-                specialtyElement.contentEditable = false;
+                        .then(response => {
+                            if (response.ok) {
+                                window.location.href = `/doctors/doctorProfile/${doctorId}`;
+                            } else {
+                                throw new Error('Failed to update package');
+                            }
+                        })
+                        .catch(error => {
+                            // Handle errors
+                            console.error(error);
+                        });
 
-                document.querySelector('.edit-button').style.display = 'block';
-                document.querySelector('.done-button').style.display = 'none';
+                    // Make the elements non-editable again
+                    usernameElement.contentEditable = false;
+                    emailElement.contentEditable = false;
+                    fNameElement.contentEditable = false;
+                    lNameElement.contentEditable = false;
+                    dateOfBirthElement.contentEditable = false;
+                    educationalBackgroundElement.contentEditable = false;
+                    hourlyRateElement.contentEditable = false;
+                    sessionPriceElement.contentEditable = false;
+                    affiliationElement.contentEditable = false;
+                    specialtyElement.contentEditable = false;
 
-            });
-        }
-    </script>
+                    document.querySelector('.edit-button').style.display = 'block';
+                    document.querySelector('.done-button').style.display = 'none';
+
+                });
+            }
+        </script>
 </body>
 
 </html>
