@@ -63,11 +63,17 @@
             <button class="filter-button">Filter</button>
         </div>
         <div class="doctor-list">
-            <div class="doctor-item">Doctor 1</div>
-            <div class="divider"></div>
-            <div class="doctor-item">Doctor 2</div>
-            <div class="divider"></div>
-            <div class="doctor-item">Doctor 3</div>
+            <% doctors.forEach(function(doctor) { %>
+                <div class="doctor-item">
+                    <strong>Username:</strong> <%= doctor.username %><br>
+                    <strong>Name:</strong> <%= doctor.fName %> <%= doctor.lName %><br>
+                    <strong>Date of Birth:</strong> <%= doctor.dateOfBirth %><br>
+                    <strong>Specialty:</strong> <%= doctor.specialty %><br>
+                    <strong>Hourly Rate:</strong> $<%= doctor.hourlyRate %><br>
+                    <!-- Add more doctor properties as needed -->
+                </div>
+                <div class="divider"></div>
+            <% }); %>
         </div>
     </div>
 </body>

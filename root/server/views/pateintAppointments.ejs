@@ -72,11 +72,14 @@
             <button class="filter-button">Filter</button>
         </div>
         <div class="appointment-list">
-            <div class="appointment-item">Appointment 1</div>
-            <div class="divider"></div>
-            <div class="appointment-item">Appointment 2</div>
-            <div class="divider"></div>
-            <div class="appointment-item">Appointment 3</div>
+            <% appointments.forEach(function(appointment) { %>
+                <div class="appointment-item">
+                    <strong>Date:</strong> <%= appointment.date %><br>
+                    <strong>Status:</strong> <%= appointment.status %><br>
+                    <!-- Add more appointment properties as needed -->
+                </div>
+                <div class="divider"></div>
+            <% }); %>
         </div>
     </div>
 </body>

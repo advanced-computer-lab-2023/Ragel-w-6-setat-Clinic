@@ -60,11 +60,17 @@
             <button class="filter-button">Filter</button>
         </div>
         <div class="patient-list">
-            <div class="patient-item">Patient 1</div>
-            <div class="divider"></div>
-            <div class="patient-item">Patient 2</div>
-            <div class="divider"></div>
-            <div class="patient-item">Patient 3</div>
+            <!-- Loop through upcoming appointments and display patients -->
+            <% upcomingAppointments.forEach(function(appointment) { %>
+                <% if (appointment.status === "upcoming") { %>
+                    <div class="patient-item">
+                        Patient: <%= appointment.patient.fName %> <%= appointment.patient.lName %><br>
+                        Doctor: <%= appointment.doctor.fName %> <%= appointment.doctor.lName %><br>
+                        Date: <%= appointment.date %>
+                    </div>
+                    <div class="divider"></div>
+                <% } %>
+            <% }); %>
         </div>
     </div>
 </body>

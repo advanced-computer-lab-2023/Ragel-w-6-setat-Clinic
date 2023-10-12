@@ -13,19 +13,19 @@
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-        .search-bar {
+        .filter-bar {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
         }
-        .name-search {
+        .specialty-filter {
             flex: 1;
             margin-right: 20px;
         }
-        .specialty-search {
+        .date-time-filter {
             flex: 1;
         }
-        .search-button {
+        .filter-button {
             background-color: #0288D1;
             color: #ffffff;
             border: none;
@@ -56,17 +56,24 @@
 <body>
     <div class="container">
         <h1>Find a Doctor</h1>
-        <div class="search-bar">
-            <input type="text" class="name-search" placeholder="Doctor Name">
-            <input type="text" class="specialty-search" placeholder="Specialty">
-            <button class="search-button">Search</button>
+        <div class="filter-bar">
+            <input type="text" class="specialty-filter" placeholder="Doctor Specialty">
+            <input type="date" class="date-time-filter" placeholder="Date">
+            <input type="time" class="date-time-filter" placeholder="Time">
+            <button class="filter-button">Filter</button>
         </div>
         <div class="doctor-list">
-            <div class="doctor-item">Doctor 1</div>
-            <div class="divider"></div>
-            <div class="doctor-item">Doctor 2</div>
-            <div class="divider"></div>
-            <div class="doctor-item">Doctor 3</div>
+            <% doctors.forEach(function(doctor) { %>
+                <div class="doctor-item">
+                    <strong>Username:</strong> <%= doctor.username %><br>
+                    <strong>Name:</strong> <%= doctor.fName %> <%= doctor.lName %><br>
+                    <strong>Date of Birth:</strong> <%= doctor.dateOfBirth %><br>
+                    <strong>Specialty:</strong> <%= doctor.specialty %><br>
+                    <strong>Hourly Rate:</strong> $<%= doctor.hourlyRate %><br>
+                    <!-- Add more doctor properties as needed -->
+                </div>
+                <div class="divider"></div>
+            <% }); %>
         </div>
     </div>
 </body>

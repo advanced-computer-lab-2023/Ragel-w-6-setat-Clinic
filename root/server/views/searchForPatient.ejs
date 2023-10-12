@@ -57,11 +57,16 @@
             <button class="search-button">Search</button>
         </div>
         <div class="patient-list">
-            <div class="patient-item">Patient 1</div>
-            <div class="divider"></div>
-            <div class="patient-item">Patient 2</div>
-            <div class="divider"></div>
-            <div class="patient-item">Patient 3</div>
+            <!-- Loop through patients and render patient items -->
+            <% patients.forEach(function(patient) { %>
+                <div class="patient-item">
+                    <%= patient.fName %> <%= patient.lName %><br>
+                    Date of Birth: <%= patient.dateOfBirth %><br>
+                    Gender: <%= patient.gender %><br>
+                    Phone Number: <%= patient.phoneNum %>
+                </div>
+                <div class="divider"></div>
+            <% }); %>
         </div>
     </div>
 </body>

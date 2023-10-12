@@ -38,11 +38,14 @@
     <div class="container">
         <h1>Select a Doctor</h1>
         <div class="doctor-list">
-            <div class="doctor-item" onclick="selectDoctor('Doctor 1')">Doctor 1</div>
-            <div class="divider"></div>
-            <div class="doctor-item" onclick="selectDoctor('Doctor 2')">Doctor 2</div>
-            <div class="divider"></div>
-            <div class="doctor-item" onclick="selectDoctor('Doctor 3')">Doctor 3</div>
+            <% doctors.forEach(function(doctor) { %>
+                <div class="doctor-item" onclick="selectDoctor('<%= doctor.username %>')">
+                    <strong>Name:</strong> <%= doctor.fName %> <%= doctor.lName %><br>
+                    <strong>Specialty:</strong> <%= doctor.specialty %><br>
+                    <strong>Hourly Rate:</strong> $<%= doctor.hourlyRate %><br>
+                </div>
+                <div class="divider"></div>
+            <% }); %>
         </div>
     </div>
     

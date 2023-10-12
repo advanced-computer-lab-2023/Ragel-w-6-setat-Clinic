@@ -41,29 +41,26 @@ const createPatient = async (req, res) => {
 };
 
  const searchForDoctor = async (req, res) =>{
-  const { name, specialty } = req.body;
-
+  const { name, specialty } = req.query;
+  const patientID = req.params.id;
   try {
     const query = {};
-    
     if (name) {
       query.$or = [
         { fName: { $regex: new RegExp(name, 'i') } },
         { lName: { $regex: new RegExp(name, 'i') } }
       ];
     }
-
     if (specialty) {
       query.specialty = { $regex: new RegExp(specialty, 'i') };
     }
-
     const doctors = await Doctor.find(query);
     console.log(doctors);
-
     if (doctors.length === 0) {
       res.status(404).json({ error: 'Doctors not found' });
     } else {
-      res.status(200).json(doctors);
+      //res.status(200).json(doctors);
+      res.render('searchForDoctors', { doctors, userID: patientID });
     }
   } catch (error) {
     console.error(error);
@@ -73,7 +70,7 @@ const createPatient = async (req, res) => {
  
  const filterAvailableAppointments = async(req, res) =>{
   const { status, date } = req.query;
-
+  //const patientID = req.params.id;
   try {
     const filter = {};
     if (status) {
@@ -82,10 +79,9 @@ const createPatient = async (req, res) => {
     if (date) {
       filter.date = new Date(date);
     }
-
     const appointments = await Appointments.find(filter);
-
     res.json(appointments);
+    //res.render('pateintAppointments', { userID: patientID ,appointments });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -98,14 +94,14 @@ const createPatient = async (req, res) => {
     try {
       const filter = {};
 
-      if(req.body.date)
+      if(req.query.date)
       {
-        filter.date = req.body.date;
+        filter.date = req.queryq.date;
       }
 
-      if(req.body.status)
+      if(req.query.status)
       {
-        filter.status = req.body.status;
+        filter.status = req.query.status;
       }
 
       if(req.params.id)
@@ -114,49 +110,43 @@ const createPatient = async (req, res) => {
       }
 
       const patient = await Patient.findById(patientId);
-
       const appointments = await Appointments.find(filter);
       
-        res.status(200).json(appointments)
-      
+       // res.status(200).json(appointments)
+       res.render('pateintAppointments', { appointments, userID: patientId }); 
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Server error' });
     }
-
  };
 
  const filterDoctors = async (req, res) => {
  
   try {
-
-    const specialty = req.body.specialty
-
+    const specialty = req.query.specialty
+    const patientId = req.params.id;
     const date = req.body.date;
     const appointmentsByDate = await Appointments.find({date : date,  isAvailable : true});
     const filter = {};
     const doctorIDS = [];
 
-
-
-
-appointmentsByDate.forEach((appointment) => {
+  appointmentsByDate.forEach((appointment) => {
   if (appointment.isAvailable === true) {
     doctorIDS.push(appointment.doctor);
   }
 });
-
-if (specialty) {
+  if (specialty) {
   filter.specialty = specialty;
-}
+  }
 
-if (doctorIDS.length > 0) {
+  if (doctorIDS.length > 0) {
   filter._id = { $in: doctorIDS };
-}
+  }
 
 try {
   const doctors = await Doctor.find(filter).exec();
-  res.json(doctors);
+  //res.json(doctors);
+  res.render('filterDoctors', { doctors, userID: patientId });
 } catch (err) {
   console.error(err);
   res.status(500).json({ error: 'Server error' });
@@ -169,19 +159,19 @@ try {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
-  // }
 };}
 
 const selectDoctor = async (req, res) => {
-  // const patiendID = req.params.id;
-  const doctorUsername = req.body.username;
+  const patientID = req.params.id;
+  const doctorUsername = req.query.username;
   try {
     
     const doctor = await Doctor.find({username : doctorUsername});
     if(!doctor){
       return res.status(404).json({message: "Doctor not found"});
     }
-    res.json(doctor);
+   // res.json(doctor);
+   res.render('selectDoctor', { doctor, userID: patientID });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });

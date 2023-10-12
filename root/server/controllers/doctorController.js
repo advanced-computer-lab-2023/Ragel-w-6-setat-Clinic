@@ -19,8 +19,8 @@ const renderUpcomingAppointments = function(req,res){
 }
 
 const searchForPatient =  async( req , res ) =>{
-  const { fname, lname } = req.body;
-
+  const { fname, lname } = req.query;
+ const doctorId = req.params.id;
   try {
     const patients = await Patient.find({
       $or: [
@@ -33,7 +33,11 @@ const searchForPatient =  async( req , res ) =>{
     if (patients.length === 0) {
       res.status(404).json({ error: 'Patients not found' });
     } else {
-      res.status(200).json(patients);
+      //res.status(200).json(patients);
+      res.render('searchForPatient', {
+        data: patients,
+        userId: doctorId, 
+      });
     }
   } catch (error) {
     console.error(error);
@@ -68,13 +72,13 @@ const filterMyAppointments = async (req, res) => {
   try {
     const filter = {};
 
-    if(req.body.date)
+    if(req.query.date)
     {
-      filter.date = req.body.date;
+      filter.date = req.query.date;
     }
-    if(req.body.status)
+    if(req.query.status)
     {
-      filter.status = req.body.status;
+      filter.status = req.query.status;
     }
     if(req.params.id)
     {
@@ -82,8 +86,12 @@ const filterMyAppointments = async (req, res) => {
     }
     const doctor = await Patient.findById(doctorId);
     const appointments = await Appointment.find(filter);
-      res.status(200).json(appointments)
-    
+      //res.status(200).json(appointments)
+      res.render('doctorAppointments', {
+        data: appointments,
+        userId: doctorId, 
+      });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -101,17 +109,20 @@ const upcomingAppointments = async(req, res) =>{
     //  date: { $gte: new Date() }, // Filter for appointments with dates in the future
     });
     const patientIds = upcomingAppointments.map((Appointment) => {
-      return Appointment.patient; // Just return the patient ID
+      return Appointment.patient; 
     });
-
     // Find patients based on their IDs using Promise.all
     const patientsWithUpcomingAppointments = await Promise.all(
       patientIds.map(async (patientId) => {
         return await Patient.findById(patientId);
       })
     );
-    res.json({
-      data: patientsWithUpcomingAppointments, // Send the actual patient data
+   /* res.json({
+      data: patientsWithUpcomingAppointments, 
+    });*/
+    res.render('upcomingappointments', {
+      data: patientsWithUpcomingAppointments,
+      userId: doctorId, 
     });
   }catch(error){    
     console.error(error);
