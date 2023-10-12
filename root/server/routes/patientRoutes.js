@@ -6,10 +6,10 @@ const router = express.Router();
 
 // post request to create a patient
 router.post("/registeration", createPatient);
-router.post("/addFamMem/:id",addFamMem);
+router.post("/familyMembers/:id",addFamMem);
 router.get("/viewPrescription/:id",viewPrescription);
-router.get("/filterthepresc/:id",filterthepresc);
-router.get("/selectPres/:id",selectPres);
+router.get("/filterPrescription/:id",filterthepresc);
+router.get("/selectPrescription/:id",selectPres);
 router.get("/filterDoctors",filterDoctors);
 
 

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prescription Management</title>
+  <style>
+    body {
+      background-color: #b3e5fc;
+      color: #212121;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .prescription-list {
+      background-color: #0288d1;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      text-align: center;
+      overflow: auto;
+    }
+
+    .prescription-item {
+      background-color: #ffffff;
+      color: #212121;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .error-message {
+      color: #ff0000;
+    }
+
+    .filters {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="filters">
+    <h3>Filter Prescriptions:</h3>
+    <form id="filterForm">
+      <label for="doctor">Doctor:</label>
+      <input type="text" id="doctor" name="doctor">
+
+      <label for="date">Date:</label>
+      <input type="date" id="date" name="date">
+
+      <label for="isFilled">Filled:</label>
+      <select id="isFilled" name="isFilled">
+        <option value="">All</option>
+        <option value="true">Filled</option>
+        <option value="false">Unfilled</option>
+      </select>
+
+      <button type="submit">Apply Filters</button>
+    </form>
+  </div>
+
+  <div class="prescription-list">
+    <h1>Prescription List</h1>
+    <div id="prescriptions-container"></div>
+    <p class="error-message" id="error-message"></p>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const filterForm = document.getElementById("filterForm");
+      const prescriptionsContainer = document.getElementById("prescriptions-container");
+      const errorMessage = document.getElementById("error-message");
+
+      filterForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(filterForm);
+      try {
+    const response = await fetch(`/patients/filterPrescription/${patientId}`, {
+        method: "POST",
+        body: formData
+    });
+
+          const data = await response.json();
+          if (response.status === 200 && data.data.prescription.length > 0) {
+            prescriptionsContainer.innerHTML = "";
+            data.data.prescription.forEach(prescription => {
+              const prescriptionItem = document.createElement("div");
+              prescriptionItem.className = "prescription-item";
+              prescriptionItem.innerHTML = `
+                <h2>Prescription ${prescription._id}</h2>
+                <p>Doctor: ${prescription.doctor}</p>
+                <p>Date: ${prescription.date}</p>
+                <p>Filled: ${prescription.isFilled ? 'Yes' : 'No'}</p>
+              `;
+              prescriptionItem.addEventListener("click", () => {
+                // Handle prescription selection here
+                console.log("Selected Prescription: ", prescription._id);
+              });
+              prescriptionsContainer.appendChild(prescriptionItem);
+            });
+          } else {
+            prescriptionsContainer.innerHTML = "";
+            errorMessage.textContent = "No matching prescriptions found.";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,1 +1,1 @@
-Logic for handling  requests.
+Logic for handling API requests.
