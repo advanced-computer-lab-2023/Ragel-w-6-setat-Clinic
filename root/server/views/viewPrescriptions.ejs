@@ -70,53 +70,21 @@
 
   <div class="prescription-list">
     <h1>Prescription List</h1>
-    <div id="prescriptions-container"></div>
-    <p class="error-message" id="error-message"></p>
-  </div>
+<div id="prescriptions-container">
+  <% prescriptions.forEach(prescription => { %>
+    <div class="prescription-item">
+      <h2>Medication: <%= prescription.medication %></h2>
+      <p>Dosage: <%= prescription.dosage %></p>
+      <p>Is Filled: <%= prescription.isFilled %></p>
+      <p>Date: <%= prescription.date %></p>
+      <p>Notes: <%= prescription.notes %></p>
+    </div>
+    <br>
+  <% }); %>
+</div>
+<p class="error-message" id="error-message"></p>
+</div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const filterForm = document.getElementById("filterForm");
-      const prescriptionsContainer = document.getElementById("prescriptions-container");
-      const errorMessage = document.getElementById("error-message");
-
-      filterForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const formData = new FormData(filterForm);
-      try {
-    const response = await fetch(`/patients/filterPrescription/${patientId}`, {
-        method: "POST",
-        body: formData
-    });
-
-          const data = await response.json();
-          if (response.status === 200 && data.data.prescription.length > 0) {
-            prescriptionsContainer.innerHTML = "";
-            data.data.prescription.forEach(prescription => {
-              const prescriptionItem = document.createElement("div");
-              prescriptionItem.className = "prescription-item";
-              prescriptionItem.innerHTML = `
-                <h2>Prescription ${prescription._id}</h2>
-                <p>Doctor: ${prescription.doctor}</p>
-                <p>Date: ${prescription.date}</p>
-                <p>Filled: ${prescription.isFilled ? 'Yes' : 'No'}</p>
-              `;
-              prescriptionItem.addEventListener("click", () => {
-                // Handle prescription selection here
-                console.log("Selected Prescription: ", prescription._id);
-              });
-              prescriptionsContainer.appendChild(prescriptionItem);
-            });
-          } else {
-            prescriptionsContainer.innerHTML = "";
-            errorMessage.textContent = "No matching prescriptions found.";
-          }
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      });
-    });
-  </script>
 </body>
 
 </html>

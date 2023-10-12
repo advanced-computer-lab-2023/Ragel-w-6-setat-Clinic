@@ -62,31 +62,44 @@
     <div class="delete-admin-container">
         <h2>Delete Admin</h2>
         <form id="deleteAdminForm">
-            <input type="text" name="username"  placeholder="Admin Username" required><br>
+            <input type="text" name="username" placeholder="Admin Username" required><br>
             <button type="submit">Delete Admin</button>
         </form>
         <div id="feedbackMessage"></div>
 
         <script>
-            document.getElementById("deleteAdminForm").addEventListener("submit", async function (event) {
+            function deleteAdmin(username) {
+                fetch(`/admins/deleteAdmin?username=${username}`, { 
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Handle successful deletion here, e.g., show a success message
+                        document.getElementById("feedbackMessage").innerHTML = "Admin deleted successfully!";
+                        console.log("da5alna");
+                        console.log("EL NAME AHO " + username);
+                    } else {
+                        // Handle errors
+                        document.getElementById("feedbackMessage").innerHTML = "Failed to delete admin.";
+                        console.log("mada5alnash");
+                        console.log("EL NAME AHO " + username);
+                    }
+                })
+                .catch(error => {
+                    // Handle network errors
+                    console.error(error);
+                    document.getElementById("feedbackMessage").innerHTML = "Network error occurred.";
+                });
+            }
+
+            document.getElementById("deleteAdminForm").addEventListener("submit", function(event) {
                 event.preventDefault();
                 const formData = new FormData(this);
-                console.log(formData.get('username'));
-                try {
-                    const response = await fetch("admins/deleteAdmin", {
-                        method: "DELETE",
-                        body: formData
-                    });
-                    const data = await response.json();
-                    const feedbackMessage = document.getElementById("feedbackMessage");
-                    if (response.status === 200) {
-                        feedbackMessage.innerHTML = `<p class="success-message">${data.message}</p>`;
-                    } else {
-                        feedbackMessage.innerHTML = `<p class="error-message">${data.message}</p>`;
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                }
+                const adminUsername = formData.get('username');
+                deleteAdmin(adminUsername);
             });
         </script>
     </div>

@@ -6,10 +6,10 @@ import Doctor from "../models/Doctor.js";
 const deleteAdmin = async (req, res) => {
   try {
     const filter = {
-      username: req.body.username
+      username: req.query.username
     };
     const deleteAdminResult = await Admin.deleteMany(filter);
-
+    
     if (deleteAdminResult.deletedCount == 0) {
       return res.status(404).json({
         status: "fail",
@@ -37,7 +37,7 @@ const deletePatient = async (req, res) => {
   try {
 
     const filter = {
-      username: req.body.username
+      username: req.query.username
     };
     const deletedPatientResult = await Patient.deleteMany(filter);
 
@@ -67,7 +67,7 @@ const deleteDoctor = async (req, res) => {
   try {
 
     const filter = {
-      username: req.body.username
+      username: req.query.username
     };
     const deleteDoctorResult = await Doctor.deleteMany(filter);
 
@@ -115,6 +115,7 @@ const viewUnregisteredDoctors = async (req, res) => {
     });
   }
 };
+
 
 export {
   deleteAdmin,

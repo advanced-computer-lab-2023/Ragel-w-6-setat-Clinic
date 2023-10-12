@@ -8,8 +8,8 @@ const router = express.Router();
 router.post("/registeration", createPatient);
 router.post("/familyMembers/:id",addFamMem);
 router.get("/viewPrescription/:id",viewPrescription);
-router.get("/filterPrescription/:id",filterthepresc);
-router.get("/selectPrescription/:id",selectPres);
+router.get("/viewPrescription/:id",filterthepresc);
+router.get("/selectedPrescription/:patientid/:id",selectPres);
 router.get("/filterDoctors",filterDoctors);
 
 

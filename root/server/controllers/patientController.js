@@ -104,18 +104,11 @@ const viewPrescription = async (req, res) => {
       });
     }
 
-
-
     const prescriptions = await Prescription.find({
       patient: patientId
     });
 
-    res.status(200).json({
-      status: 'success',
-      data: {
-        prescriptions: prescriptions,
-      },
-    });
+    res.render("viewPrescriptions", {userId: patientId, prescriptions: prescriptions})
   } catch (err) {
     res.status(500).json({
       status: 'error',
@@ -133,15 +126,15 @@ const filterthepresc = async (req, res) => {
     const filter = {};
 
     if (req.body.doctor) {
-      filter.doctor = req.body.doctor;
+      filter.doctor = req.query.doctor;
     }
 
     if (req.body.date) {
-      filter.date = req.body.date;
+      filter.date = req.query.date;
     }
 
     if (req.body.isFilled) {
-      filter.isFilled = req.body.isFilled;
+      filter.isFilled = req.query.isFilled;
     }
 
     if (req.params.id) {
@@ -149,15 +142,12 @@ const filterthepresc = async (req, res) => {
     }
     const patient = await Patient.findById(patientId);
     console.log("IS " + req.body.date + req.body.doctor + req.body.isFilled + patientId);
-    const prescription = await Prescription.find(filter);
+    const prescriptions = await Prescription.find(filter);
 
-    res.status(200).json({
-      status: 'success',
-      data: {
-        prescription: prescription,
-      },
-    });
-  } catch (err) {
+    
+    res.render("viewPrescriptions", {userId: patientId, prescriptions: prescriptions})
+  } 
+  catch (err) {
     res.status(500).json({
       status: 'error',
       message: err.message,
@@ -169,14 +159,13 @@ const filterthepresc = async (req, res) => {
 
 // Patient can select a prescription from his/her list of prescriptions req #56
 const selectPres = async (req, res) => {
-  const prescriptionId = req.body.id;
-  const patiendID = req.params.id;
+  //const prescriptionId = req.params.id;
+  const patientID = req.params.patientid;
+  const prescriptionId = req.params.id;
 
   try {
-    const prescription = await Prescription.find({
-      _id: prescriptionId,
-      patient: patiendID
-    });
+    const prescription = await Prescription.findById(prescriptionId).where({patient : patientID});
+    
 
     if (!prescription) {
       return res.status(404).json({
@@ -185,12 +174,7 @@ const selectPres = async (req, res) => {
       });
     }
 
-    res.status(200).json({
-      status: 'success',
-      data: {
-        prescription: prescription,
-      },
-    });
+    res.render("selectedPrescription", {userId: patientID, prescription: prescription})
   } catch (err) {
     res.status(500).json({
       status: 'error',
