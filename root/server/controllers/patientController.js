@@ -13,8 +13,33 @@ const getAllPatients = async (req, res) => {
   }
 };
 
+async function doctorDisplay(patientID, doctors) {
+  const patient = await Patient.findById(patientID);
+  const patientPackage = patient.subscribedPackage;
+  let sessionDiscount = 0;
+  if (patientPackage) {
+    const packageOffered = await Package.findOne({ name: patientPackage });
+    if (packageOffered) {
+      sessionDiscount = packageOffered.sessionDiscount || 0;
+    }
+  }
+  const doctorToDisplay = doctors.map((doctor) => {
+    const originalSessionPrice = doctor.sessionPrice;
+    const discountedPrice =
+      originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+    return {
+      _id: doctor._id,
+      name: doctor.fName + " " + doctor.lName,
+      specialty: doctor.specialty,
+      sessionPrice: discountedPrice,
+    };
+  });
+
+  return doctorToDisplay;
+}
+
 const renderHomePage = function (req, res) {
-  res.render("patientHome");
+  res.render("patientHome", { userId: req.params.id });
 };
 
 const renderRegisterationPage = function (req, res) {
@@ -219,25 +244,41 @@ const selectPrescription = async (req, res) => {
 // MARIAMS REQS
 
 const searchForDoctor = async (req, res) => {
-  const { name, specialty } = req.query;
   const patientID = req.params.id;
+  const filter = {};
+  if (req.query.specialty != "") {
+    filter.specialty = req.query.specialty;
+  }
+  if (req.query.fName != "") {
+    filter.fName = req.query.fName;
+    console.log(filter.fName);
+  }
+  if (req.query.lName != "") {
+    filter.lName = req.query.lName;
+  }
+
   try {
-    const query = {};
-    if (name) {
-      query.$or = [
-        { fName: { $regex: new RegExp(name, "i") } },
-        { lName: { $regex: new RegExp(name, "i") } },
-      ];
-    }
-    if (specialty) {
-      query.specialty = { $regex: new RegExp(specialty, "i") };
-    }
-    const doctors = await Doctor.find(query);
-    console.log(doctors);
+    const allDoctors = await Doctor.find().lean();
+    const uniqueSpecialtiesSet = new Set();
+    allDoctors.forEach((doctor) => {
+      uniqueSpecialtiesSet.add(doctor.specialty);
+    });
+    const uniqueSpecialties = [...uniqueSpecialtiesSet];
+
+    const doctors = await Doctor.find({ ...filter });
+    const doctorsToDisplay = await doctorDisplay(patientID, doctors);
     if (doctors.length === 0) {
-      res.status(404).json({ error: "Doctors not found" });
+      res.render("searchForDoctors", {
+        userId: patientID,
+        doctors: [],
+        uniqueSpecialties: uniqueSpecialties,
+      });
     } else {
-      res.status(200).json(doctors);
+      res.render("searchForDoctors", {
+        userId: patientID,
+        doctors: doctorsToDisplay,
+        uniqueSpecialties: uniqueSpecialties,
+      });
     }
   } catch (error) {
     console.error(error);
@@ -247,32 +288,61 @@ const searchForDoctor = async (req, res) => {
 
 const filterDoctors = async (req, res) => {
   try {
-    const specialty = req.body.specialty;
+    const specialty = req.query.specialty;
     const patientId = req.params.id;
-    const date = req.body.date;
-    const appointmentsByDate = await Appointments.find({
-      date: date,
-      isAvailable: true,
-    });
+    const date = req.query.date;
     const filter = {};
     const doctorIDS = [];
 
-    appointmentsByDate.forEach((appointment) => {
-      if (appointment.isAvailable === true) {
-        doctorIDS.push(appointment.doctor);
-      }
-    });
+    if (date) {
+      const appointmentsByDate = await Appointments.find({
+        date: date,
+        isAvailable: true,
+      });
+      appointmentsByDate.forEach((appointment) => {
+        if (appointment.isAvailable === true) {
+          doctorIDS.push(appointment.doctor);
+        }
+      });
+    }
+
     if (specialty) {
       filter.specialty = specialty;
     }
 
     if (doctorIDS.length > 0) {
       filter._id = { $in: doctorIDS };
+    } else if (doctorIDS.length === 0 && date) {
+      filter._id = null;
     }
 
     try {
+      const allDoctors = await Doctor.find().lean();
+      const uniqueSpecialtiesSet = new Set();
+      allDoctors.forEach((doctor) => {
+        uniqueSpecialtiesSet.add(doctor.specialty);
+      });
+      const uniqueSpecialties = [...uniqueSpecialtiesSet];
+
+      console.log(filter);
+
       const doctors = await Doctor.find(filter).exec();
-      res.json(doctors);
+
+      console.log(doctors);
+      const doctorsToDisplay = await doctorDisplay(patientId, doctors);
+      if (doctors.length === 0) {
+        res.render("searchForDoctors", {
+          userId: patientId,
+          doctors: [],
+          uniqueSpecialties: uniqueSpecialties,
+        });
+      } else {
+        res.render("searchForDoctors", {
+          userId: patientId,
+          doctors: doctorsToDisplay,
+          uniqueSpecialties: uniqueSpecialties,
+        });
+      }
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Server error" });
@@ -328,14 +398,15 @@ const filterMyAppointments = async (req, res) => {
 };
 
 const selectDoctor = async (req, res) => {
-  const patientID = req.params.id;
-  const doctorUsername = req.query.username;
+  const patientId = req.params.patientid;
+  const doctorId = req.params.doctorid;
   try {
-    const doctor = await Doctor.find({ username: doctorUsername });
+    const doctor = await Doctor.findOne({ _id: doctorId });
     if (!doctor) {
       return res.status(404).json({ message: "Doctor not found" });
     }
-    res.json(doctor);
+    console.log(doctor);
+    res.render("viewDoctor", { doctor: doctor });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -361,7 +432,7 @@ const getFamilyMembers = async (req, res) => {
     const familyMembers = patient.familyMembers;
 
     res.render("viewFamily.ejs", {
-      userID: patientID,
+      userId: patientID,
       patientFamily: familyMembers,
     });
   } catch (error) {
@@ -373,31 +444,20 @@ const getFamilyMembers = async (req, res) => {
 const getAllDoctors = async (req, res) => {
   try {
     const patientID = req.params.id;
-    const patient = await Patient.findById(patientID);
-    const patientPackage = patient.subscribedPackage;
-
-    let sessionDiscount = 0;
-    if (patientPackage) {
-      const packageOffered = await Package.findOne({ name: patientPackage });
-      if (packageOffered) {
-        sessionDiscount = packageOffered.sessionDiscount || 0;
-      }
-    }
-
     const doctors = await Doctor.find().lean();
-
-    const doctorsDisplay = doctors.map((doctor) => {
-      const originalSessionPrice = doctor.sessionPrice;
-      const discountedPrice =
-        originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
-      return {
-        name: doctor.fName + " " + doctor.lName,
-        specialty: doctor.specialty,
-        sessionPrice: discountedPrice,
-      };
+    const uniqueSpecialtiesSet = new Set();
+    doctors.forEach((doctor) => {
+      uniqueSpecialtiesSet.add(doctor.specialty);
     });
+    const uniqueSpecialties = [...uniqueSpecialtiesSet];
 
-    res.render("allDoctors", { userID: patientID, doctors: doctorsDisplay });
+    const doctorsToDisplay = await doctorDisplay(patientID, doctors);
+
+    res.render("searchForDoctors", {
+      userId: patientID,
+      doctors: doctorsToDisplay,
+      uniqueSpecialties: uniqueSpecialties,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });

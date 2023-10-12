@@ -36,8 +36,8 @@ router.get("/selectPrescription/:id", selectPrescription);
 router.get("/searchForDoctors/:id", searchForDoctor);
 router.get("/filterAvailableAppointments", filterAvailableAppointments);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
-router.get("/filterDoctors", filterDoctors);
-router.get("/selectDoctor/:id", selectDoctor);
+router.get("/filterDoctors/:id", filterDoctors);
+router.get("/doctorDetails/:patientid/:doctorid", selectDoctor);
 
 // SARA ROUTES
 
