@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Information</title>
+    <style>
+        body {
+            background-color: #0288D1;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #B3E5FC;
+            color: #212121;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+        }
+
+        .divider {
+            border-top: 1px solid #bdbdbd;
+            margin: 20px 0;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        .primary-text {
+            color: #212121;
+        }
+
+        .secondary-text {
+            color: #757575;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Patient Information</h1>
+        <div class="divider"></div>
+        <div class="label">Username:</div>
+        <div class="primary-text">
+            <%= patient.username %>
+        </div>
+        <div class="label">Email:</div>
+        <div class="primary-text">
+            <%= patient.email %>
+        </div>
+        <div class="label">Full Name:</div>
+        <div class="primary-text">
+            <%= patient.fName %>
+                <%= patient.lName %>
+        </div>
+        <div class="label">Date of Birth:</div>
+        <div class="primary-text">
+            <%= patient.dateOfBirth.toDateString() %>
+        </div>
+        <div class="label">Gender:</div>
+        <div class="primary-text">
+            <%= patient.gender %>
+        </div>
+        <div class="label">Phone Number:</div>
+        <div class="primary-text">
+            <%= patient.phoneNum %>
+        </div>
+        <div class="label">Emergency Contact:</div>
+        <div class="primary-text">
+            <%= patient.emergencyContact.fName %>
+                <%= patient.emergencyContact.lName %> (<%= patient.emergencyContact.phoneNum %>)
+        </div>
+        <div class="label">Family Members:</div>
+        <ul class="primary-text">
+            <% patient.familyMembers.forEach(member=> { %>
+                <li>
+                    <%= member.fName %>
+                        <%= member.lName %> - Relationship: <%= member.relationship %>
+                </li>
+                <% }); %>
+        </ul>
+        <div class="label">Wallet Balance:</div>
+        <div class="primary-text">$<%= patient.wallet %>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -251,7 +251,6 @@ const searchForDoctor = async (req, res) => {
   }
   if (req.query.fName != "") {
     filter.fName = req.query.fName;
-    console.log(filter.fName);
   }
   if (req.query.lName != "") {
     filter.lName = req.query.lName;
@@ -267,6 +266,7 @@ const searchForDoctor = async (req, res) => {
 
     const doctors = await Doctor.find({ ...filter });
     const doctorsToDisplay = await doctorDisplay(patientID, doctors);
+
     if (doctors.length === 0) {
       res.render("searchForDoctors", {
         userId: patientID,

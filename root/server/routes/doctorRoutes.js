@@ -25,13 +25,13 @@ router.get("/doctorProfile/:id", renderProfilePage);
 
 // MARIAMS ROUTES
 
-router.get("/searchForPatients", searchForPatient);
+router.get("/searchForPatients/:id", searchForPatient);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
 router.get("/upcomingappointments/:id", upcomingAppointments);
 
 //SARAS ROUTES
 
-router.get("/selectPatient/:id", getSinglePatient);
+router.get("/selectedPatient/:doctorid/:patientid", getSinglePatient);
 router.get("/viewMyPatients/:id", getMyPatients);
 
 export default router;
