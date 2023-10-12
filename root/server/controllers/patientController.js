@@ -17,10 +17,9 @@ const renderSelectDoctor = function(req,res){
   res.render("selectDoctor",{userID: patientId})
 }
 
-const renderFilterDoctor = function(req,res){
-  const patientId = req.params.id;
-  res.render("filterDoctors",{userID: patientId})
-}
+const renderViewAllDoctors = function (req,res) {
+  const patientID = req.params.id;
+};
 
 // create (register) a patient
 const createPatient = async (req, res) => {
@@ -59,8 +58,8 @@ const createPatient = async (req, res) => {
     if (doctors.length === 0) {
       res.status(404).json({ error: 'Doctors not found' });
     } else {
-      //res.status(200).json(doctors);
-      res.render('searchForDoctors', { doctors, userID: patientID });
+      res.status(200).json(doctors);
+      //res.render('searchForDoctors', { doctors, userID: patientID });
     }
   } catch (error) {
     console.error(error);
@@ -112,8 +111,8 @@ const createPatient = async (req, res) => {
       const patient = await Patient.findById(patientId);
       const appointments = await Appointments.find(filter);
       
-       // res.status(200).json(appointments)
-       res.render('pateintAppointments', { appointments, userID: patientId }); 
+       res.status(200).json(appointments)
+       //res.render('pateintAppointments', { appointments, userID: patientId }); 
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Server error' });
@@ -123,7 +122,7 @@ const createPatient = async (req, res) => {
  const filterDoctors = async (req, res) => {
  
   try {
-    const specialty = req.query.specialty
+    const specialty = req.body.specialty
     const patientId = req.params.id;
     const date = req.body.date;
     const appointmentsByDate = await Appointments.find({date : date,  isAvailable : true});
@@ -145,8 +144,8 @@ const createPatient = async (req, res) => {
 
 try {
   const doctors = await Doctor.find(filter).exec();
-  //res.json(doctors);
-  res.render('filterDoctors', { doctors, userID: patientId });
+  res.json(doctors);
+ // res.render('filterDoctors', { doctors, userID: patientId });
 } catch (err) {
   console.error(err);
   res.status(500).json({ error: 'Server error' });
@@ -170,13 +169,46 @@ const selectDoctor = async (req, res) => {
     if(!doctor){
       return res.status(404).json({message: "Doctor not found"});
     }
-   // res.json(doctor);
-   res.render('selectDoctor', { doctor, userID: patientID });
+    res.json(doctor);
+   //res.render('selectDoctor', { doctor, userID: patientID });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
-};;
+};
+
+const getAllDoctors = async (req, res) => {
+  try {
+    const patientID = req.params.id;
+    const patient = await Patient.findById(patientID);
+    const patientPackage = patient.subscribedPackage;
+    
+    let sessionDiscount = 0;
+    if (patientPackage) {
+      const packageOffered = await Package.findOne({ name: patientPackage });
+      if (packageOffered) {
+        sessionDiscount = packageOffered.sessionDiscount || 0;
+      }
+    }
+
+    const doctors = await Doctor.find().lean();
+
+    const doctorsDisplay = doctors.map((doctor) => {
+      const originalSessionPrice = doctor.sessionPrice;
+      const discountedPrice = originalSessionPrice - (originalSessionPrice * (sessionDiscount / 100));
+      return {
+        name: doctor.fName + " " + doctor.lName,
+        specialty: doctor.specialty,
+        sessionPrice: discountedPrice,
+      };
+    });
+    
+   // res.render("allDoctors", {userID: patientID , doctors: doctorsDisplay});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
 
 export { 
   createPatient, 
@@ -184,5 +216,7 @@ export {
   filterAvailableAppointments,
   filtermyAppointments,
   filterDoctors,
-  selectDoctor
+  selectDoctor,
+  getAllDoctors,
+  renderSearchDoctors
  };

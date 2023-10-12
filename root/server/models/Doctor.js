@@ -48,6 +48,10 @@ const doctorSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  sessionPrice: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Doctor = mongoose.model("Doctor", doctorSchema);

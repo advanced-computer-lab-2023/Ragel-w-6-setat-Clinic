@@ -1,5 +1,5 @@
 import express from "express";
-import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors ,selectDoctor } from "../controllers/patientController.js";
+import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors ,selectDoctor,getAllDoctors } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
@@ -8,7 +8,7 @@ const router = express.Router();
 router.post("/registeration", createPatient);
 
 // Search for a doctor by name/specialty
-router.get("/searchForDoctors" , searchForDoctor);
+router.get("/searchForDoctors/:id" , searchForDoctor);
 
 // Filter available appointments by date and status
 router.get("/filterAvailableAppointments", filterAvailableAppointments);
@@ -20,6 +20,9 @@ router.get("/filtermyAppointments/:id", filtermyAppointments);
 router.get("/filterDoctors",filterDoctors);
 
 //select a doctor from the search/filter results (dependent on 37)
-router.get("/selectDoctor",selectDoctor);
+router.get("/selectDoctor/:id",selectDoctor);
+
+
+
 
 export default router;

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Find a Doctor</title>
     <style>
         body {
             background-color: #B3E5FC;
@@ -10,71 +9,67 @@
         .container {
             background-color: #ffffff;
             padding: 20px;
+            border: 1px solid #bdbdbd;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-        .filter-bar {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .specialty-filter {
-            flex: 1;
-            margin-right: 20px;
-        }
-        .date-time-filter {
-            flex: 1;
-        }
-        .filter-button {
+        .primary-button {
             background-color: #0288D1;
             color: #ffffff;
-            border: none;
             padding: 10px 20px;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        .doctor-list {
-            background-color: #ffffff;
-            border: 1px solid #448aff;
-            border-radius: 5px;
-            padding: 20px;
-        }
-        .doctor-item {
+        .secondary-button {
             background-color: #03a9f4;
             color: #ffffff;
-            padding: 10px;
-            margin: 5px 0;
+            padding: 10px 20px;
+            border: none;
             border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        label {
+            color: #757575;
         }
         .divider {
             background-color: #bdbdbd;
             height: 1px;
-            margin: 10px 0;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Find a Doctor</h1>
-        <div class="filter-bar">
-            <input type="text" class="specialty-filter" placeholder="Doctor Specialty">
-            <input type="date" class="date-time-filter" placeholder="Date">
-            <input type="time" class="date-time-filter" placeholder="Time">
-            <button class="filter-button">Filter</button>
-        </div>
-        <div class="doctor-list">
-            <% doctors.forEach(function(doctor) { %>
-                <div class="doctor-item">
-                    <strong>Username:</strong> <%= doctor.username %><br>
-                    <strong>Name:</strong> <%= doctor.fName %> <%= doctor.lName %><br>
-                    <strong>Date of Birth:</strong> <%= doctor.dateOfBirth %><br>
-                    <strong>Specialty:</strong> <%= doctor.specialty %><br>
-                    <strong>Hourly Rate:</strong> $<%= doctor.hourlyRate %><br>
-                    <!-- Add more doctor properties as needed -->
-                </div>
-                <div class="divider"></div>
-            <% }); %>
-        </div>
+        <h1>Doctor Search</h1>
+        <form action="/search" method="POST">
+            <div class="form-group">
+                <label for="fName">First Name:</label>
+                <input type="text" id="fName" name="fName" placeholder="Enter doctor's first name">
+            </div>
+            <div class="form-group">
+                <label for="lName">Last Name:</label>
+                <input type="text" id="lName" name="lName" placeholder="Enter doctor's last name">
+            </div>
+            <div class="form-group">
+                <label for="specialty">Specialty:</label>
+                <input type="text" id="specialty" name="specialty" placeholder="Enter specialty">
+            </div>
+            <div class="form-group">
+                <label for="availabilityDate">Availability Date:</label>
+                <input type="date" id="availabilityDate" name="availabilityDate">
+            </div>
+            <div class="form-group">
+                <label for="availabilityTime">Availability Time:</label>
+                <input type="time" id="availabilityTime" name="availabilityTime">
+            </div>
+            <button class="primary-button" type="submit">Search</button>
+        </form>
+        <div class="divider"></div>
+        <h2>Search Results</h2>
+        <!-- Display search results here -->
     </div>
 </body>
 </html>
