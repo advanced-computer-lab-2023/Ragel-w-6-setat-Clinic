@@ -1,9 +1,10 @@
 
 import { Route, Routes } from "react-router-dom";
-//import Login from "./components/Login";
+import RemoveGeneral from "./components/RemoveGeneral";
 
 function App() {
-    // return (
+     return (
+        <Route path="/registration" element={<RegistrationOptions />} />
     // //   <Routes>
     // //     <Route path="/" exact element={<Login />} />
     // //     <Route path="/registration" element={<RegistrationOptions />} />
@@ -13,7 +14,7 @@ function App() {
     // //     <Route path="/admin/addadmin" element={<AddAdmin />} />
     // //     <Route path="/admin/removeuser" element={<RemoveUser />} />
     // //   </Routes>
-    // );
+     );
   }
   
   export default App;
