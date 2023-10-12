@@ -8,6 +8,10 @@ import {
   renderHomePage,
   renderAddAdminPage,
   renderPackagePage,
+  deleteAdmin,
+  deletePatient,
+  deleteDoctor,
+  viewUnregisteredDoctors,
 } from "../controllers/adminController.js";
 import { body, validationResult } from "express-validator";
 
@@ -22,5 +26,11 @@ router.delete("/packageManagement/:userid/:packageid", deletePackage);
 router.patch("/packageManagement/:userid/:packageid", updatePackage);
 router.get("/allAdmins", getAllAdmins);
 router.get("/adminHome/:id", renderHomePage);
+
+//LOJAINS ROUTES
+router.delete("/deleteAdmin", deleteAdmin);
+router.delete("/deletePatient", deletePatient);
+router.delete("/deleteDoctor", deleteDoctor);
+router.get("/viewUnregisteredDoctors", viewUnregisteredDoctors);
 
 export default router;

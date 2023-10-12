@@ -2,10 +2,6 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const familyMemberSchema = new Schema({
-  email: {
-    type: String,
-    required: true,
-  },
   fName: {
     type: String,
     required: true,

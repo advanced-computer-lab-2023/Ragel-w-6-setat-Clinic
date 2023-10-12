@@ -1,4 +1,6 @@
 import Admin from "../models/Admin.js";
+import Doctor from "../models/Doctor.js";
+import Patient from "../models/Patient.js";
 import Package from "../models/Package.js";
 
 const getAllAdmins = async (req, res) => {
@@ -113,6 +115,112 @@ const updatePackage = async (req, res) => {
   }
 };
 
+//LOJAINS REQS
+
+const deleteAdmin = async (req, res) => {
+  try {
+    const filter = {
+      username: req.body.username,
+    };
+    const deleteAdminResult = await Admin.deleteMany(filter);
+
+    if (deleteAdminResult.deletedCount == 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Admin not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        admin: deleteAdminResult,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const deletePatient = async (req, res) => {
+  try {
+    const filter = {
+      username: req.body.username,
+    };
+    const deletedPatientResult = await Patient.deleteMany(filter);
+
+    if (deletedPatientResult.deletedCount == 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Patient not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        deleted: deletedPatientResult,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const deleteDoctor = async (req, res) => {
+  try {
+    const filter = {
+      username: req.body.username,
+    };
+    const deleteDoctorResult = await Doctor.deleteMany(filter);
+
+    if (deleteDoctorResult.deletedCount == 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Doctor not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        patient: deleteDoctorResult,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const viewUnregisteredDoctors = async (req, res) => {
+  try {
+    const doctor = await Doctor.find({
+      isRegistered: false,
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        doctor: doctor,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
 export {
   createAdmin,
   createPackage,
@@ -122,4 +230,8 @@ export {
   renderHomePage,
   renderAddAdminPage,
   renderPackagePage,
+  deleteAdmin,
+  deletePatient,
+  deleteDoctor,
+  viewUnregisteredDoctors,
 };
