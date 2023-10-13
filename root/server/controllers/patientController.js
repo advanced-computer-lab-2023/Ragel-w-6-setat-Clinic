@@ -176,13 +176,18 @@ const viewPrescription = async (req, res) => {
     }
 
     // Find all the prescriptions for the patient
-    const prescriptions = await Prescription.find({ patient: patientId });
+    const prescriptions = await Prescription.find({
+      patient: patientId,
+    }).populate("doctor");
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        prescriptions: prescriptions,
-      },
+    const doctorsSet = await Doctor.find({ isRegistered: true }).select(
+      "username"
+    );
+
+    res.render("viewPrescriptions", {
+      userId: patientId,
+      prescriptions: prescriptions,
+      doctorsSet: doctorsSet,
     });
   } catch (err) {
     // Handle errors, for example, database connection issues
@@ -198,32 +203,41 @@ const filterThePrescription = async (req, res) => {
   try {
     const filter = {};
 
-    if (req.body.doctor) {
-      filter.doctor = req.body.doctor;
+    if (req.query.doctor) {
+      const doctorsWithSpecificUsername = await Doctor.findOne({
+        username: req.query.doctor,
+      });
+      filter.doctor = doctorsWithSpecificUsername._id;
     }
 
-    if (req.body.date) {
-      filter.date = req.body.date;
+    if (req.query.date) {
+      var min_date = new Date(req.query.date);
+      var max_date = new Date(req.query.date);
+      min_date.setHours(0, 0, 0, 0);
+      max_date.setHours(23, 59, 59, 999);
+      filter.date = {
+        $gte: min_date,
+        $lt: max_date,
+      };
     }
-
-    if (req.body.isFilled) {
-      filter.isFilled = req.body.isFilled;
+    if (req.query.isFilled) {
+      filter.isFilled = req.query.isFilled;
     }
 
     if (req.params.id) {
       filter.patient = req.params.id;
     }
-    const patient = await Patient.findById(patientId);
-    console.log(
-      "IS " + req.body.date + req.body.doctor + req.body.isFilled + patientId
-    );
-    const prescription = await Prescription.find(filter);
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        prescription: prescription,
-      },
+    const prescriptions = await Prescription.find(filter).populate("doctor");
+
+    const doctorsSet = await Doctor.find({ isRegistered: true }).select(
+      "username"
+    );
+
+    res.render("viewPrescriptions", {
+      userId: patientId,
+      prescriptions: prescriptions,
+      doctorsSet: doctorsSet,
     });
   } catch (err) {
     res.status(500).json({
