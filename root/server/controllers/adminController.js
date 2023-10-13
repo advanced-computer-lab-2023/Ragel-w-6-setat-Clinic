@@ -117,10 +117,23 @@ const updatePackage = async (req, res) => {
 
 //LOJAINS REQS
 
+const renderDeleteAdminPage = function (req, res) {
+  const adminId = req.params.id;
+  res.render("deleteAdmin", { userId: adminId });
+};
+const renderDeleteDoctorPage = function (req, res) {
+  const adminId = req.params.id;
+  res.render("deleteDoctor", { userId: adminId });
+};
+const renderDeletePatientPage = function (req, res) {
+  const adminId = req.params.id;
+  res.render("deletePatient", { userId: adminId });
+};
+
 const deleteAdmin = async (req, res) => {
   try {
     const filter = {
-      username: req.body.username,
+      username: req.query.username,
     };
     const deleteAdminResult = await Admin.deleteMany(filter);
 
@@ -148,7 +161,7 @@ const deleteAdmin = async (req, res) => {
 const deletePatient = async (req, res) => {
   try {
     const filter = {
-      username: req.body.username,
+      username: req.query.username,
     };
     const deletedPatientResult = await Patient.deleteMany(filter);
 
@@ -172,11 +185,10 @@ const deletePatient = async (req, res) => {
     });
   }
 };
-
 const deleteDoctor = async (req, res) => {
   try {
     const filter = {
-      username: req.body.username,
+      username: req.query.username,
     };
     const deleteDoctorResult = await Doctor.deleteMany(filter);
 
@@ -203,15 +215,14 @@ const deleteDoctor = async (req, res) => {
 
 const viewUnregisteredDoctors = async (req, res) => {
   try {
-    const doctor = await Doctor.find({
+    const doctorId = req.params.id;
+    const doctors = await Doctor.find({
       isRegistered: false,
     });
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        doctor: doctor,
-      },
+    res.render("viewDoctorApplications", {
+      userId: doctorId,
+      doctors: doctors,
     });
   } catch (err) {
     res.status(500).json({
@@ -234,4 +245,7 @@ export {
   deletePatient,
   deleteDoctor,
   viewUnregisteredDoctors,
+  renderDeleteAdminPage,
+  renderDeleteDoctorPage,
+  renderDeletePatientPage,
 };

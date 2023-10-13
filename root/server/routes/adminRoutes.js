@@ -12,12 +12,14 @@ import {
   deletePatient,
   deleteDoctor,
   viewUnregisteredDoctors,
+  renderDeleteAdminPage,
+  renderDeleteDoctorPage,
+  renderDeletePatientPage,
 } from "../controllers/adminController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
 
-// post request to create an admin
 router.get("/addAdmin/:id", renderAddAdminPage);
 router.post("/addAdmin/:id", createAdmin);
 router.get("/packageManagement/:id", renderPackagePage);
@@ -31,6 +33,9 @@ router.get("/adminHome/:id", renderHomePage);
 router.delete("/deleteAdmin", deleteAdmin);
 router.delete("/deletePatient", deletePatient);
 router.delete("/deleteDoctor", deleteDoctor);
-router.get("/viewUnregisteredDoctors", viewUnregisteredDoctors);
+router.get("/viewUnregisteredDoctors/:id", viewUnregisteredDoctors);
+router.get("/deleteAdmin/:id", renderDeleteAdminPage);
+router.get("/deleteDoctor/:id", renderDeleteDoctorPage);
+router.get("/deletePatient/:id", renderDeletePatientPage);
 
 export default router;

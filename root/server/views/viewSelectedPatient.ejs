@@ -46,10 +46,6 @@
         <div class="container">
             <h1>Patient Information</h1>
             <div class="divider"></div>
-            <div class="label">Username:</div>
-            <div class="primary-text">
-                <%= patient.username %>
-            </div>
             <div class="label">Email:</div>
             <div class="primary-text">
                 <%= patient.email %>
@@ -85,9 +81,15 @@
                     </li>
                     <% }); %>
             </ul>
-            <div class="label">Wallet Balance:</div>
-            <div class="primary-text">$<%= patient.wallet %>
-            </div>
+            <div class="label">Health Records:</div>
+            <ul class="primary-text">
+                <% patient.medicalHistory.forEach(healthRecord=> { %>
+                    <li>
+                        <%= healthRecord %>
+                    </li>
+                    <% }); %>
+            </ul>
+        </div>
         </div>
 </body>
 

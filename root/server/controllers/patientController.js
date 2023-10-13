@@ -278,6 +278,7 @@ const searchForDoctor = async (req, res) => {
   if (req.query.lName != "") {
     filter.lName = req.query.lName;
   }
+  filter.isRegistered = true;
 
   try {
     const allDoctors = await Doctor.find().lean();
@@ -287,8 +288,8 @@ const searchForDoctor = async (req, res) => {
     });
     const uniqueSpecialties = [...uniqueSpecialtiesSet];
 
-    const doctors = await Doctor.find({ ...filter });
-    const doctorsToDisplay = await doctorDisplay(patientID, doctors);
+    const doctors = await Doctor.find(filter);
+    const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
 
     if (doctors.length === 0) {
       res.render("searchForDoctors", {
@@ -339,6 +340,7 @@ const filterDoctors = async (req, res) => {
     } else if (doctorIDS.length === 0 && date) {
       filter._id = null;
     }
+    filter.isRegistered = true;
 
     try {
       const allDoctors = await Doctor.find().lean();
@@ -492,7 +494,9 @@ const getFamilyMembers = async (req, res) => {
 const getAllDoctors = async (req, res) => {
   try {
     const patientID = req.params.id;
-    const doctors = await Doctor.find().lean();
+    const filter = {};
+    filter.isRegistered = true;
+    const doctors = await Doctor.find(filter).lean();
     const uniqueSpecialtiesSet = new Set();
     doctors.forEach((doctor) => {
       uniqueSpecialtiesSet.add(doctor.specialty);
