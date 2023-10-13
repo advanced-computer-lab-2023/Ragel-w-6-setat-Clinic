@@ -11,6 +11,7 @@ import {
   upcomingAppointments,
   getMyPatients,
   getSinglePatient,
+  getMyAppointments,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 
@@ -28,6 +29,7 @@ router.get("/doctorProfile/:id", renderProfilePage);
 router.get("/searchForPatients/:id", searchForPatient);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
 router.get("/upcomingappointments/:id", upcomingAppointments);
+router.get("/getMyAppointments/:id", getMyAppointments);
 
 //SARAS ROUTES
 

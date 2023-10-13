@@ -350,7 +350,7 @@ const filterDoctors = async (req, res) => {
 
       const doctors = await Doctor.find(filter).exec();
 
-      const doctorsToDisplay = await doctorDisplay(patientId, doctors);
+      const doctorsToDisplay = await doctorsDisplay(patientId, doctors);
       if (doctors.length === 0) {
         res.render("searchForDoctors", {
           userId: patientId,
@@ -400,7 +400,14 @@ const filterMyAppointments = async (req, res) => {
     const filter = {};
 
     if (req.query.date) {
-      filter.date = req.queryq.date;
+      var min_date = new Date(req.query.date);
+      var max_date = new Date(req.query.date);
+      min_date.setHours(0, 0, 0, 0);
+      max_date.setHours(23, 59, 59, 999);
+      filter.date = {
+        $gte: min_date,
+        $lt: max_date,
+      };
     }
 
     if (req.query.status) {
@@ -409,9 +416,28 @@ const filterMyAppointments = async (req, res) => {
 
     filter.patient = req.params.id;
 
-    const appointments = await Appointments.find(filter);
+    const appointments = await Appointments.find(filter).populate("doctor");
 
-    res.status(200).json(appointments);
+    res.render("viewAppointmentsPatient", {
+      userId: patientId,
+      appointments: appointments,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const getMyAppointments = async (req, res) => {
+  try {
+    const patientId = req.params.id;
+    const appointments = await Appointments.find({
+      patient: patientId,
+    }).populate("doctor");
+    res.render("viewAppointmentsPatient", {
+      userId: patientId,
+      appointments: appointments,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
@@ -535,4 +561,5 @@ export {
   selectDoctor,
   getFamilyMembers,
   getAllDoctors,
+  getMyAppointments,
 };

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments for Patient</title>
+    <style>
+        body {
+            background-color: #0288D1;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .appointment-item {
+            background-color: #B3E5FC;
+            color: #212121;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+
+        .divider {
+            border-top: 1px solid #bdbdbd;
+            margin: 20px 0;
+        }
+
+        .search-bar {
+            background-color: #B3E5FC;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            padding: 10px;
+            /* Adjust padding to provide space between the inputs and the div border */
+            box-sizing: border-box;
+            /* Ensures padding and border are included in the total width/height */
+        }
+
+        .search-input-group {
+            flex: 1 1 calc(48% - 20px);
+            /* Adjust width for smaller screens and add some space between inputs */
+            margin-bottom: 10px;
+            /* Add bottom margin for separation between input groups */
+        }
+
+
+        .search-input-group label,
+        .search-input-group input,
+        .search-input-group select {
+            display: block;
+            margin-bottom: 5px;
+            color: #212121;
+        }
+
+        .search-input,
+        #statusFilter {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+            /* Ensures padding and border are included in the total width */
+        }
+
+        .search-button {
+            background-color: #03a9f4;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include("doctorNavBar", {doctorId: userId}) %>
+        <h1>Appointments for Doctor</h1>
+
+        <div class="search-bar">
+            <form action="/doctors/filterMyAppointments/<%= userId %>" method="get">
+                <div class="search-input-group">
+                    <label for="status">Filter by Status:</label>
+                    <select id="statusFilter" name="status" class="search-input">
+                        <option value="">All</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="rescheduled">Rescheduled</option>
+                    </select>
+
+                </div>
+                <div class="search-input-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" class="search-input">
+                </div>
+                <button type="submit" class="search-button">Filter</button>
+            </form>
+        </div>
+
+        <% if (appointments && appointments.length> 0) { %>
+            <% appointments.forEach(appointment=> { %>
+                <div class="appointment-item">
+                    <p><strong>Patient:</strong>
+                        <%= appointment.patient.fName %>
+                            <%= appointment.patient.lName %>
+                    </p>
+                    <p><strong>Date:</strong>
+                        <%= appointment.date.toDateString() %>
+                    </p>
+                    <p><strong>Type:</strong>
+                        <%= appointment.type %>
+                    </p>
+                    <p><strong>Status:</strong>
+                        <%= appointment.status %>
+                    </p>
+                </div>
+                <div class="divider"></div>
+                <% }); %>
+                    <% } else { %>
+                        <p>No appointments found for this patient.</p>
+                        <% } %>
+</body>
+
+</html>

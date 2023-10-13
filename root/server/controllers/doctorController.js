@@ -127,16 +127,43 @@ const filterMyAppointments = async (req, res) => {
     const filter = {};
 
     if (req.query.date) {
-      filter.date = req.query.date;
+      var min_date = new Date(req.query.date);
+      var max_date = new Date(req.query.date);
+      min_date.setHours(0, 0, 0, 0);
+      max_date.setHours(23, 59, 59, 999);
+      filter.date = {
+        $gte: min_date,
+        $lt: max_date,
+      };
     }
+
     if (req.query.status) {
       filter.status = req.query.status;
     }
 
     filter.doctor = req.params.id;
 
-    const appointments = await Appointments.find(filter);
-    res.status(200).json(appointments);
+    const appointments = await Appointments.find(filter).populate("patient");
+    res.render("viewAppointmentsDoctor", {
+      userId: doctorId,
+      appointments: appointments,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const getMyAppointments = async (req, res) => {
+  try {
+    const doctorId = req.params.id;
+    const appointments = await Appointments.find({
+      doctor: doctorId,
+    }).populate("patient");
+    res.render("viewAppointmentsDoctor", {
+      userId: doctorId,
+      appointments: appointments,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
@@ -246,4 +273,5 @@ export {
   upcomingAppointments,
   getMyPatients,
   getSinglePatient,
+  getMyAppointments,
 };

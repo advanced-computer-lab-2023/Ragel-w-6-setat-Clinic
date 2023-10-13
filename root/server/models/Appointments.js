@@ -20,7 +20,8 @@ const appointmentSchema = new Schema({
   },
   type: {
     type: String,
-    required: false,
+    required: true,
+    default: "general",
   },
   status: {
     type: String,

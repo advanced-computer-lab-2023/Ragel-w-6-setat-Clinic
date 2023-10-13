@@ -41,7 +41,8 @@
     <h1>Welcome, Doctor!</h1>
     <div class="button-container">
         <button class="button" onclick="window.location.href='/doctors/doctorProfile/<%= userId %>'">My Profile</button>
-        <button class="button" onclick="window.location.href='/my-appointments'">My Appointments</button>
+        <button class="button" onclick="window.location.href='/doctors/getMyAppointments/<%= userId %>'">My
+            Appointments</button>
         <button class="button" onclick="window.location.href='/doctors/viewMyPatients/<%= userId %>'">My
             Patients</button>
     </div>

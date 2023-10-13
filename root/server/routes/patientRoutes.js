@@ -15,6 +15,7 @@ import {
   selectDoctor,
   getFamilyMembers,
   getAllDoctors,
+  getMyAppointments,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -35,6 +36,7 @@ router.get("/selectPrescription/:id", selectPrescription);
 router.get("/searchForDoctors/:id", searchForDoctor);
 router.get("/filterAvailableAppointments", filterAvailableAppointments);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
+router.get("/getMyAppointments/:id", getMyAppointments);
 router.get("/filterDoctors/:id", filterDoctors);
 router.get("/doctorDetails/:patientid/:doctorid", selectDoctor);
 
