@@ -125,15 +125,15 @@ const filterthepresc = async (req, res) => {
 
     const filter = {};
 
-    if (req.body.doctor) {
+    if (req.query.doctor) {
       filter.doctor = req.query.doctor;
     }
 
-    if (req.body.date) {
+    if (req.query.date) {
       filter.date = req.query.date;
     }
 
-    if (req.body.isFilled) {
+    if (req.query.isFilled) {
       filter.isFilled = req.query.isFilled;
     }
 
@@ -145,8 +145,46 @@ const filterthepresc = async (req, res) => {
     const prescriptions = await Prescription.find(filter);
 
     
-    res.render("viewPrescriptions", {userId: patientId, prescriptions: prescriptions})
-  } 
+     const filterthepresc = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+
+    const filter = {};
+
+    if (req.query.doctor) {
+      filter.doctor = req.query.doctor;
+    }
+
+    if (req.query.date) {
+      filter.date = req.query.date;
+    }
+
+    if (req.query.isFilled !== undefined) {
+      filter.isFilled = req.query.isFilled === 'true';
+    }
+
+
+    if (req.params.id) {
+      filter.patient = patientId;
+    }
+    const patient = await Patient.findById(patientId);
+    console.log("IS " + req.body.date + req.body.doctor + req.body.isFilled + patientId);
+    const prescriptions = await Prescription.find(filter);
+
+    
+    res.render("viewPrescriptions", {
+      userId: patientId,
+      prescriptions: prescriptions
+    });
+   } 
+  catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: err.message,
+    });
+  }
+};
+   } 
   catch (err) {
     res.status(500).json({
       status: 'error',

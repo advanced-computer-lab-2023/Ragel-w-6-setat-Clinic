@@ -7,8 +7,8 @@ const router = express.Router();
 // post request to create a patient
 router.post("/registeration", createPatient);
 router.post("/familyMembers/:id",addFamMem);
-router.get("/viewPrescription/:id",viewPrescription);
-router.get("/viewPrescription/:id",filterthepresc);
+router.get("/viewPrescriptions/:id",viewPrescription);
+ router.get("/bobota5ta5/:id",filterthepresc);
 router.get("/selectedPrescription/:patientid/:id",selectPres);
 router.get("/filterDoctors",filterDoctors);
 

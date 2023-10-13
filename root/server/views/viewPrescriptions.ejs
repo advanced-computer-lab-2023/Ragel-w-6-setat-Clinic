@@ -18,6 +18,14 @@
       margin: 0;
     }
 
+    .filters {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
     .prescription-list {
       background-color: #0288d1;
       padding: 20px;
@@ -34,15 +42,10 @@
       padding: 10px;
       margin: 10px 0;
       border-radius: 5px;
-      cursor: pointer;
     }
 
     .error-message {
       color: #ff0000;
-    }
-
-    .filters {
-      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -70,20 +73,24 @@
 
   <div class="prescription-list">
     <h1>Prescription List</h1>
-<div id="prescriptions-container">
-  <% prescriptions.forEach(prescription => { %>
-    <div class="prescription-item">
-      <h2>Medication: <%= prescription.medication %></h2>
-      <p>Dosage: <%= prescription.dosage %></p>
-      <p>Is Filled: <%= prescription.isFilled %></p>
-      <p>Date: <%= prescription.date %></p>
-      <p>Notes: <%= prescription.notes %></p>
+    <div id="prescriptions-container">
+      <% prescriptions.forEach(prescription => { %>
+        <div class="prescription-item">
+          <h2>Medication: <%= prescription.medication %></h2>
+          <p>Dosage: <%= prescription.dosage %></p>
+          <p>Is Filled: <%= prescription.isFilled %></p>
+          <p>Date: <%= prescription.date %></p>
+          <p>Notes: <%= prescription.notes %></p>
+        </div>
+        <br>
+      <% }); %>
     </div>
-    <br>
-  <% }); %>
-</div>
-<p class="error-message" id="error-message"></p>
-</div>
+    <p class="error-message" id="error-message"></p>
+  </div>
+
+  <script>
+    // Your JavaScript code here
+  </script>
 
 </body>
 

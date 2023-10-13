@@ -48,10 +48,7 @@ mongoose
     console.error("Error connecting to MongoDB:", err);
   });
 
-  // app.get("/admins/deleteAdmin", (req, res) => {
-  //   const adminUserName = req.body.id;
-  //   res.render("deleteAdmin");
-  // });
+
 
   app.get("/admins/deletePatient", (req, res) => {
     const patientUserName = req.body.id;
@@ -63,7 +60,7 @@ mongoose
     res.render("deleteDoctor");
   });
 
-  app.get('/admins/delete', (req, res) => {
+  app.get('/admins/deleteAdmin', (req, res) => {
     res.render('deleteAdmin'); // Assuming 'deleteAdmin' is the name of your EJS template file
 });
   app.get("/admins/viewDoctorApplications", (req, res) => {
