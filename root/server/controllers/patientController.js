@@ -130,9 +130,15 @@ const filterthepresc = async (req, res) => {
     }
 
     if (req.query.date) {
-      filter.date = req.query.date;
+      var min_date = new Date(req.query.date);
+      var max_date = new Date(req.query.date);
+      min_date.setHours(0, 0, 0, 0);
+      max_date.setHours(23, 59, 59, 999);
+      filter.date = {
+        $gte: min_date,
+        $lt: max_date,
+      };
     }
-
     if (req.query.isFilled) {
       filter.isFilled = req.query.isFilled;
     }
@@ -140,37 +146,12 @@ const filterthepresc = async (req, res) => {
     if (req.params.id) {
       filter.patient = req.params.id;
     }
+
     const patient = await Patient.findById(patientId);
     console.log("IS " + req.body.date + req.body.doctor + req.body.isFilled + patientId);
     const prescriptions = await Prescription.find(filter);
 
-    
-     const filterthepresc = async (req, res) => {
-  const patientId = req.params.id;
-  try {
-
-    const filter = {};
-
-    if (req.query.doctor) {
-      filter.doctor = req.query.doctor;
-    }
-
-    if (req.query.date) {
-      filter.date = req.query.date;
-    }
-
-    if (req.query.isFilled !== undefined) {
-      filter.isFilled = req.query.isFilled === 'true';
-    }
-
-
-    if (req.params.id) {
-      filter.patient = patientId;
-    }
-    const patient = await Patient.findById(patientId);
-    console.log("IS " + req.body.date + req.body.doctor + req.body.isFilled + patientId);
-    const prescriptions = await Prescription.find(filter);
-
+    //res.json(prescriptions);
     
     res.render("viewPrescriptions", {
       userId: patientId,
@@ -184,15 +165,7 @@ const filterthepresc = async (req, res) => {
     });
   }
 };
-   } 
-  catch (err) {
-    res.status(500).json({
-      status: 'error',
-      message: err.message,
-    });
-  }
-};
-
+ 
 
 
 // Patient can select a prescription from his/her list of prescriptions req #56
@@ -212,6 +185,7 @@ const selectPres = async (req, res) => {
       });
     }
 
+    res.json(prescription);
     res.render("selectedPrescription", {userId: patientID, prescription: prescription})
   } catch (err) {
     res.status(500).json({
