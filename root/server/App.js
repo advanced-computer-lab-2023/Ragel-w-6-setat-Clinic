@@ -51,23 +51,26 @@ mongoose
 
 
   app.get("/admins/deletePatient", (req, res) => {
-    const patientUserName = req.body.id;
     res.render("deletePatient");
   });
 
   app.get("/admins/deleteDoctor", (req, res) => {
-    const DoctorUserName = req.body.id;
     res.render("deleteDoctor");
   });
 
   app.get('/admins/deleteAdmin', (req, res) => {
-    res.render('deleteAdmin'); // Assuming 'deleteAdmin' is the name of your EJS template file
+    res.render('deleteAdmin');
 });
+
   app.get("/admins/viewDoctorApplications", (req, res) => {
     const DoctorUserName = req.query.id;
-    res.render("viewDoctorApplications",{username : DoctorUserName});
+    res.render("viewDoctorApplications");
   });
 
-
+ 
+  app.get("/patients/addFamMem/:userId", (req,res)=>
+  { const patientID = req.params.userId;
+    res.render("addFamMems",{userId :patientID });
+  });
 
 

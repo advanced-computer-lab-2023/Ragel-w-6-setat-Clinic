@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Family Member</title>
+    <style>
+        body {
+            background-color: #B3E5FC;
+            font-family: Arial, sans-serif;
+            color: #212121;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            color: #0288D1;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input[type="text"],
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #BDBDBD;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .form-group button[type="submit"] {
+            background-color: #448aff;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .form-group button[type="submit"]:hover {
+            background-color: #2979ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        
+        <h2 style="color: #0288D1;">Add Family Member</h2>
+
+        <form action="/patients/addFamMem/<%= userId %>" method="post">
+            <div class="form-group">
+                <label for="fName">First Name:</label>
+                <input type="text" id="fName" name="fName" required>
+            </div>
+            <div class="form-group">
+                <label for="lName">Last Name:</label>
+                <input type="text" id="lName" name="lName" required>
+            </div>
+            <div class="form-group">
+                <label for="nationalID">National ID:</label>
+                <input type="text" id="nationalID" name="nationalID" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dateOfBirth">Date of Birth:</label>
+                <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+            </div>
+            <div class="form-group">
+                <label for="relationship">Relationship:</label>
+                <select id="relationship" name="relationship" required>
+                    <option value="father">Father</option>
+                    <option value="mother">Mother</option>
+                    <option value="brother">Brother</option>
+                    <option value="sister">Sister</option>
+                    <option value="son">Son</option>
+                    <option value="daughter">Daughter</option>
+                    <option value="wife">Wife</option>
+                    <option value="husband">Husband</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit">Add Family Member</button>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

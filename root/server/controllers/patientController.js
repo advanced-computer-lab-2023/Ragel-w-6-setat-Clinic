@@ -22,22 +22,26 @@ const createPatient = async (req, res) => {
 };
 
 
-
 // Patient adds a family member using certain attributes req #14
 const addFamMem = async (req, res) => {
-  const patientId = req.params.id;
+  console.log("INNNNNN");
+  const userId = req.params.userId;
+  console.log("HERE IS THE USER ID " + userId);
+
   const {
     fName,
     lName,
     nationalID,
     gender,
     dateOfBirth,
-    relationship
+    relationship,
   } = req.body;
+
   const validRelationships = ["wife", "husband", "son", "daughter"];
 
   try {
-    const patient = await Patient.findById(patientId);
+    const patient = await Patient.findById(userId);
+    
 
     if (!patient) {
       return res.status(404).json({
@@ -46,23 +50,21 @@ const addFamMem = async (req, res) => {
       });
     }
 
-    // Check if the relationship is valid (wife, husband, or children)
-    if (!validRelationships.includes(req.body.relationship)) {
+    //Check if the relationship is valid (wife, husband, or children)
+    console.log(fName);
+    
+    console.log(relationship);
+    if (!validRelationships.includes(relationship)) {
       return res.status(400).json({
         status: 'fail',
-        message: 'Invalid relationship. Allowed values are wife, husband, or children.',
+        message: 'Invalid relationship. Allowed values are wife, husband, son, or daughter.',
       });
     }
+  
+    console.log(nationalID);
+    
 
-    // Check if the nationalID of the new family member already exists
-    const isDuplicate = patient.familyMembers.some(member => member.nationalID === nationalID);
-    if (isDuplicate) {
-      return res.status(400).json({
-        status: 'fail',
-        message: 'National ID already exists for a family member',
-      });
-    }
-
+    console.log(fName);
     // Add the new family member to the patient's familyMembers array
     const newFamilyMember = {
       fName: fName,
@@ -73,15 +75,14 @@ const addFamMem = async (req, res) => {
       relationship: relationship,
     };
 
+ 
+
+    console.log("FNAME " + fName);
+
     patient.familyMembers.push(newFamilyMember);
     await patient.save();
-
-    res.status(201).json({
-      status: 'success',
-      data: {
-        patient: patient,
-      },
-    });
+   res.json({newFamilyMember : newFamilyMember});
+   
   } catch (err) {
     res.status(500).json({
       status: 'error',

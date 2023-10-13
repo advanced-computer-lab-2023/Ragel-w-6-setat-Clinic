@@ -61,25 +61,25 @@ const patientSchema = new Schema({
         },
         fName: {
           type: String,
-          required: true,
+          required: false,
         },
         lName: {
           type: String,
-          required: true,
+          required: false,
         },
         nationalID: {
           type: String,
-          required: true,
+          required: false,
           unique: true,
         },
         gender: {
           type: String,
-          required: true,
+          required: false,
           enum: ["male", "female"],
         },
         dateOfBirth: {
           type: Date,
-          required: true,
+          required: false,
         },
         relationship: {
           type: String,
