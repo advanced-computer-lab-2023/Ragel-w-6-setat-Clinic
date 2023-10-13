@@ -15,7 +15,6 @@ import {
   selectDoctor,
   getFamilyMembers,
   getAllDoctors,
-  getSingleDoctor,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -43,6 +42,6 @@ router.get("/doctorDetails/:patientid/:doctorid", selectDoctor);
 
 router.get("/familyMembers/:id", getFamilyMembers);
 router.get("/viewDoctors/:id", getAllDoctors);
-router.get("/selectDoctor/:id", getSingleDoctor);
+// router.get("/selectDoctor/:id", getSingleDoctor);
 
 export default router;

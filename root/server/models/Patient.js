@@ -91,6 +91,11 @@ const patientSchema = new Schema({
     type: Number,
     default: 0,
   },
+  subscribedPackage: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Package",
+    default: null,
+  },
 });
 
 const Patient = mongoose.model("Patient", patientSchema);

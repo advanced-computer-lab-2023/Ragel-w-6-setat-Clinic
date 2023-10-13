@@ -2,6 +2,7 @@ import Patient from "../models/Patient.js";
 import Prescription from "../models/Prescription.js";
 import Doctor from "../models/Doctor.js";
 import Appointments from "../models/Appointments.js";
+import Package from "../models/Package.js";
 
 const getAllPatients = async (req, res) => {
   try {
@@ -13,12 +14,12 @@ const getAllPatients = async (req, res) => {
   }
 };
 
-async function doctorDisplay(patientID, doctors) {
+async function doctorsDisplay(patientID, doctors) {
   const patient = await Patient.findById(patientID);
   const patientPackage = patient.subscribedPackage;
   let sessionDiscount = 0;
   if (patientPackage) {
-    const packageOffered = await Package.findOne({ name: patientPackage });
+    const packageOffered = await Package.findById({ _id: patientPackage });
     if (packageOffered) {
       sessionDiscount = packageOffered.sessionDiscount || 0;
     }
@@ -34,6 +35,28 @@ async function doctorDisplay(patientID, doctors) {
       sessionPrice: discountedPrice,
     };
   });
+
+  return doctorToDisplay;
+}
+
+async function doctorDisplay(patientID, doctor) {
+  const patient = await Patient.findById(patientID);
+  const patientPackage = patient.subscribedPackage;
+  let sessionDiscount = 0;
+  if (patientPackage) {
+    const packageOffered = await Package.findById({ _id: patientPackage });
+    if (packageOffered) {
+      sessionDiscount = packageOffered.sessionDiscount || 0;
+    }
+  }
+
+  const originalSessionPrice = doctor.sessionPrice;
+  const discountedPrice =
+    originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+  const doctorToDisplay = {
+    ...doctor.toObject(),
+    sessionPrice: discountedPrice,
+  };
 
   return doctorToDisplay;
 }
@@ -399,12 +422,13 @@ const selectDoctor = async (req, res) => {
   const patientId = req.params.patientid;
   const doctorId = req.params.doctorid;
   try {
-    const doctor = await Doctor.findOne({ _id: doctorId });
+    const doctor = await Doctor.findById({ _id: doctorId });
     if (!doctor) {
       return res.status(404).json({ message: "Doctor not found" });
     }
-    console.log(doctor);
-    res.render("viewDoctor", { userId: patientId, doctor: doctor });
+
+    const doc = await doctorDisplay(patientId, doctor);
+    res.render("viewDoctor", { userId: patientId, doctor: doc });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -449,7 +473,7 @@ const getAllDoctors = async (req, res) => {
     });
     const uniqueSpecialties = [...uniqueSpecialtiesSet];
 
-    const doctorsToDisplay = await doctorDisplay(patientID, doctors);
+    const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
 
     res.render("searchForDoctors", {
       userId: patientID,
@@ -462,38 +486,38 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
-const getSingleDoctor = async (req, res) => {
-  try {
-    const doctorID = req.body.id;
-    const patientID = req.params.id;
-    const patient = await Patient.findById(patientID);
-    const patientPackage = patient.subscribedPackage;
+// const getSingleDoctor = async (req, res) => {
+//   try {
+//     const doctorID = req.body.id;
+//     const patientID = req.params.id;
+//     const patient = await Patient.findById(patientID);
+//     const patientPackage = patient.subscribedPackage;
 
-    let sessionDiscount = 0;
-    if (patientPackage) {
-      const packageOffered = await Package.findOne({ name: patientPackage });
-      if (packageOffered) {
-        sessionDiscount = packageOffered.sessionDiscount || 0;
-      }
-    }
-    const doctor = await Doctor.findById(doctorID);
-    const originalSessionPrice = doctor.sessionPrice;
-    const discountedPrice =
-      originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
-    if (!doctor) {
-      return res.status(404).json({ message: "doctor not found" });
-    }
-    const modifiedDoctor = {
-      ...doctor.toObject(), // Convert Mongoose document to plain JavaScript object
-      sessionPrice: discountedPrice, // Replace sessionPrice with discountedPrice
-    };
+//     let sessionDiscount = 0;
+//     if (patientPackage) {
+//       const packageOffered = await Package.findOne({ name: patientPackage });
+//       if (packageOffered) {
+//         sessionDiscount = packageOffered.sessionDiscount || 0;
+//       }
+//     }
+//     const doctor = await Doctor.findById(doctorID);
+//     const originalSessionPrice = doctor.sessionPrice;
+//     const discountedPrice =
+//       originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+//     if (!doctor) {
+//       return res.status(404).json({ message: "doctor not found" });
+//     }
+//     const modifiedDoctor = {
+//       ...doctor.toObject(), // Convert Mongoose document to plain JavaScript object
+//       sessionPrice: discountedPrice, // Replace sessionPrice with discountedPrice
+//     };
 
-    res.json(modifiedDoctor);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
+//     res.json(modifiedDoctor);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Server Error" });
+//   }
+// };
 
 export {
   createPatient,
@@ -511,5 +535,4 @@ export {
   selectDoctor,
   getFamilyMembers,
   getAllDoctors,
-  getSingleDoctor,
 };
