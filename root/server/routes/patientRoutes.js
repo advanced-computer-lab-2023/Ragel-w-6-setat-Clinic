@@ -5,7 +5,7 @@ import {
   getAllPatients,
   renderHomePage,
   renderRegisterationPage,
-  addFamMem,
+  addFamilyMember,
   filterThePrescription,
   selectPrescription,
   filterDoctors,
@@ -16,6 +16,7 @@ import {
   getFamilyMembers,
   getAllDoctors,
   getMyAppointments,
+  renderAddFamilyMember,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -27,10 +28,14 @@ router.get("/allPatients", getAllPatients);
 router.get("/patientHome/:id", renderHomePage);
 
 // LOJAINS ROUTES
-router.post("/addFamMem/:id", addFamMem);
+router.post("/addFamilyMember/:id", addFamilyMember);
+router.get("/addFamilyMember/:id", renderAddFamilyMember);
 router.get("/viewPrescription/:id", viewPrescription);
 router.get("/filterThePrescription/:id", filterThePrescription);
-router.get("/selectPrescription/:id", selectPrescription);
+router.get(
+  "/selectPrescription/:patientid/:prescriptionid",
+  selectPrescription
+);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);

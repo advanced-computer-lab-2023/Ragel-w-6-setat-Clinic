@@ -99,10 +99,16 @@ const createPatient = async (req, res) => {
 
 // LOJAINS REQS
 
-const addFamMem = async (req, res) => {
+const renderAddFamilyMember = function (req, res) {
+  res.render("addFamilyMember", { userId: req.params.id });
+};
+
+const addFamilyMember = async (req, res) => {
   const patientId = req.params.id;
+
   const { fName, lName, nationalID, gender, dateOfBirth, relationship } =
     req.body;
+
   const validRelationships = ["wife", "husband", "son", "daughter"];
 
   try {
@@ -115,27 +121,13 @@ const addFamMem = async (req, res) => {
       });
     }
 
-    // Check if the relationship is valid (wife, husband, or children)
-    if (!validRelationships.includes(req.body.relationship)) {
-      return res.status(400).json({
-        status: "fail",
-        message:
-          "Invalid relationship. Allowed values are wife, husband, or children.",
-      });
-    }
+    // if (!validRelationships.includes(relationship)) {
+    //   res.render("addFamilyMember", {
+    //     message:
+    //       "Invalid relationship. Allowed values are wife, husband, son, or daughter.",
+    //   });
+    // }
 
-    // Check if the nationalID of the new family member already exists
-    const isDuplicate = patient.familyMembers.some(
-      (member) => member.nationalID === nationalID
-    );
-    if (isDuplicate) {
-      return res.status(400).json({
-        status: "fail",
-        message: "National ID already exists for a family member",
-      });
-    }
-
-    // Add the new family member to the patient's familyMembers array
     const newFamilyMember = {
       fName: fName,
       lName: lName,
@@ -147,12 +139,9 @@ const addFamMem = async (req, res) => {
 
     patient.familyMembers.push(newFamilyMember);
     await patient.save();
-
-    res.status(201).json({
-      status: "success",
-      data: {
-        patient: patient,
-      },
+    res.render("addFamilyMember", {
+      userId: patientId,
+      message: "Family Member added successfully!",
     });
   } catch (err) {
     res.status(500).json({
@@ -248,14 +237,14 @@ const filterThePrescription = async (req, res) => {
 };
 
 const selectPrescription = async (req, res) => {
-  const prescriptionId = req.body.id;
-  const patiendID = req.params.id;
+  const prescriptionId = req.params.prescriptionid;
+  const patiendID = req.params.patientid;
 
   try {
-    const prescription = await Prescription.find({
+    const prescription = await Prescription.findOne({
       _id: prescriptionId,
       patient: patiendID,
-    });
+    }).populate("doctor");
 
     if (!prescription) {
       return res.status(404).json({
@@ -264,11 +253,9 @@ const selectPrescription = async (req, res) => {
       });
     }
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        prescription: prescription,
-      },
+    res.render("viewPrescription", {
+      userId: patiendID,
+      prescription: prescription,
     });
   } catch (err) {
     res.status(500).json({
@@ -530,46 +517,13 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
-// const getSingleDoctor = async (req, res) => {
-//   try {
-//     const doctorID = req.body.id;
-//     const patientID = req.params.id;
-//     const patient = await Patient.findById(patientID);
-//     const patientPackage = patient.subscribedPackage;
-
-//     let sessionDiscount = 0;
-//     if (patientPackage) {
-//       const packageOffered = await Package.findOne({ name: patientPackage });
-//       if (packageOffered) {
-//         sessionDiscount = packageOffered.sessionDiscount || 0;
-//       }
-//     }
-//     const doctor = await Doctor.findById(doctorID);
-//     const originalSessionPrice = doctor.sessionPrice;
-//     const discountedPrice =
-//       originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
-//     if (!doctor) {
-//       return res.status(404).json({ message: "doctor not found" });
-//     }
-//     const modifiedDoctor = {
-//       ...doctor.toObject(), // Convert Mongoose document to plain JavaScript object
-//       sessionPrice: discountedPrice, // Replace sessionPrice with discountedPrice
-//     };
-
-//     res.json(modifiedDoctor);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };
-
 export {
   createPatient,
   viewPrescription,
   getAllPatients,
   renderHomePage,
   renderRegisterationPage,
-  addFamMem,
+  addFamilyMember,
   filterThePrescription,
   selectPrescription,
   filterDoctors,
@@ -580,4 +534,5 @@ export {
   getFamilyMembers,
   getAllDoctors,
   getMyAppointments,
+  renderAddFamilyMember,
 };

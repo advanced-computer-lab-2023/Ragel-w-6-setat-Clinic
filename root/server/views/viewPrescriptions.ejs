@@ -107,20 +107,18 @@
       <div id="prescriptions-container">
         <% prescriptions.forEach(prescription=> { %>
           <div class="prescription-item">
-            <h2>Medication: <%= prescription.medication %>
-            </h2>
-            <p>Doctor: Dr. <%= prescription.doctor.fName %>
-                <%= prescription.doctor.lName %>
-            </p>
-            <p>Dosage: <%= prescription.dosage %>
-            </p>
-            <p>Is Filled: <%= prescription.isFilled %>
-            </p>
-            <p>Date: <%= prescription.date.getFullYear(); %>-<%= prescription.date.getMonth()+1; %>-<%=
-                    prescription.date.getDate(); %>
-            </p>
-            <p>Notes: <%= prescription.notes %>
-            </p>
+            <a href="/patients/selectPrescription/<%= userId %>/<%= prescription._id %>">
+              <h2>Medication: <%= prescription.medication %>
+              </h2>
+              <p>Doctor: Dr. <%= prescription.doctor.fName %>
+                  <%= prescription.doctor.lName %>
+              </p>
+              <p>Is Filled: <%= prescription.isFilled %>
+              </p>
+              <p>Date: <%= prescription.date.getFullYear(); %>-<%= prescription.date.getMonth()+1; %>-<%=
+                      prescription.date.getDate(); %>
+              </p>
+            </a>
           </div>
           <br>
           <% }); %>
