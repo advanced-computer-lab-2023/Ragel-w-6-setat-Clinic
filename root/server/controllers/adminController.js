@@ -6,17 +6,16 @@ import Doctor from "../models/Doctor.js";
 const deleteAdmin = async (req, res) => {
   try {
     const filter = {
-      username: req.query.username
+      username: req.query.username,
     };
     const deleteAdminResult = await Admin.deleteMany(filter);
-    
+
     if (deleteAdminResult.deletedCount == 0) {
       return res.status(404).json({
         status: "fail",
         message: "Admin not found",
       });
     }
-
 
     res.status(200).json({
       status: "success",
@@ -35,9 +34,8 @@ const deleteAdmin = async (req, res) => {
 // Admin deletes patient from system by username reqID #8 
 const deletePatient = async (req, res) => {
   try {
-
     const filter = {
-      username: req.query.username
+      username: req.query.username,
     };
     const deletedPatientResult = await Patient.deleteMany(filter);
 
@@ -47,7 +45,6 @@ const deletePatient = async (req, res) => {
         message: "Patient not found",
       });
     }
-
 
     res.status(200).json({
       status: "success",
@@ -65,9 +62,8 @@ const deletePatient = async (req, res) => {
 // Admin deletes doctor from system by username reqID #8 
 const deleteDoctor = async (req, res) => {
   try {
-
     const filter = {
-      username: req.query.username
+      username: req.query.username,
     };
     const deleteDoctorResult = await Doctor.deleteMany(filter);
 
@@ -95,22 +91,15 @@ const deleteDoctor = async (req, res) => {
 // View all the doctors that are not registered (only requets)
 const viewUnregisteredDoctors = async (req, res) => {
   try {
-
-    const doctor = await Doctor.find({
-      isRegistered: false
+    const doctorId = req.params.id;
+    const doctors = await Doctor.find({
+      isRegistered: false,
     });
 
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        doctor: doctor,
-      },
-    });
+    res.json(doctors);
   } catch (err) {
-
     res.status(500).json({
-      status: 'error',
+      status: "error",
       message: err.message,
     });
   }

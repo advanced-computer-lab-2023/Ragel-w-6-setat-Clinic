@@ -18,12 +18,6 @@ let port = process.env.PORT;
 // express app
 const app = express();
 
-// view engine setup
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
-
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -50,27 +44,7 @@ mongoose
 
 
 
-  app.get("/admins/deletePatient", (req, res) => {
-    res.render("deletePatient");
-  });
 
-  app.get("/admins/deleteDoctor", (req, res) => {
-    res.render("deleteDoctor");
-  });
-
-  app.get('/admins/deleteAdmin', (req, res) => {
-    res.render('deleteAdmin');
-});
-
-  app.get("/admins/viewDoctorApplications", (req, res) => {
-    const DoctorUserName = req.query.id;
-    res.render("viewDoctorApplications");
-  });
 
  
-  app.get("/patients/addFamMem/:userId", (req,res)=>
-  { const patientID = req.params.userId;
-    res.render("addFamMems",{userId :patientID });
-  });
-
 
