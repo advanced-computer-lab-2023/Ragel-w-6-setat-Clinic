@@ -1,1 +1,0 @@
-Components that connect to Redux (if you're using Redux for state management).

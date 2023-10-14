@@ -1,20 +1,24 @@
+import { BrowserRouter , Routes, Route} from 'react-router-dom'
 
-import { Route, Routes } from "react-router-dom";
-import RemoveGeneral from "./components/RemoveGeneral";
+//pages and components
+import Home from './pages/Home';
+
 
 function App() {
-     return (
-        <Route path="/registration" element={<RegistrationOptions />} />
-    // //   <Routes>
-    // //     <Route path="/" exact element={<Login />} />
-    // //     <Route path="/registration" element={<RegistrationOptions />} />
-    // //     <Route path="/registration/patient" element={<PatientRegistration />} />
-    // //     <Route path="/registration/doctor" element={<DoctorRegistration />} />
-    // //     <Route path="/admin/landingpage" element={<AdminLanding />} />
-    // //     <Route path="/admin/addadmin" element={<AddAdmin />} />
-    // //     <Route path="/admin/removeuser" element={<RemoveUser />} />
-    // //   </Routes>
-     );
-  }
-  
-  export default App;
+  return (
+    <div className="App">
+    <BrowserRouter>
+    <div classname = "pages">
+      <Routes>
+        <Route
+        path = "/"
+        element = {<Home />}
+        />
+      </Routes>
+    </div>
+    </BrowserRouter>
+    </div>
+  );
+}
+
+export default App;
