@@ -2,6 +2,8 @@ import Admin from "../models/Admin.js";
 import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
 import Package from "../models/Package.js";
+import Appointment from "../models/Appointments.js";
+import Prescription from "../models/Prescription.js";
 
 const getAllAdmins = async (req, res) => {
   async (req, res) => {
@@ -170,7 +172,13 @@ const deletePatient = async (req, res) => {
     const filter = {
       username: req.query.username,
     };
-    const deletedPatientResult = await Patient.deleteMany(filter);
+    const deletedPatientResult = await Patient.findOneAndDelete(filter);
+    const deleteRelatedAppointments = await Appointment.deleteMany({
+      patient: deletedPatientResult._id,
+    });
+    const deleteRelatedPrescriptions = await Prescription.deleteMany({
+      patient: deletedPatientResult._id,
+    });
     const allPatients = await Patient.find();
 
     if (deletedPatientResult.deletedCount == 0) {
@@ -199,7 +207,13 @@ const deleteDoctor = async (req, res) => {
     const filter = {
       username: req.query.username,
     };
-    const deleteDoctorResult = await Doctor.deleteMany(filter);
+    const deleteDoctorResult = await Doctor.findOneAndDelete(filter);
+    const deleteRelatedAppointments = await Appointment.deleteMany({
+      doctor: deleteDoctorResult._id,
+    });
+    const deleteRelatedPrescriptions = await Prescription.deleteMany({
+      doctor: deleteDoctorResult._id,
+    });
     const allDoctors = await Doctor.find();
 
     if (deleteDoctorResult.deletedCount == 0) {
