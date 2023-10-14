@@ -115,7 +115,9 @@
                             <%= appointment.doctor.lName %>
                     </p>
                     <p><strong>Date:</strong>
-                        <%= appointment.date.toDateString() %>
+                        <%=appointment.date.getFullYear(); %>-<%= appointment.date.getMonth()+1; %>-<%=
+                                    appointment.date.getDate(); %>
+                                    <%= appointment.date.getHours(); %>:<%= appointment.date.getMinutes(); %>
                     </p>
                     <p><strong>Type:</strong>
                         <%= appointment.type %>
