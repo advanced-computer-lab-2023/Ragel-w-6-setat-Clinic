@@ -30,9 +30,9 @@ router.get("/allAdmins", getAllAdmins);
 router.get("/adminHome/:id", renderHomePage);
 
 //LOJAINS ROUTES
-router.delete("/deleteAdmin", deleteAdmin);
-router.delete("/deletePatient", deletePatient);
-router.delete("/deleteDoctor", deleteDoctor);
+router.delete("/deleteAdmin/:id", deleteAdmin);
+router.delete("/deletePatient/:id", deletePatient);
+router.delete("/deleteDoctor/:id", deleteDoctor);
 router.get("/viewUnregisteredDoctors/:id", viewUnregisteredDoctors);
 router.get("/deleteAdmin/:id", renderDeleteAdminPage);
 router.get("/deleteDoctor/:id", renderDeleteDoctorPage);

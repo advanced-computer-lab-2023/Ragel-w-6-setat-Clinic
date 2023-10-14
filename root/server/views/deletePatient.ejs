@@ -66,6 +66,20 @@
             margin-top: 20px;
             font-size: 18px;
         }
+
+        .admin-item {
+            width: calc(20%);
+            background-color: #0288d1;
+            color: #212121;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+
+        .divider {
+            border-top: 1px solid #bdbdbd;
+            margin: 20px 0;
+        }
     </style>
 </head>
 
@@ -75,13 +89,26 @@
             <h2>Delete Patient</h2>
             <form id="deletePatientForm">
                 <input type="text" name="username" placeholder="Patient Username" required><br>
-                <button type="submit">Delete Patient</button>
+                <button onclick="deletePatient('<%= userId%>')">Delete Patient</button>
             </form>
             <div id="feedbackMessage"></div>
 
+            <div class="admin-item">
+                <h3>Patients</h3>
+                <% if (locals.patients) { %>
+                    <% patients.forEach(patient=> { %>
+                        <p>
+                            Username: <%= patient.username %>
+                        </p>
+                        <div class="divider"></div>
+                        <% }) %>
+                            <% } %>
+            </div>
+
             <script>
-                function deletePatient(username) {
-                    fetch(`/admins/deletePatient?username=${username}`, {
+                function deletePatient(userId) {
+                    const username = document.querySelector('input[name="username"]').value;
+                    fetch(`/admins/deletePatient/${userId}/?username=${username}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
@@ -89,30 +116,17 @@
                     })
                         .then(response => {
                             if (response.ok) {
-                                // Handle successful deletion here, e.g., show a success message
-                                document.getElementById("feedbackMessage").innerHTML = "Patient deleted successfully!";
-                                console.log("da5alna");
-                                console.log("EL NAME AHO " + username);
+                                // // Redirect to the updated page after successful deletion
+                                // window.location.href = `/admins/deleteAdmin/${userId}`;
                             } else {
-                                // Handle errors
-                                document.getElementById("feedbackMessage").innerHTML = "Failed to delete Patient.";
-                                console.log("mada5alnash");
-                                console.log("EL NAME AHO " + username);
+                                throw new Error('Failed to delete package');
                             }
                         })
                         .catch(error => {
-                            // Handle network errors
+                            // Handle errors
                             console.error(error);
-                            document.getElementById("feedbackMessage").innerHTML = "Network error occurred.";
                         });
                 }
-
-                document.getElementById("deletePatientForm").addEventListener("submit", function (event) {
-                    event.preventDefault();
-                    const formData = new FormData(this);
-                    const patientUsername = formData.get('username');
-                    deletePatient(patientUsername);
-                });
             </script>
         </div>
 </body>

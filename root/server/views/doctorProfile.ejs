@@ -123,21 +123,16 @@
                 var affiliationElement = document.querySelector('.affiliation');
                 var specialtyElement = document.querySelector('.specialty');
 
-                usernameElement.contentEditable = true;
+                usernameElement.contentEditable = false;
                 emailElement.contentEditable = true;
-                fNameElement.contentEditable = true;
-                lNameElement.contentEditable = true;
-                dateOfBirthElement.contentEditable = true;
-                educationalBackgroundElement.contentEditable = true;
+                fNameElement.contentEditable = false;
+                lNameElement.contentEditable = false;
+                dateOfBirthElement.contentEditable = false;
+                educationalBackgroundElement.contentEditable = false;
                 hourlyRateElement.contentEditable = true;
-                sessionPriceElement.contentEditable = true;
+                sessionPriceElement.contentEditable = false;
                 affiliationElement.contentEditable = true;
-                specialtyElement.contentEditable = true;
-
-                var dateOfBirthPicker = flatpickr(dateOfBirthElement, {
-                    dateFormat: 'Y-m-d', // Set the desired date format
-                    disableMobile: true // Disable mobile-friendly interface (optional)
-                });
+                specialtyElement.contentEditable = false;
 
 
                 document.querySelector('.edit-button').style.display = 'none';
@@ -147,16 +142,9 @@
                 document.querySelector('.done-button').addEventListener('click', function () {
                     // Prepare data for patch request
                     var updatedDoctor = {
-                        username: usernameElement.innerText,
                         email: emailElement.innerText,
-                        fName: fNameElement.innerText,
-                        lName: lNameElement.innerText,
-                        dateOfBirth: dateOfBirthPicker.selectedDates[0],
-                        educationalBackground: educationalBackgroundElement.innerText,
                         hourlyRate: hourlyRateElement.innerText,
-                        sessionPrice: sessionPriceElement.innerText,
                         affiliation: affiliationElement.innerText,
-                        specialty: specialtyElement.innerText
                     };
 
                     fetch(`/doctors/doctorProfile/${doctorId}`, {
@@ -169,7 +157,6 @@
 
                         .then(response => {
                             if (response.ok) {
-                                window.location.href = `/doctors/doctorProfile/${doctorId}`;
                             } else {
                                 throw new Error('Failed to update package');
                             }

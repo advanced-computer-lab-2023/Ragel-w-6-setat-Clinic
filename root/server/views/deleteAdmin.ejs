@@ -66,6 +66,20 @@
             margin-top: 30px;
             font-size: 18px;
         }
+
+        .admin-item {
+            width: calc(20%);
+            background-color: #0288d1;
+            color: #212121;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+
+        .divider {
+            border-top: 1px solid #bdbdbd;
+            margin: 20px 0;
+        }
     </style>
 </head>
 
@@ -73,48 +87,49 @@
     <%- include("adminNavBar", {adminId: userId}) %>
         <div class="delete-admin-container">
             <h2>Delete Admin</h2>
-            <form id="deleteAdminForm">
+
+            <form>
                 <input type="text" name="username" placeholder="Admin Username" required><br>
-                <button type="submit">Delete Admin</button>
+                <button onclick="deleteAdmin('<%= userId%>')"> Delete Admin</button>
             </form>
             <div id="feedbackMessage"></div>
+        </div>
 
-            <script>
-                function deleteAdmin(username) {
-                    fetch(`/admins/deleteAdmin?username=${username}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
+        <div class="admin-item">
+            <h3>Admins</h3>
+            <% if (locals.admins) { %>
+                <% admins.forEach(admin=> { %>
+                    <p>
+                        Username: <%= admin.username %>
+                    </p>
+                    <div class="divider"></div>
+                    <% }) %>
+                        <% } %>
+        </div>
+
+        <script>
+            function deleteAdmin(userId) {
+                const username = document.querySelector('input[name="username"]').value;
+                fetch(`/admins/deleteAdmin/${userId}/?username=${username}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            // // Redirect to the updated page after successful deletion
+                            // window.location.href = `/admins/deleteAdmin/${userId}`;
+                        } else {
+                            throw new Error('Failed to delete package');
                         }
                     })
-                        .then(response => {
-                            if (response.ok) {
-                                // Handle successful deletion here, e.g., show a success message
-                                document.getElementById("feedbackMessage").innerHTML = "Admin deleted successfully!";
-                                console.log("da5alna");
-                                console.log("EL NAME AHO " + username);
-                            } else {
-                                // Handle errors
-                                document.getElementById("feedbackMessage").innerHTML = "Failed to delete admin.";
-                                console.log("mada5alnash");
-                                console.log("EL NAME AHO " + username);
-                            }
-                        })
-                        .catch(error => {
-                            // Handle network errors
-                            console.error(error);
-                            document.getElementById("feedbackMessage").innerHTML = "Network error occurred.";
-                        });
-                }
-
-                document.getElementById("deleteAdminForm").addEventListener("submit", function (event) {
-                    event.preventDefault();
-                    const formData = new FormData(this);
-                    const adminUsername = formData.get('username');
-                    deleteAdmin(adminUsername);
-                });
-            </script>
-        </div>
+                    .catch(error => {
+                        // Handle errors
+                        console.error(error);
+                    });
+            }
+        </script>
 </body>
 
 </html>

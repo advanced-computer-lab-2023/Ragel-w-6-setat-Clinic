@@ -117,38 +117,44 @@ const updatePackage = async (req, res) => {
 
 //LOJAINS REQS
 
-const renderDeleteAdminPage = function (req, res) {
+const renderDeleteAdminPage = async function (req, res) {
   const adminId = req.params.id;
-  res.render("deleteAdmin", { userId: adminId });
+  const allAdmins = await Admin.find({ _id: { $ne: adminId } });
+  res.render("deleteAdmin", { userId: adminId, admins: allAdmins });
 };
-const renderDeleteDoctorPage = function (req, res) {
+const renderDeleteDoctorPage = async function (req, res) {
   const adminId = req.params.id;
-  res.render("deleteDoctor", { userId: adminId });
+  const allDoctors = await Doctor.find();
+  res.render("deleteDoctor", { userId: adminId, doctors: allDoctors });
 };
-const renderDeletePatientPage = function (req, res) {
+const renderDeletePatientPage = async function (req, res) {
   const adminId = req.params.id;
-  res.render("deletePatient", { userId: adminId });
+  const allPatients = await Patient.find();
+  res.render("deletePatient", { userId: adminId, patients: allPatients });
 };
 
 const deleteAdmin = async (req, res) => {
   try {
+    const adminId = req.params.id;
     const filter = {
       username: req.query.username,
     };
-    const deleteAdminResult = await Admin.deleteMany(filter);
 
-    if (deleteAdminResult.deletedCount == 0) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Admin not found",
+    const deleteAdminResult = await Admin.deleteMany(filter);
+    const allAdmins = await Admin.find({ _id: { $ne: adminId } });
+
+    if (deleteAdminResult.length === 0) {
+      return res.render("deleteAdmin", {
+        userId: adminId,
+        admins: allAdmins,
+        message: "No such admin in the system",
       });
     }
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        admin: deleteAdminResult,
-      },
+    res.render("deleteAdmin", {
+      userId: adminId,
+      admins: allAdmins,
+      message: "Admin successfully deleted.",
     });
   } catch (err) {
     res.status(500).json({
@@ -160,23 +166,25 @@ const deleteAdmin = async (req, res) => {
 
 const deletePatient = async (req, res) => {
   try {
+    const adminId = req.params.id;
     const filter = {
       username: req.query.username,
     };
     const deletedPatientResult = await Patient.deleteMany(filter);
+    const allPatients = await Patient.find();
 
     if (deletedPatientResult.deletedCount == 0) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Patient not found",
+      return res.render("deletePatient", {
+        userId: adminId,
+        patients: allPatients,
+        message: "No such patient in the system",
       });
     }
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        deleted: deletedPatientResult,
-      },
+    return res.render("deletePatient", {
+      userId: adminId,
+      patients: allPatients,
+      message: "Patient successfully deleted.",
     });
   } catch (err) {
     res.status(500).json({
@@ -187,23 +195,25 @@ const deletePatient = async (req, res) => {
 };
 const deleteDoctor = async (req, res) => {
   try {
+    const adminId = req.params.id;
     const filter = {
       username: req.query.username,
     };
     const deleteDoctorResult = await Doctor.deleteMany(filter);
+    const allDoctors = await Doctor.find();
 
     if (deleteDoctorResult.deletedCount == 0) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Doctor not found",
+      return res.render("deleteDoctor", {
+        userId: adminId,
+        doctors: allDoctors,
+        message: "No such doctor in the system",
       });
     }
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        patient: deleteDoctorResult,
-      },
+    res.render("deleteAdmin", {
+      userId: adminId,
+      doctors: allDoctors,
+      message: "Doctor successfully deleted.",
     });
   } catch (err) {
     res.status(500).json({
