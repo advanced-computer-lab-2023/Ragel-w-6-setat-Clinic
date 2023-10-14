@@ -38,6 +38,11 @@
         .secondary-text {
             color: #757575;
         }
+
+        .img {
+            width: 50px;
+            height: 50px;
+        }
     </style>
 </head>
 
@@ -85,7 +90,7 @@
             <ul class="primary-text">
                 <% patient.medicalHistory.forEach(healthRecord=> { %>
                     <li>
-                        <%= healthRecord %>
+                        <img src=<%=healthRecord %> />
                     </li>
                     <% }); %>
             </ul>

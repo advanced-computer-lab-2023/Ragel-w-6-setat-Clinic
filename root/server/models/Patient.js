@@ -85,7 +85,9 @@ const patientSchema = new Schema({
   },
   medicalHistory: {
     type: Array,
-    default: [],
+    default: [
+      "https://assets-global.website-files.com/651a053c342015fefc668f61/651a053d342015fefc66e09a_Personal%20Health%20Record%20Example%20(Sample).png",
+    ],
   },
   wallet: {
     type: Number,
