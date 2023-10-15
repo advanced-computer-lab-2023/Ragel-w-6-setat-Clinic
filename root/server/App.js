@@ -11,6 +11,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import { deleteAdmin } from "./controllers/adminController.js";
 dotenv.config({ path: "./.env" });
+import cors from 'cors';
 
 let uri = process.env.MONGODB_URI;
 let port = process.env.PORT;
@@ -21,6 +22,7 @@ const app = express();
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 app.use("/patients", patientRoutes);
 app.use("/doctors", doctorRoutes);

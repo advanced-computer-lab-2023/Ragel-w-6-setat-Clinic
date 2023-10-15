@@ -13,9 +13,9 @@ import {
 const router = express.Router();
 
 
-router.delete("/deleteAdmin", deleteAdmin);
-router.delete("/deletePatient", deletePatient);
-router.delete("/deleteDoctor", deleteDoctor);
+router.delete("/deleteAdmin/:id", deleteAdmin);
+router.delete("/deletePatient/:id", deletePatient);
+router.delete("/deleteDoctor/:username", deleteDoctor);
 router.get("/viewUnregisteredDoctors", viewUnregisteredDoctors);
 
 export default router;

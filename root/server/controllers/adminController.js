@@ -1,28 +1,26 @@
 import Admin from "../models/Admin.js";
 import Patient from "../models/Patient.js";
 import Doctor from "../models/Doctor.js";
+import Appointment from "../models/Appointments.js";
+import Prescription from "../models/Prescription.js";
 
 // Admin deletes admins from system by username reqID #8
 const deleteAdmin = async (req, res) => {
   try {
+    const adminId = req.params.id;
     const filter = {
       username: req.query.username,
     };
+
     const deleteAdminResult = await Admin.deleteMany(filter);
+     const allAdmins = await Admin.find({ _id: { $ne: adminId } });
 
     if (deleteAdminResult.deletedCount == 0) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Admin not found",
-      });
+      res.json("No such admin in the system")
     }
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        admin: deleteAdminResult,
-      },
-    });
+    return res.json("Admin deleted successfully")
+
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -34,24 +32,19 @@ const deleteAdmin = async (req, res) => {
 // Admin deletes patient from system by username reqID #8 
 const deletePatient = async (req, res) => {
   try {
+    const adminId = req.params.id;
     const filter = {
       username: req.query.username,
     };
     const deletedPatientResult = await Patient.deleteMany(filter);
+    const allPatients = await Patient.find();
 
     if (deletedPatientResult.deletedCount == 0) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Patient not found",
-      });
+      res.json("No such patient in the system")
     }
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        deleted: deletedPatientResult,
-      },
-    });
+    return res.json("Patient deleted successfully")
+    
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -62,24 +55,26 @@ const deletePatient = async (req, res) => {
 // Admin deletes doctor from system by username reqID #8 
 const deleteDoctor = async (req, res) => {
   try {
+    //const adminId = req.params.id;
     const filter = {
-      username: req.query.username,
+      username: req.params.username,
     };
     const deleteDoctorResult = await Doctor.deleteMany(filter);
+    const deleteRelatedAppointments = await Appointment.deleteMany({
+      doctor: deleteDoctorResult._id,
+    });
+    const deleteRelatedPrescriptions = await Prescription.deleteMany({
+      doctor: deleteDoctorResult._id,
+    });
+    const allDoctors = await Doctor.find();
 
+   
     if (deleteDoctorResult.deletedCount == 0) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Doctor not found",
-      });
+      res.json("No such doctor in the system")
     }
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        patient: deleteDoctorResult,
-      },
-    });
+    return res.json("Doctor deleted successfully")
+    
   } catch (err) {
     res.status(500).json({
       status: "error",
