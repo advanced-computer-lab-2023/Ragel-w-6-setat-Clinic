@@ -2,6 +2,8 @@ import Patient from "../models/Patient.js";
 import Doctor from "../models/Doctor.js";
 import Appointments from "../models/Appointments.js";
 import Package from "../models/Package.js";
+import CreditCard from "../models/CreditCard.js";
+import Prescription from "../models/Prescription.js";
 
 // create (register) a patient
 const createPatient = async (req, res) => {
@@ -214,6 +216,37 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
+// Patient can view list of all prescriptions req #54
+const viewPrescription = async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    // Check if the patient exists
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Patient not found",
+      });
+    }
+
+    // Find all the prescriptions for the patient
+    const prescriptions = await Prescription.find({
+      patient: patientId,
+    }).populate("doctor");
+
+    const doctorsSet = await Doctor.find({ isRegistered: true }).select(
+      "username"
+    );
+    res.json({prescriptions : prescriptions});
+  } catch (err) {
+    // Handle errors, for example, database connection issues
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
 //----------------------------------------------------------sprint 2--------------------------------------------------------------//
 
 const viwHealthPackages = async (req, res) => {
@@ -266,17 +299,62 @@ const linkFamilyMember = async (req, res) => {
     return res.status(500).json({ error: 'An error occurred while linking a family member' });
   }
 };
+  
+const payAppointment = async (req, res) => {
+  try {
+    const patientId = req.params.id;
+    const paymentMethod = req.body.paymentMethod; // Payment method is now sent as a string
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+    const appointment = await Appointments.findOne({
+      patient: patientId,
+      status: 'upcoming',     //pendingPayment
+    });
+    if (!appointment) {
+      return res.status(400).json({ error: 'No pending appointment for this patient' });
+    }
 
-const payAppointment = async (req, res) => { 
+    // I dont know from where do i get the actual amount 
+    const paymentAmount = 100; // Change this to the actual amount
 
-};
+    if (paymentMethod === 'wallet') {
+      // Check if the patient's wallet has sufficient balance
+      if (patient.wallet >= paymentAmount) {
+        patient.wallet -= paymentAmount;
+        await patient.save();
 
+      // Update the appointment status to 'completed'
+      // appointment.status = 'completed';
+      //await appointment.save();
 
+        return res.status(200).json({ message: 'Payment successful from wallet' });
+      } else {
+        return res.status(400).json({ error: 'Insufficient wallet balance' });
+      }
+    } else if (paymentMethod === 'creditCard') {
+      // Check if the patient has a credit card
+      const creditCard = await CreditCard.findOne({ patient: patientId });
 
+      if (!creditCard) {
+        return res.status(400).json({ error: 'No credit card on file' });
+      }
 
+      // Process the payment with the credit card (you may need to integrate a payment gateway)
+      // If the payment is successful, update the appointment status
+      // You would typically use a payment gateway library to handle credit card payments
 
-
-
+      return res.status(200).json({ message: 'Payment successful with credit card' });
+    } else {
+      return res.status(400).json({ error: 'Invalid payment method' });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'An error occurred while processing the payment' });
+  }
+  };
+  
 export { 
   createPatient, 
   searchForDoctor,
@@ -285,6 +363,7 @@ export {
   filterDoctors,
   selectDoctor,
   getAllDoctors,
+  viewPrescription,
   viwHealthPackages,
   linkFamilyMember,
   payAppointment

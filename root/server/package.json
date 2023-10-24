@@ -7,7 +7,8 @@
     "express-validator": "^7.0.1",
     "mongoose": "^7.5.4",
     "react-router-dom": "^6.16.0",
-    "start": "nodemon ./src/App.js"
+    "start": "nodemon ./src/App.js",
+    "stripe": "^14.1.0"
   },
   "name": "virtual_clinic",
   "version": "1.0.0",
@@ -21,6 +22,6 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-  "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1"
   }
 }

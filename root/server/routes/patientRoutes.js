@@ -1,5 +1,5 @@
 import express from "express";
-import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors ,selectDoctor,getAllDoctors,viwHealthPackages, linkFamilyMember,payAppointment } from "../controllers/patientController.js";
+import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors ,selectDoctor,getAllDoctors,viwHealthPackages, linkFamilyMember,payAppointment , viewPrescription } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
@@ -24,6 +24,7 @@ router.get("/selectDoctor/:id",selectDoctor);
 
 router.get("/viewDoctors", getAllDoctors);
 
+router.get("/viewPrescription/:id", viewPrescription);
 
 //----------------------------------------------------------sprint 2--------------------------------------------------------------//
  

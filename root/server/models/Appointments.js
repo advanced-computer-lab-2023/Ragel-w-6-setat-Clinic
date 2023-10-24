@@ -19,7 +19,6 @@ const appointmentSchema = new Schema({
   isAvailable: {
     type: Boolean,
     default: true,
-
   },
   type: {
     type: String,
