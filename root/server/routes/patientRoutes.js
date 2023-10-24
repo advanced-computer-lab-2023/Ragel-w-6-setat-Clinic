@@ -1,5 +1,5 @@
 import express from "express";
-import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors ,selectDoctor,getAllDoctors } from "../controllers/patientController.js";
+import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors ,selectDoctor,getAllDoctors,viwHealthPackages, linkFamilyMember,payAppointment } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
@@ -22,7 +22,19 @@ router.get("/filterDoctors",filterDoctors);
 //select a doctor from the search/filter results (dependent on 37)
 router.get("/selectDoctor/:id",selectDoctor);
 
+router.get("/viewDoctors", getAllDoctors);
 
+
+//----------------------------------------------------------sprint 2--------------------------------------------------------------//
+ 
+//view health packages options and details 
+router.get("/viewHealthPackages",viwHealthPackages);
+
+//link another patient's account as a family member using email or phone number stating relation to the patient
+router.post("/linkFamilyMember/:id",linkFamilyMember);
+
+//choose to pay for my appointment using my wallet or credit card
+router.post("/payForAppointment/:id",payAppointment);
 
 
 export default router;

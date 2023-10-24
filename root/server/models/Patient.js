@@ -69,7 +69,8 @@ const patientSchema = new Schema({
         },
         nationalID: {
           type: String,
-          required: true,
+          //required: true,
+          default: "",
           unique: true,
         },
         gender: {

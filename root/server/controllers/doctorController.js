@@ -3,20 +3,6 @@ import Patient from "../models/Patient.js";
 import Appointment from "../models/Appointments.js";
 import mongoose from 'mongoose'
 
-const renderSearchPatient = function(req,res){
-  const doctorId = req.params.id;
-  res.render("searchForPatient",{userID: doctorId})
-}
-
-const renderDoctorsAppointment = function(req,res){
-  const doctorId = req.params.id;
-  res.render("doctorAppointments",{userID: doctorId})
-}
-
-const renderUpcomingAppointments = function(req,res){
-  const doctorId = req.params.id;
-  res.render("upcomingappointments",{userID: doctorId})
-}
 
 const searchForPatient =  async( req , res ) =>{
   const { fname, lname } = req.query;
@@ -130,9 +116,36 @@ const upcomingAppointments = async(req, res) =>{
   }
 }
 
+const getMyPatients = async (req, res) => {
+  try {
+    const doctorId = req.params.id;
+    const appointments = await Appointment.find({ doctor: doctorId }).populate('patient');
+    const doctorPatients = [];
+    
+    for (const appointment of appointments) {
+      if (appointment.patient !== null) {
+        const patientId = appointment.patient;
+        try {
+          const patient = await Patient.findById(patientId).exec();
+          doctorPatients.push(patient);
+        } catch (error) {
+          console.error('Error finding patient:', error);
+          // Handle error if necessary
+        }
+      }
+    }
+
+    res.json(doctorPatients);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 export {
    searchForPatient,
    addAppointment, 
    filterMyAppointments, 
-   upcomingAppointments
+   upcomingAppointments,
+   getMyPatients
   };

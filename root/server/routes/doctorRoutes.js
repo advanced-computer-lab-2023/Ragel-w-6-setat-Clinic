@@ -1,5 +1,5 @@
   import express from "express";
-  import {searchForPatient ,addAppointment, filterMyAppointments ,upcomingAppointments} from "../controllers/doctorController.js";
+  import {searchForPatient ,addAppointment, filterMyAppointments ,upcomingAppointments, getMyPatients} from "../controllers/doctorController.js";
 
   import { body, validationResult } from "express-validator";
 
@@ -16,5 +16,7 @@
 
   // Filter patients based on upcoming appointments with the doctor
   router.get("/upcomingappointments/:id", upcomingAppointments)
+
+  router.get('/viewMypatients/:id', getMyPatients);
 
   export default router;
