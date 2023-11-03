@@ -1,5 +1,5 @@
 import express from "express";
-import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors ,selectDoctor,getAllDoctors,viwHealthPackages, linkFamilyMember,payAppointment , viewPrescription } from "../controllers/patientController.js";
+import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors ,selectDoctor,getAllDoctors,viwHealthPackages, linkFamilyMember,payAppointment , viewPrescription ,makeCreditCardPayment } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
@@ -36,6 +36,9 @@ router.post("/linkFamilyMember/:id",linkFamilyMember);
 
 //choose to pay for my appointment using my wallet or credit card
 router.post("/payForAppointment/:id",payAppointment);
+
+//enter credit card details and pay for an appointment using Stripe
+router.post("/makeCreditCardPayment/:id",makeCreditCardPayment);
 
 
 export default router;

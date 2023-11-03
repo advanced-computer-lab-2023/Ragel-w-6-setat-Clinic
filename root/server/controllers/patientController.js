@@ -229,7 +229,6 @@ const viewPrescription = async (req, res) => {
         message: "Patient not found",
       });
     }
-
     // Find all the prescriptions for the patient
     const prescriptions = await Prescription.find({
       patient: patientId,
@@ -354,6 +353,25 @@ const payAppointment = async (req, res) => {
     return res.status(500).json({ error: 'An error occurred while processing the payment' });
   }
   };
+
+ const makeCreditCardPayment = async (req, res) => {
+  const { cardNumber, expirationDate, securityCode, name, appointmentCost } = req.body;
+  // dont foeget to add STRIPE_SECRET_KEY=sk_test_your_actual_secret_key in .ENV
+  try {
+    // Create a Payment Intent with Stripe
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: appointmentCost * 100, // Amount in cents (Stripe expects the amount in cents)
+      currency: 'usd',
+      description: 'Appointment Payment',
+      payment_method_types: ['card'],
+    });
+
+    res.status(200).json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error('Payment creation failed:', error);
+    res.status(500).json({ message: 'Payment creation failed' });
+  }
+ }
   
 export { 
   createPatient, 
@@ -366,5 +384,6 @@ export {
   viewPrescription,
   viwHealthPackages,
   linkFamilyMember,
-  payAppointment
+  payAppointment,
+  makeCreditCardPayment
  };

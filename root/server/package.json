@@ -8,7 +8,7 @@
     "mongoose": "^7.5.4",
     "react-router-dom": "^6.16.0",
     "start": "nodemon ./src/App.js",
-    "stripe": "^14.1.0"
+    "stripe": "^14.3.0"
   },
   "name": "virtual_clinic",
   "version": "1.0.0",
