@@ -1,0 +1,77 @@
+/* google font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;800&family=VT323&display=swap');
+
+/* layout */
+:root {
+    --dark-primary: #0288D1;
+    --light-primary: #B3E5FC;
+    --primary: #03a9f4;
+    --text-icons: #ffffff;
+    --accent: #448aff;
+    --primary-text: #212121;
+    --secondary-text: #757575;
+    --divider: #bdbdbd;
+}
+
+body {
+    background: var(--light-primary);
+    margin: 0;
+    font-family: "Poppins";
+}
+
+header {
+    background: var(--dark-primary);
+}
+
+header .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header a {
+    color: var(--text-icons);
+    text-decoration: none;
+    margin: auto;
+}
+
+.pages {
+    max-width: 1400px;
+    padding: 20px;
+    margin: 0 auto;
+}
+
+.medicine-details {
+    background: #fff;
+    border-radius: 4px;
+    margin: 20px auto;
+    padding: 20px;
+    position: relative;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.medicine-details h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+    color: var(--primary);
+}
+
+.medicine-details p {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--secondary-text);
+}
+
+.medicine-details span {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    background: var(--light-primary);
+    padding: 6px;
+    border-radius: 50%;
+    color: var(--primary-text);
+}

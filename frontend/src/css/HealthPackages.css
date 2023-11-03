@@ -1,0 +1,21 @@
+
+.container {
+  background-color: #B3E5FC; /* Dark primary color */
+  padding: 20px;
+  border-radius: 10px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background-color: #B3E5FC; /* Dark primary color */
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #bdbdbd; /* Divider color */
+  color: #212121; /* Primary text color */
+}
