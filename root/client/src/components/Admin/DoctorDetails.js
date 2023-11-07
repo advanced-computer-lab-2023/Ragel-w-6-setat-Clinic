@@ -1,7 +1,6 @@
 const DoctorDetails = ({doctor}) => {
     return (
         <div className = "doctor-details">
-            <h4>(doctor.username)</h4>
             <p><strong> Username : </strong>{doctor.username}</p>
             <p><strong> Email : </strong>{doctor.email}</p>
             <p><strong> First Name : </strong>{doctor.fName}</p>

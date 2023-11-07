@@ -1,7 +1,8 @@
 import { useEffect,useState } from "react"
 
 //components 
-import DoctorDetails from '../components/DoctorDetails'
+import DoctorDetails from '../components/Admin/DoctorDetails'
+import AdminDeleteDoctor from '../components/Admin/AdminDeleteDoctor'
 
 const Home = () => {
     const [doctors,setdoctors] = useState(null)
@@ -27,7 +28,9 @@ const Home = () => {
                 {doctors && doctors.map((doctor) => (
                     <DoctorDetails key = {doctor._id} doctor = {doctor}/> ))}
             </div>
+            <AdminDeleteDoctor />
         </div>
+        
     )
 }
 

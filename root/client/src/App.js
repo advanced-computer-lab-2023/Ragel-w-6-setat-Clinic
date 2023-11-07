@@ -1,7 +1,7 @@
 import { BrowserRouter , Routes, Route} from 'react-router-dom'
 
 //pages and components
-import Home from './pages/Home';
+import Admin from './pages/Admin';
 
 
 function App() {
@@ -11,8 +11,8 @@ function App() {
     <div classname = "pages">
       <Routes>
         <Route
-        path = "/"
-        element = {<Home />}
+        path = "/admins"
+        element = {<Admin />}
         />
       </Routes>
     </div>
