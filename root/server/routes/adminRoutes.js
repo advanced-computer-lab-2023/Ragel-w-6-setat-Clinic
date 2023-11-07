@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.delete("/deleteAdmin/:id", deleteAdmin);
 router.delete("/deletePatient/:id", deletePatient);
-router.delete("/deleteDoctor/:username", deleteDoctor);
+router.delete("/deleteDoctor", deleteDoctor);
 router.get("/viewUnregisteredDoctors", viewUnregisteredDoctors);
 
 export default router;

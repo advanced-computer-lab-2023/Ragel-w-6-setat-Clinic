@@ -1,6 +1,7 @@
 import Patient from "../models/Patient.js";
 import Prescription from "../models/Prescription.js";
 import Doctor from "../models/Doctor.js";
+import Appointments from "../models/Appointments.js";
 
 
 
@@ -165,10 +166,107 @@ const selectPrescription = async (req, res) => {
 };
 
 
+const viewUpcomingAppointments = async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    // Check if the patient exists
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Patient not found",
+      });
+    }
+
+    
+    const appointments = await Appointments.find({
+      patient: patientId, status : "upcoming"
+    });
+
+    // const doctorsSet = await Doctor.find({ isRegistered: true }).select(
+    //   "username"
+    // );
+
+    res.json({appointments : appointments});
+  } catch (err) {
+    // Handle errors, for example, database connection issues
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+
+
+const getHealthRecords = async (req, res) => {
+  try {
+    const patientID = req.params.id; // Get patient's email from the request body
+
+    // Find the patient using the provided email in the familyMembers array
+    const patient = await Patient.findById(patientID);
+
+    if (!patient) {
+      return res
+        .status(404)
+        .json({ message: "No patient" });
+    }
+
+    // Extract family members from the patient object
+    const medicalHistory = patient.medicalHistory;
+
+    res.json(medicalHistory);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+
+const filterAppointments = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    const filter = {};
+
+    if (req.query.status) {
+      filter.status = req.query.status;
+    }
+
+    if (req.params.id) {
+      filter.patient = patientId;
+    }
+
+    if (req.query.date) {
+      var min_date = new Date(req.query.date);
+      var max_date = new Date(req.query.date);
+      min_date.setHours(0, 0, 0, 0);
+      max_date.setHours(23, 59, 59, 999);
+      filter.date = {
+        $gte: min_date,
+        $lt: max_date,
+      };
+    }
+
+    const appointments = await Appointments.find(filter);
+
+
+    res.json({appointments : appointments});
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
 
 export {
   addFamilyMember,
   viewPrescription,
   filterThePrescription,
-  selectPrescription
+  selectPrescription,
+  viewUpcomingAppointments,
+  getHealthRecords,
+  filterAppointments
 };

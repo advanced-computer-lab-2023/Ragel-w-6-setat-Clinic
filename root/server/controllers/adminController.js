@@ -7,13 +7,13 @@ import Prescription from "../models/Prescription.js";
 // Admin deletes admins from system by username reqID #8
 const deleteAdmin = async (req, res) => {
   try {
-    const adminId = req.params.id;
+    //const adminId = req.params.id;
     const filter = {
       username: req.query.username,
     };
 
     const deleteAdminResult = await Admin.deleteMany(filter);
-     const allAdmins = await Admin.find({ _id: { $ne: adminId } });
+    // const allAdmins = await Admin.find({ _id: { $ne: adminId } });
 
     if (deleteAdminResult.deletedCount == 0) {
       res.json("No such admin in the system")
@@ -55,9 +55,9 @@ const deletePatient = async (req, res) => {
 // Admin deletes doctor from system by username reqID #8 
 const deleteDoctor = async (req, res) => {
   try {
-    //const adminId = req.params.id;
+    const adminId = req.params.id;
     const filter = {
-      username: req.params.username,
+      username: req.body.username,
     };
     const deleteDoctorResult = await Doctor.deleteMany(filter);
     const deleteRelatedAppointments = await Appointment.deleteMany({
