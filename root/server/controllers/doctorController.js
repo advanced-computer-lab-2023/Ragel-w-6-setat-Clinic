@@ -2,6 +2,7 @@ import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
 import Prescription from "../models/Prescription.js";
 import Appointments from "../models/Appointments.js";
+import DoctorContract from "../models/DoctorContract";
 
 const viewUpcomingAppointments = async (req, res) => {
     const doctorId = req.params.id;
@@ -129,6 +130,63 @@ const viewUpcomingAppointments = async (req, res) => {
     }
   };
   
+  const viewContract = async (req, res) => {
+    const doctorId = req.params.id;
+  
+    try {
+    
+      const doctor = await Doctor.findById(doctorId);
+      if (!doctor) {
+        return res.status(404).json({
+          status: "fail",
+          message: "Doctor not found",
+        });
+      }
+  
+      const contracts = await DoctorContract.find({
+        doctorId: doctorId,
+      })
+  
+  
+      res.json({contracts : contracts});
+    } catch (err) {
+      res.status(500).json({
+        status: "error",
+        message: err.message,
+      });
+    }
+  };
+
+  const acceptContract = async (req, res) => {
+    try {
+      const doctorId = req.params.id; // Extract doctor ID from request params
+  
+      // Find the contract by doctor ID and update the isApproved field to true
+      const updatedContract = await DoctorContract.findOneAndUpdate(
+        { doctorId: doctorId },
+        { isApproved: true },
+        { new: true } // Return the updated contract
+      );
+  
+      if (!updatedContract) {
+        return res.status(404).json({
+          status: "fail",
+          message: "Contract not found for the specified doctor ID",
+        });
+      }
+  
+      res.status(200).json({
+        status: "success",
+        message: "Contract accepted successfully",
+        contract: updatedContract,
+      });
+    } catch (err) {
+      res.status(500).json({
+        status: "error",
+        message: err.message,
+      });
+    }
+  };
   
 export {
     viewUpcomingAppointments,

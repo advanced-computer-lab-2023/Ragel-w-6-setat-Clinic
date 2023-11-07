@@ -3,11 +3,6 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const doctorContractSchema = new Schema({
-  contractId: {
-    type: String,
-    required: true,
-    unique: true
-  },
   doctorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Doctor",
