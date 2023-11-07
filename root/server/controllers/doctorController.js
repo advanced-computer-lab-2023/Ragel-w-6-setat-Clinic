@@ -5,13 +5,12 @@ import mongoose from 'mongoose'
 
 
 const searchForPatient =  async( req , res ) =>{
-  const { fname, lname } = req.query;
- const doctorId = req.params.id;
+  const { fName, lName } = req.query;
   try {
     const patients = await Patient.find({
       $or: [
-        { fName: { $regex: new RegExp(fname, 'i') }},
-        { lName: { $regex: new RegExp(lname, 'i') }},
+        { fName: fName},
+        { lName: lName},
       ],
     });
     console.log(patients);
@@ -19,16 +18,13 @@ const searchForPatient =  async( req , res ) =>{
     if (patients.length === 0) {
       res.status(404).json({ error: 'Patients not found' });
     } else {
-      //res.status(200).json(patients);
-      res.render('searchForPatient', {
-        data: patients,
-        userId: doctorId, 
-      });
+      res.status(200).json(patients);
+     
     }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
-  }
+  }  
 };
 
 //--sprint 2
@@ -54,30 +50,23 @@ const addAppointment = async (req, res) => {
 
 const filterMyAppointments = async (req, res) => {
   const  doctorId  = req.params.id; // Get doctotId from URL parameter
-
   try {
     const filter = {};
 
-    if(req.query.date)
+    if(req.body.date)
     {
-      filter.date = req.query.date;
+      filter.date = req.body.date;
     }
-    if(req.query.status)
+    if(req.body.status)
     {
-      filter.status = req.query.status;
+      filter.status = req.body.status;
     }
     if(req.params.id)
     {
       filter.doctor = req.params.id;
     }
-    const doctor = await Patient.findById(doctorId);
     const appointments = await Appointment.find(filter);
-      //res.status(200).json(appointments)
-      res.render('doctorAppointments', {
-        data: appointments,
-        userId: doctorId, 
-      });
-
+      res.status(200).json(appointments);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -85,9 +74,7 @@ const filterMyAppointments = async (req, res) => {
 };
 
 const upcomingAppointments = async(req, res) =>{
-  //jwt token //
   const  doctorId  = req.params.id;
-
   try{
     const upcomingAppointments = await Appointment.find({
       doctor: doctorId,
@@ -103,13 +90,13 @@ const upcomingAppointments = async(req, res) =>{
         return await Patient.findById(patientId);
       })
     );
-   /* res.json({
+    res.json({
       data: patientsWithUpcomingAppointments, 
-    });*/
-    res.render('upcomingappointments', {
+    });
+   /* res.render('upcomingappointments', {
       data: patientsWithUpcomingAppointments,
       userId: doctorId, 
-    });
+    });*/
   }catch(error){    
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -130,7 +117,6 @@ const getMyPatients = async (req, res) => {
           doctorPatients.push(patient);
         } catch (error) {
           console.error('Error finding patient:', error);
-          // Handle error if necessary
         }
       }
     }

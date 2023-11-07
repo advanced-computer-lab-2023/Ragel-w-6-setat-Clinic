@@ -22,12 +22,18 @@ const appointmentSchema = new Schema({
   },
   type: {
     type: String,
-    required: false,
+    required: true,
+    default: "general", 
   },
   status: {
     type: String,
-    required: false,
-    enum: ["upcoming", "completed", "cancelled", "rescheduled"],
+    required: true,
+    default: "available",
+    enum: ["available","upcoming", "completed", "cancelled", "rescheduled"],
+  },
+  price: {
+    type: Number,
+    required: true,
   },
 });
 

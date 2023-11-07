@@ -5,7 +5,6 @@ const packageSchema = new Schema({
   name: {
     type: String,
     required: true,
-    enum: ["Silver", "Gold", "Platinum"],
   },
   price: {
     type: Number,
@@ -26,10 +25,6 @@ const packageSchema = new Schema({
   subscriptionDiscount: {
     type: Number,
     required: true,
-  },
-  status: {
-    type: String,
-    default: "Unsubscribed",
   },
 });
 

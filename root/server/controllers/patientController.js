@@ -24,64 +24,27 @@ const createPatient = async (req, res) => {
 };
 
  const searchForDoctor = async (req, res) =>{
- /* const { name, specialty } = req.body;
-  const patientID = req.params.id;
+  const { fName, lName, specialty } = req.query;
   try {
-    const query = {};
-    if (name) {
-      query.$or = [
-        { fName: { $regex: new RegExp(name, 'i') } },
-        { lName: { $regex: new RegExp(name, 'i') } }
-      ];
-    }
-    if (specialty) {
-      query.specialty = { $regex: new RegExp(specialty, 'i') };
-    }
-
-    console.log(query);
-
-    const doctors = await Doctor.find(query);
-
+    const doctors = await Doctor.find({
+      $or: [
+        { fName: fName},
+        { lName: lName},
+        {specialty: specialty},
+      ],
+    });
     console.log(doctors);
 
     if (doctors.length === 0) {
-      res.status(404).json({ error: 'Doctors not found' });
+      res.status(404).json({ error: 'Doctor not found' });
     } else {
       res.status(200).json(doctors);
-      // res.render('searchForDoctors', { doctors, userID: patientID });
+     
     }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
-  }*/
-  
-  const patientID = req.params.id;
-  const filter = {};
-  if (req.query.specialty != "") {
-    filter.specialty = req.query.specialty;
-  }
-  if (req.query.fName != "") {
-    filter.fName = req.query.fName;
-  }
-  if (req.query.lName != "") {
-    filter.lName = req.query.lName;
-  }
-  filter.isRegistered = true;
-
-  try {
-   /* const allDoctors = await Doctor.find().lean();
-    const uniqueSpecialtiesSet = new Set();
-    allDoctors.forEach((doctor) => {
-      uniqueSpecialtiesSet.add(doctor.specialty);
-    });
-    const uniqueSpecialties = [...uniqueSpecialtiesSet];*/
-
-    const doctors = await Doctor.find(filter);
-      res.json(doctors)
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
-  }
+  }  
 };
  
  const filterAvailableAppointments = async(req, res) =>{
@@ -112,7 +75,7 @@ const createPatient = async (req, res) => {
 
       if(req.query.date)
       {
-        filter.date = req.queryq.date;
+        filter.date = req.query.date;
       }
 
       if(req.query.status)
@@ -125,7 +88,6 @@ const createPatient = async (req, res) => {
         filter.patient = req.params.id;
       }
 
-      const patient = await Patient.findById(patientId);
       const appointments = await Appointments.find(filter);
       
        res.status(200).json(appointments)
@@ -139,9 +101,9 @@ const createPatient = async (req, res) => {
  const filterDoctors = async (req, res) => {
  
   try {
-    const specialty = req.body.specialty
+    const specialty = req.query.specialty
     const patientId = req.params.id;
-    const date = req.body.date;
+    const date = req.query.date;
     const appointmentsByDate = await Appointments.find({date : date,  isAvailable : true});
     const filter = {};
     const doctorIDS = [];
@@ -162,7 +124,6 @@ const createPatient = async (req, res) => {
 try {
   const doctors = await Doctor.find(filter).exec();
   res.json(doctors);
- // res.render('filterDoctors', { doctors, userID: patientId });
 } catch (err) {
   console.error(err);
   res.status(500).json({ error: 'Server error' });
@@ -178,7 +139,6 @@ try {
 };}
 
 const selectDoctor = async (req, res) => {
-  const patientID = req.params.id;
   const doctorUsername = req.query.username;
   try {
     
@@ -204,7 +164,6 @@ const getAllDoctors = async (req, res) => {
     doctors.forEach((doctor) => {
       uniqueSpecialtiesSet.add(doctor.specialty);
     });
-    const uniqueSpecialties = [...uniqueSpecialtiesSet];
 
     //const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
 
@@ -260,7 +219,7 @@ const viwHealthPackages = async (req, res) => {
 
 const linkFamilyMember = async (req, res) => {
   try {
-    const { email, phoneNum, relationship } = req.body;
+    const { email, relationship, nationalID } = req.body;
     const patientId = req.params.id;
     const requestingPatient = await Patient.findById(patientId);
 
@@ -268,7 +227,7 @@ const linkFamilyMember = async (req, res) => {
       return res.status(404).json({ error: 'Requesting patient not found' });
     }
 
-    const existingPatient = await Patient.findOne({ $or: [{ email }, { phoneNum }] });
+    const existingPatient = await Patient.findOne({email});
     if (!existingPatient) {
       return res.status(404).json({ error: 'Patient to link not found' });
     }
@@ -287,6 +246,7 @@ const linkFamilyMember = async (req, res) => {
       email: existingPatient.email,
       fName,
       lName,
+      nationalID,
       gender,
       dateOfBirth,
       relationship,
@@ -299,40 +259,35 @@ const linkFamilyMember = async (req, res) => {
   }
 };
   
-const payAppointment = async (req, res) => {
+const payAppointmentWallet = async (req, res) => {
   try {
     const patientId = req.params.id;
-    const paymentMethod = req.body.paymentMethod; // Payment method is now sent as a string
     const patient = await Patient.findById(patientId);
     if (!patient) {
       return res.status(404).json({ error: 'Patient not found' });
     }
     const appointment = await Appointments.findOne({
       patient: patientId,
-      status: 'upcoming',     //pendingPayment
+      status: 'available', 
     });
     if (!appointment) {
       return res.status(400).json({ error: 'No pending appointment for this patient' });
     }
-
-    // I dont know from where do i get the actual amount 
-    const paymentAmount = 100; // Change this to the actual amount
-
-    if (paymentMethod === 'wallet') {
-      // Check if the patient's wallet has sufficient balance
+    const paymentAmount = appointment.price; 
       if (patient.wallet >= paymentAmount) {
         patient.wallet -= paymentAmount;
         await patient.save();
-
-      // Update the appointment status to 'completed'
-      // appointment.status = 'completed';
-      //await appointment.save();
-
+        appointment.status = 'upcoming';
+        await appointment.save();
         return res.status(200).json({ message: 'Payment successful from wallet' });
       } else {
         return res.status(400).json({ error: 'Insufficient wallet balance' });
       }
-    } else if (paymentMethod === 'creditCard') {
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'An error occurred while processing the payment' });
+    }
+   /* } else if (paymentMethod === 'creditCard') {
       // Check if the patient has a credit card
       const creditCard = await CreditCard.findOne({ patient: patientId });
 
@@ -347,14 +302,11 @@ const payAppointment = async (req, res) => {
       return res.status(200).json({ message: 'Payment successful with credit card' });
     } else {
       return res.status(400).json({ error: 'Invalid payment method' });
-    }
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: 'An error occurred while processing the payment' });
-  }
+    }*/
   };
 
- const makeCreditCardPayment = async (req, res) => {
+//stripe payment still not complete 
+ const payAppointmentCreditCard = async (req, res) => {
   const { cardNumber, expirationDate, securityCode, name, appointmentCost } = req.body;
   // dont foeget to add STRIPE_SECRET_KEY=sk_test_your_actual_secret_key in .ENV
   try {
@@ -384,6 +336,6 @@ export {
   viewPrescription,
   viwHealthPackages,
   linkFamilyMember,
-  payAppointment,
-  makeCreditCardPayment
+  payAppointmentWallet,
+  payAppointmentCreditCard
  };
