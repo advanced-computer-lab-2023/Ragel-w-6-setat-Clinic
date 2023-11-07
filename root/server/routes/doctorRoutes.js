@@ -3,26 +3,26 @@ import {
   createDoctor,
   updateDoctorProfile,
   getAllDoctors,
-  renderHomePage,
-  renderRegisterationPage,
-  renderProfilePage,
+  doctorDetails,
   searchForPatient,
   filterMyAppointments,
   upcomingAppointments,
   getMyPatients,
   getSinglePatient,
   getMyAppointments,
+  scheduleFollowUp,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
 
-router.get("/registeration", renderRegisterationPage);
+// HABIBAS ROUTES
+
 router.post("/registeration", createDoctor);
 router.patch("/doctorProfile/:id", updateDoctorProfile);
 router.get("/allDoctors", getAllDoctors);
-router.get("/doctorHome/:id", renderHomePage);
-router.get("/doctorProfile/:id", renderProfilePage);
+router.get("/doctorProfile/:id", doctorDetails);
+router.post("/scheduleFollowUp/:doctorid", scheduleFollowUp);
 
 // MARIAMS ROUTES
 

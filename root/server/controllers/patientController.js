@@ -4,6 +4,8 @@ import Doctor from "../models/Doctor.js";
 import Appointments from "../models/Appointments.js";
 import Package from "../models/Package.js";
 
+// HABIBAS REQS
+
 const getAllPatients = async (req, res) => {
   try {
     const patients = await Patient.find({}, "username password"); // Retrieve only username and password fields
@@ -61,14 +63,6 @@ async function doctorDisplay(patientID, doctor) {
   return doctorToDisplay;
 }
 
-const renderHomePage = function (req, res) {
-  res.render("patientHome", { userId: req.params.id });
-};
-
-const renderRegisterationPage = function (req, res) {
-  res.render("patientRegister");
-};
-
 const createPatient = async (req, res) => {
   try {
     const patient = await Patient.create({
@@ -86,8 +80,135 @@ const createPatient = async (req, res) => {
         lName: req.body.emergencyLName,
       },
     });
-    res.render("login", {
-      registeredSuccessfully: true,
+    res.status(201).json({
+      status: "success",
+      message: "Patient successfully registered.",
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+const cancelHealthPackageSubscription = async (req, res) => {
+  const patientId = req.params.patientid;
+  try {
+    const patient = await Patient.findById(patientId);
+    patient.subscribedPackage = null;
+
+    const familyMembers = patient.familyMembers;
+    if (familyMembers && familyMembers.length > 0) {
+      for (const familyMember of familyMembers) {
+        const familyMemberEmail = familyMember.email;
+        if (familyMemberEmail) {
+          const familyMemberDoc = await Patient.findOne({
+            email: familyMemberEmail,
+          });
+          if (familyMemberDoc) {
+            familyMemberDoc.subscribedPackage = null;
+            await familyMemberDoc.save();
+          }
+        }
+      }
+    }
+    await patient.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Health package subscription cancelled successfully.",
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+const viewSelectedDoctorAvailableAppointments = async (req, res) => {
+  const patientId = req.params.patientid;
+  const doctorId = req.params.doctorid;
+  try {
+    const appointments = await Appointments.find({
+      doctor: doctorId,
+      isAvailable: true,
+    });
+    res.status(200).json({
+      status: "success",
+      appointments: appointments,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+const registerForAnAppointmentPatient = async (req, res) => {
+  const patientId = req.params.patientid;
+  const appointmentId = req.params.appointmentid;
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+    if (!appointment.isAvailable) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Appointment is not available",
+      });
+    }
+    appointment.patient = patientId;
+    appointment.isAvailable = false;
+    appointment.status = "upcoming";
+    await appointment.save();
+    res.status(200).json({
+      status: "success",
+      message: "Appointment registered successfully.",
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+const registerForAnAppointmentFamilyMember = async (req, res) => {
+  const patientId = req.params.patientid;
+  const appointmentId = req.params.appointmentid;
+  const familyMemberEmail = req.body.familymemberemail;
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+    if (!appointment.isAvailable) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Appointment is not available",
+      });
+    }
+
+    const patient = await Patient.findById(patientId);
+
+    const familyMember = patient.familyMembers.find(
+      (member) => member.email === familyMemberEmail
+    );
+
+    if (!familyMember) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Family member not found with the specified email",
+      });
+    }
+
+    const familyMemberDoc = await Patient.findOne({ email: familyMemberEmail });
+
+    appointment.patient = familyMemberDoc._id;
+    appointment.isAvailable = false;
+    appointment.status = "upcoming";
+    await appointment.save();
+    res.status(200).json({
+      status: "success",
+      message: "Appointment registered successfully.",
     });
   } catch (err) {
     res.status(400).json({
@@ -98,10 +219,6 @@ const createPatient = async (req, res) => {
 };
 
 // LOJAINS REQS
-
-const renderAddFamilyMember = function (req, res) {
-  res.render("addFamilyMember", { userId: req.params.id });
-};
 
 const addFamilyMember = async (req, res) => {
   const patientId = req.params.id;
@@ -139,8 +256,8 @@ const addFamilyMember = async (req, res) => {
 
     patient.familyMembers.push(newFamilyMember);
     await patient.save();
-    res.render("addFamilyMember", {
-      userId: patientId,
+    res.status(201).json({
+      status: "success",
       message: "Family Member added successfully!",
     });
   } catch (err) {
@@ -171,15 +288,13 @@ const viewPrescription = async (req, res) => {
 
     const doctorsSet = await Doctor.find({ isRegistered: true }).select(
       "username"
-    );
+    ); // ??? what for
 
-    res.render("viewPrescriptions", {
-      userId: patientId,
+    res.status(200).json({
+      status: "success",
       prescriptions: prescriptions,
-      doctorsSet: doctorsSet,
     });
   } catch (err) {
-    // Handle errors, for example, database connection issues
     res.status(500).json({
       status: "error",
       message: err.message,
@@ -223,10 +338,9 @@ const filterThePrescription = async (req, res) => {
       "username"
     );
 
-    res.render("viewPrescriptions", {
-      userId: patientId,
+    res.status(200).json({
+      status: "success",
       prescriptions: prescriptions,
-      doctorsSet: doctorsSet,
     });
   } catch (err) {
     res.status(500).json({
@@ -253,8 +367,8 @@ const selectPrescription = async (req, res) => {
       });
     }
 
-    res.render("viewPrescription", {
-      userId: patiendID,
+    res.status(200).json({
+      status: "success",
       prescription: prescription,
     });
   } catch (err) {
@@ -293,14 +407,14 @@ const searchForDoctor = async (req, res) => {
     const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
 
     if (doctors.length === 0) {
-      res.render("searchForDoctors", {
-        userId: patientID,
+      res.status(200).json({
+        status: "success",
         doctors: [],
         uniqueSpecialties: uniqueSpecialties,
       });
     } else {
-      res.render("searchForDoctors", {
-        userId: patientID,
+      res.status(200).json({
+        status: "success",
         doctors: doctorsToDisplay,
         uniqueSpecialties: uniqueSpecialties,
       });
@@ -343,36 +457,31 @@ const filterDoctors = async (req, res) => {
     }
     filter.isRegistered = true;
 
-    try {
-      const allDoctors = await Doctor.find().lean();
-      const uniqueSpecialtiesSet = new Set();
-      allDoctors.forEach((doctor) => {
-        uniqueSpecialtiesSet.add(doctor.specialty);
+    const allDoctors = await Doctor.find().lean();
+    const uniqueSpecialtiesSet = new Set();
+    allDoctors.forEach((doctor) => {
+      uniqueSpecialtiesSet.add(doctor.specialty);
+    });
+    const uniqueSpecialties = [...uniqueSpecialtiesSet];
+
+    const doctors = await Doctor.find(filter).exec();
+
+    const doctorsToDisplay = await doctorsDisplay(patientId, doctors);
+    if (doctors.length === 0) {
+      res.status(200).json({
+        status: "success",
+        doctors: [],
+        uniqueSpecialties: uniqueSpecialties,
       });
-      const uniqueSpecialties = [...uniqueSpecialtiesSet];
-
-      const doctors = await Doctor.find(filter).exec();
-
-      const doctorsToDisplay = await doctorsDisplay(patientId, doctors);
-      if (doctors.length === 0) {
-        res.render("searchForDoctors", {
-          userId: patientId,
-          doctors: [],
-          uniqueSpecialties: uniqueSpecialties,
-        });
-      } else {
-        res.render("searchForDoctors", {
-          userId: patientId,
-          doctors: doctorsToDisplay,
-          uniqueSpecialties: uniqueSpecialties,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Server error" });
+    } else {
+      res.status(200).json({
+        status: "success",
+        doctors: doctorsToDisplay,
+        uniqueSpecialties: uniqueSpecialties,
+      });
     }
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -421,10 +530,7 @@ const filterMyAppointments = async (req, res) => {
 
     const appointments = await Appointments.find(filter).populate("doctor");
 
-    res.render("viewAppointmentsPatient", {
-      userId: patientId,
-      appointments: appointments,
-    });
+    res.status(200).json({ appointments: appointments });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
@@ -437,10 +543,7 @@ const getMyAppointments = async (req, res) => {
     const appointments = await Appointments.find({
       patient: patientId,
     }).populate("doctor");
-    res.render("viewAppointmentsPatient", {
-      userId: patientId,
-      appointments: appointments,
-    });
+    res.status(200).json({ appointments: appointments });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
@@ -457,7 +560,7 @@ const selectDoctor = async (req, res) => {
     }
 
     const doc = await doctorDisplay(patientId, doctor);
-    res.render("viewDoctor", { userId: patientId, doctor: doc });
+    res.status(200).json({ doctor: doc });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -473,19 +576,14 @@ const getFamilyMembers = async (req, res) => {
     // Find the patient using the provided email in the familyMembers array
     const patient = await Patient.findById(patientID);
 
-    if (!patient) {
-      return res
-        .status(404)
-        .json({ message: "There are no Family Members registered" });
-    }
-
     // Extract family members from the patient object
     const familyMembers = patient.familyMembers;
 
-    res.render("viewFamily.ejs", {
-      userId: patientID,
-      patientFamily: familyMembers,
-    });
+    if (!familyMembers) {
+      return res.status(200).json({ patientFamily: [] });
+    } else {
+      res.status(200).json({ patientFamily: familyMembers });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -506,8 +604,8 @@ const getAllDoctors = async (req, res) => {
 
     const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
 
-    res.render("searchForDoctors", {
-      userId: patientID,
+    res.status(200).json({
+      status: "success",
       doctors: doctorsToDisplay,
       uniqueSpecialties: uniqueSpecialties,
     });
@@ -521,8 +619,6 @@ export {
   createPatient,
   viewPrescription,
   getAllPatients,
-  renderHomePage,
-  renderRegisterationPage,
   addFamilyMember,
   filterThePrescription,
   selectPrescription,
@@ -534,5 +630,8 @@ export {
   getFamilyMembers,
   getAllDoctors,
   getMyAppointments,
-  renderAddFamilyMember,
+  cancelHealthPackageSubscription,
+  viewSelectedDoctorAvailableAppointments,
+  registerForAnAppointmentPatient,
+  registerForAnAppointmentFamilyMember,
 };

@@ -17,24 +17,11 @@ const getAllAdmins = async (req, res) => {
   };
 };
 
-const renderHomePage = function (req, res) {
+const getAllPackages = async (req, res) => {
   const adminId = req.params.id;
-  res.render("adminHome", { userId: adminId });
-};
-
-const renderAddAdminPage = function (req, res) {
-  const adminId = req.params.id;
-  res.render("addAdmin", { userId: adminId });
-};
-
-const renderPackagePage = async (req, res) => {
   try {
     const packages = await Package.find({});
-    const adminId = req.params.id;
-    res.render("packageManagement", {
-      userId: adminId,
-      healthPackages: packages,
-    });
+    res.status(200).json({ packages: packages });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -43,11 +30,13 @@ const renderPackagePage = async (req, res) => {
 
 // create an admin
 const createAdmin = async (req, res) => {
+  const adminId = req.params.id;
   try {
-    const adminId = req.params.id;
     const admin = await Admin.create(req.body);
-    const message = "Admin successfully added.";
-    res.render("addAdmin", { userId: adminId, message: message });
+    res.status(201).json({
+      status: "success",
+      message: "Admin successfully added.",
+    });
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -62,8 +51,7 @@ const createPackage = async (req, res) => {
     const pack = await Package.create(req.body);
     const packages = await Package.find({});
     const adminId = req.params.id;
-    res.render("packageManagement", {
-      userId: adminId,
+    res.status(201).json({
       healthPackages: packages,
     });
   } catch (err) {
@@ -77,12 +65,11 @@ const createPackage = async (req, res) => {
 // have an admin delete a package
 
 const deletePackage = async (req, res) => {
+  const adminId = req.params.userid;
   try {
     const pack = await Package.findByIdAndDelete(req.params.packageid);
     const packages = await Package.find({});
-    const adminId = req.params.userid;
-    res.render("packageManagement", {
-      userId: adminId,
+    res.status(201).json({
       healthPackages: packages,
     });
   } catch (err) {
@@ -96,6 +83,7 @@ const deletePackage = async (req, res) => {
 // update a package
 
 const updatePackage = async (req, res) => {
+  const adminId = req.params.userid;
   try {
     const pack = await Package.findOneAndUpdate(
       { _id: req.params.packageid },
@@ -104,9 +92,7 @@ const updatePackage = async (req, res) => {
       }
     );
     const packages = await Package.find({});
-    const adminId = req.params.userid;
-    res.render("packageManagement", {
-      userId: adminId,
+    res.status(201).json({
       healthPackages: packages,
     });
   } catch (err) {
@@ -119,20 +105,30 @@ const updatePackage = async (req, res) => {
 
 //LOJAINS REQS
 
-const renderDeleteAdminPage = async function (req, res) {
+const getAllDoctors = async function (req, res) {
   const adminId = req.params.id;
-  const allAdmins = await Admin.find({ _id: { $ne: adminId } });
-  res.render("deleteAdmin", { userId: adminId, admins: allAdmins });
+  try {
+    const doctors = await Doctor.find({});
+    res.status(200).json({ doctors: doctors });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
 };
-const renderDeleteDoctorPage = async function (req, res) {
+
+const getAllPatients = async function (req, res) {
   const adminId = req.params.id;
-  const allDoctors = await Doctor.find();
-  res.render("deleteDoctor", { userId: adminId, doctors: allDoctors });
-};
-const renderDeletePatientPage = async function (req, res) {
-  const adminId = req.params.id;
-  const allPatients = await Patient.find();
-  res.render("deletePatient", { userId: adminId, patients: allPatients });
+  try {
+    const patients = await Patient.find({});
+    res.status(200).json({ patients: patients });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
 };
 
 const deleteAdmin = async (req, res) => {
@@ -146,18 +142,18 @@ const deleteAdmin = async (req, res) => {
     const allAdmins = await Admin.find({ _id: { $ne: adminId } });
 
     if (deleteAdminResult.length === 0) {
-      return res.render("deleteAdmin", {
-        userId: adminId,
+      res.status(404).json({
+        status: "fail",
         admins: allAdmins,
         message: "No such admin in the system",
       });
+    } else {
+      res.status(200).json({
+        status: "success",
+        admins: allAdmins,
+        message: "Admin successfully deleted.",
+      });
     }
-
-    res.render("deleteAdmin", {
-      userId: adminId,
-      admins: allAdmins,
-      message: "Admin successfully deleted.",
-    });
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -182,18 +178,18 @@ const deletePatient = async (req, res) => {
     const allPatients = await Patient.find();
 
     if (deletedPatientResult.deletedCount == 0) {
-      return res.render("deletePatient", {
-        userId: adminId,
+      res.status(404).json({
+        status: "fail",
         patients: allPatients,
         message: "No such patient in the system",
       });
+    } else {
+      res.status(200).json({
+        status: "success",
+        patients: allPatients,
+        message: "Patient successfully deleted.",
+      });
     }
-
-    return res.render("deletePatient", {
-      userId: adminId,
-      patients: allPatients,
-      message: "Patient successfully deleted.",
-    });
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -201,6 +197,7 @@ const deletePatient = async (req, res) => {
     });
   }
 };
+
 const deleteDoctor = async (req, res) => {
   try {
     const adminId = req.params.id;
@@ -217,18 +214,18 @@ const deleteDoctor = async (req, res) => {
     const allDoctors = await Doctor.find();
 
     if (deleteDoctorResult.deletedCount == 0) {
-      return res.render("deleteDoctor", {
-        userId: adminId,
+      res.status(404).json({
+        status: "fail",
         doctors: allDoctors,
         message: "No such doctor in the system",
       });
+    } else {
+      res.status(200).json({
+        status: "success",
+        doctors: allDoctors,
+        message: "Doctor successfully deleted.",
+      });
     }
-
-    res.render("deleteAdmin", {
-      userId: adminId,
-      doctors: allDoctors,
-      message: "Doctor successfully deleted.",
-    });
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -238,14 +235,14 @@ const deleteDoctor = async (req, res) => {
 };
 
 const viewUnregisteredDoctors = async (req, res) => {
+  const doctorId = req.params.id;
   try {
-    const doctorId = req.params.id;
     const doctors = await Doctor.find({
       isRegistered: false,
     });
 
-    res.render("viewDoctorApplications", {
-      userId: doctorId,
+    res.status(200).json({
+      status: "success",
       doctors: doctors,
     });
   } catch (err) {
@@ -262,14 +259,11 @@ export {
   deletePackage,
   updatePackage,
   getAllAdmins,
-  renderHomePage,
-  renderAddAdminPage,
-  renderPackagePage,
+  getAllPackages,
   deleteAdmin,
   deletePatient,
   deleteDoctor,
   viewUnregisteredDoctors,
-  renderDeleteAdminPage,
-  renderDeleteDoctorPage,
-  renderDeletePatientPage,
+  getAllDoctors,
+  getAllPatients,
 };

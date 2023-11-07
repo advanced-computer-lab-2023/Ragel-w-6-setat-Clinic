@@ -3,8 +3,6 @@ import {
   createPatient,
   viewPrescription,
   getAllPatients,
-  renderHomePage,
-  renderRegisterationPage,
   addFamilyMember,
   filterThePrescription,
   selectPrescription,
@@ -16,20 +14,38 @@ import {
   getFamilyMembers,
   getAllDoctors,
   getMyAppointments,
-  renderAddFamilyMember,
+  cancelHealthPackageSubscription,
+  viewSelectedDoctorAvailableAppointments,
+  registerForAnAppointmentPatient,
+  registerForAnAppointmentFamilyMember,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
 
-router.get("/registeration", renderRegisterationPage);
+// HABIBAS ROUTES
+
 router.post("/registeration", createPatient);
 router.get("/allPatients", getAllPatients);
-router.get("/patientHome/:id", renderHomePage);
+router.patch(
+  "/subscribedHealthPackage/cancelHealthPackage/:patientid",
+  cancelHealthPackageSubscription
+);
+router.get(
+  "/doctorDetails/availableAppointment/:patientid/:doctorid",
+  viewSelectedDoctorAvailableAppointments
+);
+router.patch(
+  "/registerForAnAppointmentPatient/:patientid/:appointmentid",
+  registerForAnAppointmentPatient
+);
+router.patch(
+  "/registerForAnAppointmentFamilyMember/:patientid/:appointmentid",
+  registerForAnAppointmentFamilyMember
+);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);
-router.get("/addFamilyMember/:id", renderAddFamilyMember);
 router.get("/viewPrescription/:id", viewPrescription);
 router.get("/filterThePrescription/:id", filterThePrescription);
 router.get(

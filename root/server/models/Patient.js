@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const familyMemberSchema = new Schema({
+  email: {
+    type: String,
+  },
   fName: {
     type: String,
     required: true,
