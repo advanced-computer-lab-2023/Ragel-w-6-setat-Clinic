@@ -99,10 +99,31 @@ const patientSchema = new Schema({
     default: 0,
   },
   subscribedPackage: {
-    type: String,
-    required: false,
-  }
+    type: [
+      {
+        packageName: {
+          type: String,
+          required: true,
+        },
+        subscriptionStatus: {
+          type: String,
+          enum: ["subscribed", "unsubscribed", "cancelled"],
+          default: "subscribed",
+        },
+        renewalDate: {
+          type: Date,
+          required: false,
+        },
+        cancellationDate: {
+          type: Date,
+          required: false,
+        },
+      },
+    ],
+    default: [],
+  },
 });
+
 
 const Patient = mongoose.model("Patient", patientSchema);
 export default Patient;

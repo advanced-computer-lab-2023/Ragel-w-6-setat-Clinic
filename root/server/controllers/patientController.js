@@ -3,19 +3,140 @@ import Doctor from "../models/Doctor.js";
 import Package from "../models/Package.js";
 // create (register) a patient
 
+// m2 requirements :
+/*async function getMyHealthPackages(req, res) {
+  try {
+    const patientID = req.params.id;
+    const patient = await Patient.findById(patientID)//.populate("familyMembers");
 
-const renderViewAllDoctors = function (req,res) {
-  const patientID = req.params.id;
+    if (!patient) {
+      return res.status(404).json({ message: "There is no patient with this id" });
+    }
+
+    const subscribedPackage = patient.subscribedPackage;
+    //const familyMembers = patient.familyMembers.map((member) => ({
+      //subscribedPackage: member.subscribedPackage,
+    //}));
+
+    if (!subscribedPackage /*&& familyMembers.length === 0) {
+      return res.status(404).json({ message: "There is no subscribed package" });
+    } else {
+      console.log({ subscribedPackage });
+      res.status(200).json({ subscribedPackage});
+  }
+}
+   catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+
+};
+}*/
+
+
+//req 28
+const subscribeToHealthPackage = async (req, res) => {
+    const patientId = req.params.id;
+    const { packageName, subscriptionStatus, renewalDate, cancellationDate } =
+      req.body;
+      try {
+      const patient = await Patient.findById(patientId);
   
-};
+      if (!patient) {
+        return res.status(404).json({
+          status: "fail",
+          message: "Patient not found",
+        });
+      }
+      
+      if (patient.subscribedPackage && patient.subscribedPackage.length > 0) {
+        return res.status(400).json({ message: 'Patient is already subscribed to a health package' });
+      }
+      const newPackage = {
+  
+        packageName,  
+        subscriptionStatus,
+        renewalDate,
+        cancellationDate,
+      };
+  
+      patient.subscribedPackage.push(newPackage);
+      await patient.save();
+      res.status(200).json({ message: 'Subscription successful' });  
+    } catch (err) {
+      res.status(500).json({
+        status: "error",
+        message: err.message,
+      });
+    }
+  };
 
-const renderSelectedDoctor = function (req,res){
-  const patientID = req.params.id;
-  res.render("selectedDoctor",{userID:patientID});
-};
+
+//req 31
+const statusHealth = async (req, res) => {  
+  try {
+    const patientID = req.params.id;
+    const patient = await Patient.findById(patientID);
+    if (!patient) {
+      return res.status(404).json({ message: "There is no patient with this id" });
+    }
+    const subscribedPackage = patient.subscribedPackage;
+    console.log(subscribedPackage);
+    if (!subscribedPackage || subscribedPackage.length === 0){
+      return res.status(404).json({ message: "The patient is not subscribed to any health package" });
+    } else {
+      const healthCareStatus = {
+        self: {
+          packageName: patient.subscribedPackage[0].packageName,
+          subscriptionStatus: patient.subscribedPackage[0].subscriptionStatus,
+          renewalDate: patient.subscribedPackage[0].renewalDate,
+          cancellationDate: patient.subscribedPackage[0].cancellationDate,
+        }
+      };
+      res.status(200).json({ healthCareStatus });
+    }
+    
+  }
+    catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: err.message,
+      });
+    }
+  };
 
 
-const createPatient = async (req, res) => {
+  //req 30
+const getMyHealthPackages =  async (req, res) => {
+  try {
+    const patientID = req.params.id;
+    const patient = await Patient.findById(patientID);
+
+    if (!patient) {
+      return res.status(404).json({ message: "There is no patient with this id" });
+    }
+
+    const subscribedPackage = patient.subscribedPackage;
+
+    if (!subscribedPackage) {
+      return res.status(404).json({ message: "The patient is not subscribed to any health package" });
+    } else {
+      res.status(200).json({ message: `The patient is subscribed to the ${subscribedPackage} health package.` });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+}
+
+
+
+
+
+async function createPatient(req, res) {
   try {
     const patient = await Patient.create(req.body);
     res.status(201).json({
@@ -30,30 +151,30 @@ const createPatient = async (req, res) => {
       message: err.message,
     });
   }
-};
+}
 
 const getFamilyMembers = async (req, res) => {
   try {
-    const patientID = req.params.id; // Get patient's email from the request body
+    const patientID = req.params.id; 
 
-
-    // Find the patient using the provided email in the familyMembers array
+    
     const patient = await Patient.findById(patientID);
 
     if (!patient) {
-      return res.status(404).json({ message: 'There are no Family Members registered' });
+      return res.status(404).json({ message: "There are no Family Members registered" });
     }
 
     // Extract family members from the patient object
     const familyMembers = patient.familyMembers;
 
-    res.render('viewFamily.ejs', {userID: patientID, patientFamily: familyMembers});
+    res.status(200).json(familyMembers);
+   
+    
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: "Server Error" });
   }
-}
-
+};
 const getAllDoctors = async (req, res) => {
   try {
     const patientID = req.params.id;
@@ -80,7 +201,7 @@ const getAllDoctors = async (req, res) => {
       };
     });
 
-    res.render("allDoctors", {userID: patientID , doctors: doctorsDisplay});
+    res.json({userID: patientID , doctors: doctorsDisplay});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
@@ -90,10 +211,11 @@ const getAllDoctors = async (req, res) => {
 
 
   const getSingleDoctor = async (req, res) => {
-    try {
-      
-      const  doctorID  = req.body.id;
-      const patientID = req.params.id;
+   
+    app.get('/doctors/:doctorId/details', async (req, res) => {
+      try{
+      const  doctorID  = req.params.doctorid;
+      const patientID = req.params.userid;
       const patient = await Patient.findById(patientID);
       const patientPackage = patient.subscribedPackage;
       
@@ -114,19 +236,21 @@ const getAllDoctors = async (req, res) => {
         ...doctor.toObject(), // Convert Mongoose document to plain JavaScript object
         sessionPrice: discountedPrice // Replace sessionPrice with discountedPrice
     };
-    
-    res.json(modifiedDoctor);
-    
+    res.json({userID:patientID, doctor: modifiedDoctor });
       
   
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Server Error' });
     }
-  };
+  });
   
+  };
 
 
-export { createPatient, getFamilyMembers, getAllDoctors, getSingleDoctor };
+
+
+
+export { createPatient, getFamilyMembers, getAllDoctors, getSingleDoctor, getMyHealthPackages, statusHealth, subscribeToHealthPackage};
 
 

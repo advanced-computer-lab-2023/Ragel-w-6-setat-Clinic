@@ -73,7 +73,7 @@ const updateDoctorProfile = async (req, res) => {
       }
     }
 
-    res.json(doctorPatients);
+    res.json ({userID: doctorId, mypatients: doctorPatients});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });

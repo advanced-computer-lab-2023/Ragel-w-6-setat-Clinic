@@ -14,9 +14,8 @@ const router = express.Router();
 // post request to create a doctor
 
 // select only one patient 
-router.get('/selectpatient/:id',getSinglePatient);
-// view all mypatients 
-router.get('/viewMypatients/:id', getMyPatients);
+router.get("/selectedPatient/:doctorid/:patientid", getSinglePatient);
+router.get("/viewMyPatients/:id", getMyPatients);
 
 router.post("/registeration", createDoctor);
 

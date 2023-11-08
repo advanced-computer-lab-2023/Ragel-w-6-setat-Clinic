@@ -1,65 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Patient</title>
-    <style>
-        body {
-            background-color: #0288D1;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-        }
-
-        .patient-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .patient-item {
-            background-color: #B3E5FC;
-            color: #212121;
-            padding: 10px;
-            margin: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .patient-item:hover {
-            background-color: #03a9f4;
-        }
-
-        .divider {
-            border-top: 1px solid #bdbdbd;
-            margin: 10px 0;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Select a Patient</h1>
-
-    <ul class="patient-list">
-        <li class="patient-item" id="patient1">Patient Name 1</li>
-        <div class="divider"></div>
-        <li class="patient-item" id="patient2">Patient Name 2</li>
-        <div class="divider"></div>
-        <li class="patient-item" id="patient3">Patient Name 3</li>
-        <div class="divider"></div>
-        <!-- Add more patients as needed -->
+<% if (locals.mypatients && mypatients.length > 0) { %>
+    <ul>
+        <% mypatients.forEach(patients => { %>
+            <li class="patient-item">
+                <h2><%= patients.fName %> <%= patients.lName %></h2>
+                <p><strong>Email:</strong> <%= patients.email %></p>
+                <p><strong>Date of Birth:</strong> <%= patients.dateOfBirth.toDateString() %></p>
+                <p><strong>Gender:</strong> <%= patients.gender %></p>
+                <p><strong>Phone Number:</strong> <%= patients.phoneNum %></p>
+                <!-- Add more patient details as needed -->
+                <a href="doctors/selectpatient/<%= userID %>/<%= patient._id %>" class="select-button">Submit</a>
+                <a href="#" class="select-button" onclick="choosePatient('<%= patient._id %>')">Select this patient</a>
+            </li>
+            <div class="divider"></div>
+        <% }); %>
     </ul>
-
-    <script>
-        // JavaScript logic to handle patient selection
-        const patientItems = document.querySelectorAll('.patient-item');
-        patientItems.forEach(patientItem => {
-            patientItem.addEventListener('click', () => {
-                // Handle patient selection logic here
-                console.log(`Selected Patient: ${patientItem.textContent}`);
-            });
-        });
-    </script>
-</body>
-
-</html>
+<% } else { %>
+    <p>No patients found in the database.</p>
+<% } %>
