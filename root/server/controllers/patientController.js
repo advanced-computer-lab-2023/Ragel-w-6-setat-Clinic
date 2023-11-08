@@ -107,8 +107,7 @@ const statusHealth = async (req, res) => {
   };
 
 
-  //req 30
-const getMyHealthPackages =  async (req, res) => {
+  //req 30const getMyHealthPackages =  async (req, res) => {
   try {
     const patientID = req.params.id;
     const patient = await Patient.findById(patientID);
@@ -130,7 +129,7 @@ const getMyHealthPackages =  async (req, res) => {
       message: err.message,
     });
   }
-}
+
 
 
 
