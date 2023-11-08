@@ -29,6 +29,10 @@ const appointmentSchema = new Schema({
     default: "available",
     enum: ["available", "upcoming", "completed", "cancelled", "rescheduled"],
   },
+  price: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Appointment = mongoose.model("Appointment", appointmentSchema);
