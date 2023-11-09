@@ -37,6 +37,11 @@ import DoctorProfile from "views/DoctorViews/doctorProfile";
 import SearchForPatients from "views/DoctorViews/searchForPatients";
 import DoctorAppointments from "views/DoctorViews/doctorAppointments";
 
+// admin views
+
+import AllUsers from "views/AdminViews/allUsers";
+import ManageHealthPackages from "views/AdminViews/healthPackagesManagement";
+
 var routes = [
   //patient routes
   {
@@ -163,6 +168,22 @@ var routes = [
     component: <Tables />,
     layout: "/admin",
   },
+  {
+    path: "/allUsers",
+    name: "System Users",
+    icon: "ni ni-circle-08 text-pink",
+    component: <AllUsers />,
+    layout: "/admin",
+  },
+  {
+    path: "/healthPackagesManagement",
+    name: "Health Packages Management",
+    icon: "ni ni-box-2",
+    component: <ManageHealthPackages />,
+    layout: "/admin",
+  },
+
+  // auth routes
   {
     path: "/login",
     name: "Login",
