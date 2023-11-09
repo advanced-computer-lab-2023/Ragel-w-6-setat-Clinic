@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const familyMemberSchema = new Schema({
   email: {
     type: String,
+    default: "",
   },
   fName: {
     type: String,
