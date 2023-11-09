@@ -27,6 +27,7 @@ import AddFamilyMember from "views/PatientViews/addFamilyMember.js";
 import FilterAppointments from "views/PatientViews/filterAppointments.js";
 import HealthPackages from "views/PatientViews/healthPackages";
 import SearchForDoctors from "views/PatientViews/searchForDoctors";
+import FilterPrescriptions from "views/PatientViews/filterPrescriptions";
 
 var routes = [
   //patient routes
@@ -70,6 +71,13 @@ var routes = [
     name: "Search for Doctors",
     icon: "ni ni-single-02",
     component: <SearchForDoctors />,
+    layout: "/patient",
+  },
+  {
+    path: "/filterPrescriptions",
+    name: "My Prescriptions",
+    icon: "ni ni-collection",
+    component: <FilterPrescriptions />,
     layout: "/patient",
   },
 
