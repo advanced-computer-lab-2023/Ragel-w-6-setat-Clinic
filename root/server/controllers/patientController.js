@@ -4,35 +4,6 @@ import Package from "../models/Package.js";
 // create (register) a patient
 
 // m2 requirements :
-/*async function getMyHealthPackages(req, res) {
-  try {
-    const patientID = req.params.id;
-    const patient = await Patient.findById(patientID)//.populate("familyMembers");
-
-    if (!patient) {
-      return res.status(404).json({ message: "There is no patient with this id" });
-    }
-
-    const subscribedPackage = patient.subscribedPackage;
-    //const familyMembers = patient.familyMembers.map((member) => ({
-      //subscribedPackage: member.subscribedPackage,
-    //}));
-
-    if (!subscribedPackage /*&& familyMembers.length === 0) {
-      return res.status(404).json({ message: "There is no subscribed package" });
-    } else {
-      console.log({ subscribedPackage });
-      res.status(200).json({ subscribedPackage});
-  }
-}
-   catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
-
-};
-}*/
 
 
 //req 28
@@ -68,8 +39,8 @@ const subscribeToHealthPackage = async (req, res) => {
       res.status(500).json({
         status: "error",
         message: err.message,
-      });
-    }
+   });
+   }
   };
 
 
@@ -107,7 +78,8 @@ const statusHealth = async (req, res) => {
   };
 
 
-  //req 30const getMyHealthPackages =  async (req, res) => {
+  //req 30 
+  const getMyHealthPackages =  async (req, res) => {
   try {
     const patientID = req.params.id;
     const patient = await Patient.findById(patientID);
@@ -129,6 +101,7 @@ const statusHealth = async (req, res) => {
       message: err.message,
     });
   }
+};
 
 
 
@@ -152,28 +125,46 @@ async function createPatient(req, res) {
   }
 }
 
+
+
+
 const getFamilyMembers = async (req, res) => {
   try {
-    const patientID = req.params.id; 
-
-    
+    const patientID = req.params.id;
     const patient = await Patient.findById(patientID);
 
     if (!patient) {
       return res.status(404).json({ message: "There are no Family Members registered" });
     }
 
-    // Extract family members from the patient object
     const familyMembers = patient.familyMembers;
+    const registeredFamilyMembers = [];
 
-    res.status(200).json(familyMembers);
-   
-    
+    for (const member of familyMembers) {
+      const registeredPatient = await Patient.findOne({ email: member.email });
+
+     
+      if (registeredPatient) {
+        registeredFamilyMembers.push({
+          email: member.email,
+          fname: registeredPatient.fName,
+          lname: registeredPatient.lName,
+          dateOfBirth: registeredPatient.dateOfBirth,
+        });
+      }
+    }
+if (registeredFamilyMembers.length === 0) {
+      return res.status(404).json({ message: "There are no Family Members registered" });
+}
+    res.status(200).json({ registeredFamilyMembers });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+
+
 const getAllDoctors = async (req, res) => {
   try {
     const patientID = req.params.id;
@@ -247,9 +238,15 @@ const getAllDoctors = async (req, res) => {
   };
 
 
+  
 
 
+export { createPatient, 
+  getFamilyMembers,
+   getAllDoctors,
+    getSingleDoctor,
+     getMyHealthPackages,
+      statusHealth,
+       subscribeToHealthPackage};
 
-export { createPatient, getFamilyMembers, getAllDoctors, getSingleDoctor, getMyHealthPackages, statusHealth, subscribeToHealthPackage};
-
-
+  
