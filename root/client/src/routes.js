@@ -24,6 +24,9 @@ import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
 import SubscribedPackage from "views/PatientViews/viewSubscribedPackage.js";
 import AddFamilyMember from "views/PatientViews/addFamilyMember.js";
+import FilterAppointments from "views/PatientViews/filterAppointments.js";
+import HealthPackages from "views/PatientViews/healthPackages";
+import SearchForDoctors from "views/PatientViews/searchForDoctors";
 
 var routes = [
   //patient routes
@@ -46,6 +49,27 @@ var routes = [
     name: "Add a Family Member",
     icon: "ni ni-single-02",
     component: <AddFamilyMember />,
+    layout: "/patient",
+  },
+  {
+    path: "/filterAppointments",
+    name: "My Appointments",
+    icon: "ni ni-fat-add",
+    component: <FilterAppointments />,
+    layout: "/patient",
+  },
+  {
+    path: "/healthPackagesOptions",
+    name: "Health Package Options",
+    icon: "ni ni-box-2",
+    component: <HealthPackages />,
+    layout: "/patient",
+  },
+  {
+    path: "/allDoctors",
+    name: "Search for Doctors",
+    icon: "ni ni-single-02",
+    component: <SearchForDoctors />,
     layout: "/patient",
   },
 

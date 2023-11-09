@@ -17,9 +17,13 @@
 */
 
 // reactstrap components
+import React, { useState } from "react";
 import {
+  ListGroup,
+  ListGroupItem,
   Button,
   Card,
+  Collapse,
   CardHeader,
   CardBody,
   FormGroup,
@@ -33,6 +37,10 @@ import {
 import UserHeader from "components/Headers/UserHeader.js";
 
 const AddFamilyMember = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggle = () => setIsOpen(!isOpen);
+
   return (
     <>
       <div
@@ -176,6 +184,30 @@ const AddFamilyMember = () => {
                             className="form-control-alternative"
                             type="email"
                           />
+                        </FormGroup>
+                      </Col>
+                      <Col lg="6">
+                        <FormGroup>
+                          <React.StrictMode>
+                            <Button
+                              color="primary"
+                              onClick={toggle}
+                              style={{ marginBottom: "1rem" }}
+                            >
+                              View all registered family members
+                            </Button>
+                            <Collapse isOpen={isOpen}>
+                              <Card>
+                                <CardBody>
+                                  <ListGroup>
+                                    <ListGroupItem>Habiba Samir</ListGroupItem>
+                                    <ListGroupItem>Shahd Amer</ListGroupItem>
+                                    <ListGroupItem>Hana Younis</ListGroupItem>
+                                  </ListGroup>
+                                </CardBody>
+                              </Card>
+                            </Collapse>
+                          </React.StrictMode>
                         </FormGroup>
                       </Col>
                     </Row>
