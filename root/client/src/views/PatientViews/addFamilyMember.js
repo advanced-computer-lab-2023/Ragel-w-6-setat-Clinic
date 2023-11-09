@@ -211,6 +211,18 @@ const AddFamilyMember = () => {
                         </FormGroup>
                       </Col>
                     </Row>
+                    <Row>
+                      <Col lg="6">
+                        <Button
+                          color="primary"
+                          href="#pablo"
+                          onClick={(e) => e.preventDefault()}
+                          size="sm"
+                        >
+                          Link Family Member
+                        </Button>
+                      </Col>
+                    </Row>
                   </div>
                 </Form>
               </CardBody>

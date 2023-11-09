@@ -22,6 +22,8 @@ import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
+
+// patient views
 import SubscribedPackage from "views/PatientViews/viewSubscribedPackage.js";
 import AddFamilyMember from "views/PatientViews/addFamilyMember.js";
 import FilterAppointments from "views/PatientViews/filterAppointments.js";
@@ -29,6 +31,11 @@ import HealthPackages from "views/PatientViews/healthPackages";
 import SearchForDoctors from "views/PatientViews/searchForDoctors";
 import FilterPrescriptions from "views/PatientViews/filterPrescriptions";
 import Wallet from "views/PatientViews/wallet";
+
+// doctor views
+import DoctorProfile from "views/DoctorViews/doctorProfile";
+import SearchForPatients from "views/DoctorViews/searchForPatients";
+import DoctorAppointments from "views/DoctorViews/doctorAppointments";
 
 var routes = [
   //patient routes
@@ -87,6 +94,37 @@ var routes = [
     icon: "ni ni-money-coins",
     component: <Wallet />,
     layout: "/patient",
+  },
+
+  //doctor routes
+
+  {
+    path: "/index",
+    name: "Dashboard",
+    icon: "ni ni-tv-2 text-primary",
+    component: <Index />,
+    layout: "/doctor",
+  },
+  {
+    path: "/myProfile",
+    name: "My Profile",
+    icon: "ni ni-circle-08",
+    component: <DoctorProfile />,
+    layout: "/doctor",
+  },
+  {
+    path: "/myPatients",
+    name: "My Patients",
+    icon: "ni ni-single-02",
+    component: <SearchForPatients />,
+    layout: "/doctor",
+  },
+  {
+    path: "/myAppointments",
+    name: "My Appointments",
+    icon: "ni ni-fat-add",
+    component: <DoctorAppointments />,
+    layout: "/doctor",
   },
 
   //admin routes
