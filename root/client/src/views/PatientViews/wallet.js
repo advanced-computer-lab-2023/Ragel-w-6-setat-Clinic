@@ -17,26 +17,15 @@
 */
 import { useState } from "react";
 // node.js library that concatenates classes (strings)
-import classnames from "classnames";
 // javascipt plugin for creating charts
 import Chart from "chart.js";
-// react plugin used to create charts
-import { Line, Bar } from "react-chartjs-2";
 // reactstrap components
-import {
-  Button,
-  Card,
-  CardTitle,
-  CardBody,
-  Container,
-  Row,
-  Col,
-} from "reactstrap";
+import { Card, CardTitle, CardBody, Container, Row, Col } from "reactstrap";
 
 // core components
 import { chartOptions, parseOptions } from "variables/charts.js";
 
-const SubscribedPackage = (props) => {
+const Wallet = (props) => {
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
   }
@@ -55,55 +44,32 @@ const SubscribedPackage = (props) => {
       <Container className="mt--7" fluid>
         <Row>
           <Col lg="6" xl="3">
-            <Card
-              className="card-stats mb-4 mb-xl-0"
-              style={{
-                width: "18rem",
-                backgroundColor: "#435585",
-              }}
-            >
+            <Card className="card-stats mb-4 mb-xl-0">
               <CardBody>
                 <Row>
                   <div className="col">
                     <CardTitle
                       tag="h5"
-                      className="text-uppercase  mb-0"
-                      style={{
-                        color: "white",
-                      }}
+                      className="text-uppercase text-muted mb-0"
                     >
-                      Package
+                      Wallet Amount
                     </CardTitle>
-                    <span
-                      className="h2 font-weight-bold mb-0"
-                      style={{
-                        color: "white",
-                      }}
-                    >
-                      Gold Package
-                    </span>
+                    <span className="h2 font-weight-bold mb-0">924</span>
                   </div>
+                  <Col className="col-auto">
+                    <div className="icon icon-shape bg-blue text-white rounded-circle shadow">
+                      <i className="fas fa-percent" />
+                    </div>
+                  </Col>
                 </Row>
-                <p className="mt-3 mb-0 text-muted text-sm">
-                  <span
-                    className="text-nowrap"
-                    style={{
-                      color: "white",
-                    }}
-                  >
-                    Status: Subscribed
-                  </span>
-                </p>
-                <Button style={{ backgroundColor: "#F8F6F4" }} type="button">
-                  Cancel
-                </Button>
               </CardBody>
             </Card>
           </Col>
+          ;
         </Row>
       </Container>
     </>
   );
 };
 
-export default SubscribedPackage;
+export default Wallet;

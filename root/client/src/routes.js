@@ -28,6 +28,7 @@ import FilterAppointments from "views/PatientViews/filterAppointments.js";
 import HealthPackages from "views/PatientViews/healthPackages";
 import SearchForDoctors from "views/PatientViews/searchForDoctors";
 import FilterPrescriptions from "views/PatientViews/filterPrescriptions";
+import Wallet from "views/PatientViews/wallet";
 
 var routes = [
   //patient routes
@@ -78,6 +79,13 @@ var routes = [
     name: "My Prescriptions",
     icon: "ni ni-collection",
     component: <FilterPrescriptions />,
+    layout: "/patient",
+  },
+  {
+    path: "/wallet",
+    name: "My Wallet",
+    icon: "ni ni-money-coins",
+    component: <Wallet />,
     layout: "/patient",
   },
 

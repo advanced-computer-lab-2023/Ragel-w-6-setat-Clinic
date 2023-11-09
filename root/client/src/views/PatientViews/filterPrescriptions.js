@@ -64,7 +64,7 @@ const FilterPrescriptions = () => {
                       </Col>
                     </Row>
                     <Row>
-                      <Col lg="5">
+                      <Col lg="6">
                         <FormGroup>
                           <label className="form-control-label">On Date:</label>
                           <br />
@@ -127,6 +127,7 @@ const FilterPrescriptions = () => {
                       <Table
                         className="align-items-center table-flush"
                         responsive
+                        hover
                       >
                         <thead className="thead-light">
                           <tr>
