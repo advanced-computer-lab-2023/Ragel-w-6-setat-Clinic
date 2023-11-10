@@ -18,6 +18,7 @@ import {
   viewSelectedDoctorAvailableAppointments,
   registerForAnAppointmentPatient,
   registerForAnAppointmentFamilyMember,
+  getMyHealthPackages,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -66,5 +67,9 @@ router.get("/doctorDetails/:patientid/:doctorid", selectDoctor);
 router.get("/familyMembers/:id", getFamilyMembers);
 router.get("/viewDoctors/:id", getAllDoctors);
 // router.get("/selectDoctor/:id", getSingleDoctor);
+
+// sprint 2
+
+router.get("/healthPackages/:id", getMyHealthPackages);
 
 export default router;

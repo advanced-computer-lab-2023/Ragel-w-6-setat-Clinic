@@ -569,6 +569,8 @@ const selectDoctor = async (req, res) => {
 
 // SARAS REQS
 
+//sprint 1
+
 const getFamilyMembers = async (req, res) => {
   try {
     const patientID = req.params.id; // Get patient's email from the request body
@@ -615,6 +617,36 @@ const getAllDoctors = async (req, res) => {
   }
 };
 
+//sprint 2
+
+const getMyHealthPackages = async (req, res) => {
+  try {
+    const patientID = req.params.id;
+    const patient = await Patient.findById(patientID).populate(
+      "subscribedPackage"
+    );
+
+    if (!patient) {
+      return res
+        .status(404)
+        .json({ message: "There is no patient with this id" });
+    }
+
+    const subscribedPackage = patient.subscribedPackage;
+
+    if (!subscribedPackage) {
+      return res.status(404).json({
+        message: "The patient is not subscribed to any health package",
+      });
+    } else {
+      res.status(200).json(subscribedPackage);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 export {
   createPatient,
   viewPrescription,
@@ -634,4 +666,5 @@ export {
   viewSelectedDoctorAvailableAppointments,
   registerForAnAppointmentPatient,
   registerForAnAppointmentFamilyMember,
+  getMyHealthPackages,
 };

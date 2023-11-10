@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 // node.js library that concatenates classes (strings)
 import classnames from "classnames";
 // javascipt plugin for creating charts
@@ -36,10 +36,37 @@ import {
 // core components
 import { chartOptions, parseOptions } from "variables/charts.js";
 
+//contexts to use
+import { UserContext } from "../../contexts/UserContext";
+
 const SubscribedPackage = (props) => {
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
   }
+
+  const { user } = useContext(UserContext);
+
+  const [packageDetails, setPackageDetails] = useState(null);
+
+  useEffect(() => {
+    const fetchSubscribedPackage = async () => {
+      try {
+        const response = await fetch(`/patients/healthPackages/${user._id}`);
+        const json = await response.json();
+        console.log(json);
+
+        if (response.ok) {
+          setPackageDetails(json);
+        } else {
+          console.error("Error fetching data:", response.statusText);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    fetchSubscribedPackage();
+  }, []);
 
   return (
     <>
@@ -80,7 +107,7 @@ const SubscribedPackage = (props) => {
                         color: "white",
                       }}
                     >
-                      Gold Package
+                      {packageDetails ? packageDetails.name : ""} Package
                     </span>
                   </div>
                 </Row>
