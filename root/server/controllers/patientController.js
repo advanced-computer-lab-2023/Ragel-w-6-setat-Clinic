@@ -45,7 +45,7 @@ const subscribeToHealthPackage = async (req, res) => {
 
 
 //req 31
-const statusHealth = async (req, res) => {  
+const statusHealth = async (req, res) => {
   try {
     const patientID = req.params.id;
     const patient = await Patient.findById(patientID);
@@ -54,54 +54,58 @@ const statusHealth = async (req, res) => {
     }
     const subscribedPackage = patient.subscribedPackage;
     console.log(subscribedPackage);
-    if (!subscribedPackage || subscribedPackage.length === 0){
+    if (!subscribedPackage || subscribedPackage.length === 0) {
       return res.status(404).json({ message: "The patient is not subscribed to any health package" });
     } else {
-      const healthCareStatus = {
-        self: {
+      const healthCareStatus = [
+        {
           packageName: patient.subscribedPackage[0].packageName,
           subscriptionStatus: patient.subscribedPackage[0].subscriptionStatus,
           renewalDate: patient.subscribedPackage[0].renewalDate,
           cancellationDate: patient.subscribedPackage[0].cancellationDate,
         }
-      };
-      res.status(200).json({ healthCareStatus });
-    }
-    
-  }
-    catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: err.message,
-      });
-    }
-  };
-
-
-  //req 30 
-  const getMyHealthPackages =  async (req, res) => {
-  try {
-    const patientID = req.params.id;
-    const patient = await Patient.findById(patientID);
-
-    if (!patient) {
-      return res.status(404).json({ message: "There is no patient with this id" });
-    }
-
-    const subscribedPackage = patient.subscribedPackage;
-
-    if (!subscribedPackage) {
-      return res.status(404).json({ message: "The patient is not subscribed to any health package" });
-    } else {
-      res.status(200).json({ message: `The patient is subscribed to the ${subscribedPackage} health package.` });
+      ];
+      res.status(200).json(healthCareStatus);
     }
   } catch (error) {
     res.status(500).json({
       status: "error",
-      message: err.message,
+      message: error.message, // Changed 'err' to 'error' here
     });
   }
 };
+
+
+
+  //req 30 
+  const getMyHealthPackages = async (req, res) => {
+    try {
+      const patientID = req.params.id;
+      const patient = await Patient.findById(patientID).populate(
+        "subscribedPackage"
+      );
+  
+      if (!patient) {
+        return res
+          .status(404)
+          .json({ message: "There is no patient with this id" });
+      }
+  
+      const subscribedPackage = patient.subscribedPackage;
+  
+      if (!subscribedPackage) {
+        return res.status(404).json({
+          message: "The patient is not subscribed to any health package",
+        });
+      } else {
+        res.status(200).json(subscribedPackage);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  };
+  
 
 
 
