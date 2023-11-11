@@ -1,1 +1,0 @@
-Images, icons, and other static assets.
