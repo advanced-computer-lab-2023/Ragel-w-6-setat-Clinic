@@ -251,7 +251,6 @@ const linkFamilyMember = async (req, res) => {
       dateOfBirth,
       relationship,
     });
-    requestingPatient.subscribedPackage = null;
 
     await requestingPatient.save();
     return res.status(201).json({ message: 'Family member linked successfully' });
