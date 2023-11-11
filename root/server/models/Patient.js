@@ -64,6 +64,10 @@ const patientSchema = new Schema({
     required: true,
     enum: ["male", "female"],
   },
+  nationalID: {
+    type: String,
+    required: true,
+  },
   phoneNum: {
     type: String,
     required: true,

@@ -219,7 +219,7 @@ const viwHealthPackages = async (req, res) => {
 
 const linkFamilyMember = async (req, res) => {
   try {
-    const { email, relationship, nationalID } = req.body;
+    const { email, relationship } = req.body;
     const patientId = req.params.id;
     const requestingPatient = await Patient.findById(patientId);
 
@@ -241,7 +241,7 @@ const linkFamilyMember = async (req, res) => {
       return res.status(400).json({ error: 'Family member already exists' });
     }
     
-    const { fName, lName, gender ,dateOfBirth } = existingPatient;
+    const { fName, lName, nationalID, gender ,dateOfBirth } = existingPatient;
     requestingPatient.familyMembers.push({
       email: existingPatient.email,
       fName,
@@ -251,6 +251,8 @@ const linkFamilyMember = async (req, res) => {
       dateOfBirth,
       relationship,
     });
+    requestingPatient.subscribedPackage = null;
+
     await requestingPatient.save();
     return res.status(201).json({ message: 'Family member linked successfully' });
   } catch (error) {
@@ -258,7 +260,7 @@ const linkFamilyMember = async (req, res) => {
     return res.status(500).json({ error: 'An error occurred while linking a family member' });
   }
 };
-  
+
 const payAppointmentWallet = async (req, res) => {
   try {
     const patientId = req.params.id;
