@@ -20,6 +20,8 @@ const subscribeToHealthPackage = async (req, res) => {
           message: "Patient not found",
         });
       }
+
+      
       
       if (patient.subscribedPackage && patient.subscribedPackage.length > 0) {
         return res.status(400).json({ message: 'Patient is already subscribed to a health package' });
@@ -45,7 +47,7 @@ const subscribeToHealthPackage = async (req, res) => {
 
 
 //req 31
-const statusHealth = async (req, res) => {
+/*const statusHealth = async (req, res) => {
   try {
     const patientID = req.params.id;
     const patient = await Patient.findById(patientID);
@@ -74,6 +76,68 @@ const statusHealth = async (req, res) => {
     });
   }
 };
+*/
+
+const statusHealth = async (req, res) => {
+  try {
+    console.log("HEREEEE");
+    const patientId = req.params.id;
+
+    // Retrieve patient's subscribed package
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    const patientPackage = [
+      {
+        packageName: patient.subscribedPackage[0].packageName,
+        subscriptionStatus: patient.subscribedPackage[0].subscriptionStatus,
+        renewalDate: patient.subscribedPackage[0].renewalDate,
+        cancellationDate: patient.subscribedPackage[0].cancellationDate,
+      },
+    ];
+
+    console.log("here is the patient package", patientPackage);
+
+    const familyMembers = patient.familyMembers;
+
+    // Retrieve registered family members' subscribed packages
+    const familyMembersPackages = [];
+
+    for (const member of familyMembers) {
+      const registeredPatient = await Patient.findOne({ email: member.email });
+
+      if (registeredPatient && registeredPatient.subscribedPackage.length > 0) {
+        const familyMemberPackage = {
+          packageName: registeredPatient.subscribedPackage[0].packageName,
+          subscriptionStatus: registeredPatient.subscribedPackage[0].subscriptionStatus,
+          renewalDate: registeredPatient.subscribedPackage[0].renewalDate,
+          cancellationDate: registeredPatient.subscribedPackage[0].cancellationDate,
+        };
+
+        familyMembersPackages.push(familyMemberPackage);
+      }
+    }
+
+    console.log(familyMembersPackages);
+
+    res.status(200).json({
+      patientPackage,
+      familyMembersPackages,
+    });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+
+
+
 
 
 

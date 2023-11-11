@@ -16,7 +16,7 @@
 
 */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 // node.js library that concatenates classes (strings)
 import classnames from "classnames";
 // javascipt plugin for creating charts
@@ -27,6 +27,7 @@ import { Line, Bar } from "react-chartjs-2";
 import axios from "axios";
 //for the route
 import { useParams } from 'react-router-dom';
+import {UserContext} from "../../contexts/UserContext.js";
 // reactstrap components
 import {
   Button,
@@ -42,104 +43,86 @@ import {
 import { chartOptions, parseOptions } from "variables/charts.js";
 
 
+const SubscribedPackages = () => {
+  const { user } = useContext(UserContext);
+  const [packageInfo, setPackageInfo] = useState(null);
 
-  const SubscribedPackage = () => {
-    const [packageInfo, setPackageInfo] = useState(null);
-    const { id } = useParams();
-    console.log(id);
-  
-    useEffect(() => {
-      const fetchPackageInfo = async () => {
-        try {
-          const response = await axios.get(`/patients/healthStatus/${id}`);
-          console.log(response);
-    
-          // Check if the response status is OK (200)
-          if (response.status === 200) {
-            // Access the packageInfo array directly
-            setPackageInfo(response.data);
-    
-            // Log the packageInfo array
-            console.log(response.data,"hello");
-          } else {
-            // Handle other response status codes
-            console.error(`Unexpected response status: ${response.status}`);
-          }
-        } catch (error) {
-          // Handle 404 error
-          if (error.response && error.response.status === 404) {
-            console.log("Patient not found or has no subscribed package");
-          } else {
-            console.error("An error occurred:", error);
-          }
+  useEffect(() => {
+    const fetchPackageInfo = async () => {
+      try {
+        const response = await axios.get(`/patients/healthStatus/${user._id}`);
+        if (response.status === 200) {
+          setPackageInfo(response.data);
+        } else {
+          console.error(`Unexpected response status: ${response.status}`);
         }
-      };
-    
-      fetchPackageInfo();
-    }, [id]);
-    
-    
-    return (
-      <>
-        <div className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center">
-          <span className="mask bg-gradient-default opacity-8" />
-        </div>
-        <Container className="mt--7" fluid>
-          <Row>
-            <Col lg="6" xl="3">
-              <Card
-                className="card-stats mb-4 mb-xl-0"
-                style={{
-                  width: "18rem",
-                  backgroundColor: "#435585",
-                }}
-              >
-                <CardBody>
-                  <Row>
-                    <div className="col">
-                      <CardTitle
-                        tag="h5"
-                        className="text-uppercase mb-0"
-                        style={{
-                          color: "white",
-                        }}
-                      >
-                        Package
-                      </CardTitle>
-                      <span
-                        className="h2 font-weight-bold mb-0"
-                        style={{
-                          color: "white",
-                        }}
-                      >
-                        {packageInfo ? (
-                          packageInfo.map((package1) => (
-                            // Check if package1 and its properties are defined
-                            package1 && package1.packageName ? (
-                              <div key={package1.packageName}>
-                              <p>Package Name: {package1.packageName}</p>
-                              <p>Status: {package1.subscriptionStatus}</p>
-                              <p>Renewal Date: {package1.renewalDate=== null? 'Not determined': package1.renewalDate}</p>
-                              <p>Cancellation Date: {package1.cancellationDate === null ? 'Not Determined' : package1.cancellationDate}</p>
-                            </div>
-                            ) : null
-                          ))
-                        ) : (
-                          <div>No subscribed packages found</div>
-                        )}
-                      </span>
-                    </div>
-                  </Row>
-                  {/* ... */}
-                  <Button style={{ backgroundColor: "#F8F6F4" }}>Cancel</Button>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-        </Container>
-      </>
-    );
-   };  
-  
-  
-  export default SubscribedPackage;
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          console.log("Patient not found or has no subscribed package");
+        } else {
+          console.error("An error occurred:", error);
+        }
+      }
+    };
+
+    fetchPackageInfo();
+  }, [user._id]);
+
+  return (
+    <div>
+      <h3>Patient's Subscribed Package</h3>
+      {packageInfo ? (
+        <>
+          {packageInfo.patientPackage.map((package1) => (
+            <div key={package1.packageName}>
+              <p>Package Name: {package1.packageName}</p>
+              <p>Status: {package1.subscriptionStatus}</p>
+              <p>
+                Renewal Date:{" "}
+                {package1.renewalDate === null ? "Not determined" : package1.renewalDate}
+              </p>
+              <p>
+                Cancellation Date:{" "}
+                {package1.cancellationDate === null
+                  ? "Not Determined"
+                  : package1.cancellationDate}
+              </p>
+            </div>
+          ))}
+                 <Button style={{ backgroundColor: "#F8F6F4" }}>Cancel</Button>
+        </>
+      ) : (
+        <div>No subscribed packages found</div>
+      )}
+
+      <h3>Family Members' Subscribed Packages</h3>
+      {packageInfo ? (
+        <>
+          {packageInfo.familyMembersPackages.map((familyMemberPackage) => (
+            <div key={familyMemberPackage.packageName}>
+              <p>Package Name: {familyMemberPackage.packageName}</p>
+              <p>Status: {familyMemberPackage.subscriptionStatus}</p>
+              <p>
+                Renewal Date:{" "}
+                {familyMemberPackage.renewalDate === null
+                  ? "Not determined"
+                  : familyMemberPackage.renewalDate}
+              </p>
+              <p>
+                Cancellation Date:{" "}
+                {familyMemberPackage.cancellationDate === null
+                  ? "Not Determined"
+                  : familyMemberPackage.cancellationDate}
+              </p>
+            </div>
+          ))}
+            <Button style={{ backgroundColor: "#F8F6F4" }}>Cancel</Button>
+        </>
+      ) : (
+        <div>No subscribed packages found for family members</div>
+      )}
+    </div>
+  );
+};
+
+export default SubscribedPackages;
