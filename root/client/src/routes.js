@@ -28,6 +28,7 @@ import Patients from "views/AdminViews/Patient";
 import PatientPrescriptions from "views/AdminViews/PatientPrescriptions";
 import ViewDoctors from "views/AdminViews/Doctors";
 import AddFamilyMember from "views/AdminViews/addFamilyMember";
+import PayWithWalletButton from "views/AdminViews/PayAppointment";
 
 
 var routes = [
@@ -115,6 +116,14 @@ var routes = [
     component: <AddFamilyMember />,
     layout: "/auth",
   },
+  {
+    path: "/PayAppointment/:id",
+    name: "PayAppointment",
+    icon: "ni ni-circle-08 text-pink",
+    component: <PayWithWalletButton />,
+    layout: "/auth",
+  },
+  
 
 ];
 export default routes;

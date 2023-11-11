@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import {
+  Alert,
   Card,
   CardHeader,
   Table,
@@ -21,6 +22,7 @@ const ViewDoctors = () => {
   const [searchSpecialty, setSearchSpecialty] = useState('');
   const [filterDate, setFilterDate] = useState('');
   const [expandedDoctorId, setExpandedDoctorId] = useState(null);
+  const [searchErrorMessage, setSearchErrorMessage] = useState(null);
   const [searchedOrFiltered, setSearchedOrFiltered] = useState(false);
 
   useEffect(() => {
@@ -45,20 +47,22 @@ const ViewDoctors = () => {
           specialty: searchSpecialty,
         },
       });
-  
+
       if (response.data && response.data.length > 0) {
         setDoctors(response.data);
+        setSearchErrorMessage(null); // Reset error message if doctors are found
       } else {
         setDoctors([]); // Set to an empty array if no doctors found
-        showToast('No doctors found for the given search criteria.', 'error');
+        setSearchErrorMessage('No doctors found for the given search criteria.');
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
         // Handle 404 status separately
         setDoctors([]);
-        showToast('No doctors found for the given search criteria.', 'error');
+        setSearchErrorMessage('No doctors found for the given search criteria.');
       } else {
         console.error('Error searching for doctors:', error);
+        setSearchErrorMessage('An error occurred while searching for doctors.');
       }
     }
   };
@@ -165,6 +169,11 @@ const ViewDoctors = () => {
                 </Col>
               </Row>
             </div>
+            {searchErrorMessage && (
+                <Alert color="danger" style={{ marginTop: '1rem' }}>
+                  {searchErrorMessage}
+                </Alert>
+              )}
             <Table className="align-items-center table-flush" responsive>
               <thead className="thead-light">
                 <tr>
