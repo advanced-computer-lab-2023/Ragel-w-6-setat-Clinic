@@ -105,7 +105,7 @@ var routes = [
     path: "/Doctor",
     name: "Doctor",
     icon: "ni ni-circle-08 text-pink",
-    component: <viewDoctors />,
+    component: <ViewDoctors />,
     layout: "/auth",
   },
   {

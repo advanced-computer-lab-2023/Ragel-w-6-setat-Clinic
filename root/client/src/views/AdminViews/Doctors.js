@@ -80,14 +80,14 @@ const ViewDoctors = () => {
   };
 
   const handleSelectDoctor = (doctorId) => {
-    if (searchedOrFiltered) {
-      if (expandedDoctorId === doctorId) {
-        setExpandedDoctorId(null);
-      } else {
-        setExpandedDoctorId(doctorId);
-      }
+    // Allow selection regardless of whether a search or filter has been performed
+    if (expandedDoctorId === doctorId) {
+      setExpandedDoctorId(null);
+    } else {
+      setExpandedDoctorId(doctorId);
     }
   };
+  
 
   const showToast = (message, type) => {
     toast[type](message, {
@@ -214,7 +214,7 @@ const ViewDoctors = () => {
         </Col>
       </Row>
     </Container>
-  );
+  )
 };
 
 export default ViewDoctors;
