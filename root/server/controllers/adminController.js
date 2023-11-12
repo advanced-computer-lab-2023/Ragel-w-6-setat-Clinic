@@ -6,22 +6,21 @@ import Appointment from "../models/Appointments.js";
 import Prescription from "../models/Prescription.js";
 
 const getAllAdmins = async (req, res) => {
-  async (req, res) => {
-    try {
-      const admins = await Admin.find({}, "username password"); // Retrieve only username and password fields
-      res.json(admins);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  };
+  const adminId = req.params.id;
+  try {
+    const admins = await Admin.find({}); // Retrieve only username and password fields
+    res.status(200).json(admins);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 const getAllPackages = async (req, res) => {
   const adminId = req.params.id;
   try {
     const packages = await Package.find({});
-    res.status(200).json({ packages: packages });
+    res.status(200).json(packages);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -31,6 +30,7 @@ const getAllPackages = async (req, res) => {
 // create an admin
 const createAdmin = async (req, res) => {
   const adminId = req.params.id;
+  console.log("heree");
   try {
     const admin = await Admin.create(req.body);
     res.status(201).json({
@@ -51,9 +51,7 @@ const createPackage = async (req, res) => {
     const pack = await Package.create(req.body);
     const packages = await Package.find({});
     const adminId = req.params.id;
-    res.status(201).json({
-      healthPackages: packages,
-    });
+    res.status(201).json({ message: "package successfully added" });
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -67,11 +65,25 @@ const createPackage = async (req, res) => {
 const deletePackage = async (req, res) => {
   const adminId = req.params.userid;
   try {
-    const pack = await Package.findByIdAndDelete(req.params.packageid);
-    const packages = await Package.find({});
-    res.status(201).json({
-      healthPackages: packages,
-    });
+    const deletedPackage = await Package.findByIdAndDelete(
+      req.params.packageid
+    );
+    if (deletedPackage) {
+      // Find all patients subscribed to the deleted package
+      const patientsToUpdate = await Patient.find({
+        "subscribedPackage.packageId": deletedPackage._id,
+      });
+
+      // Update each patient's subscribedPackage to null
+      const updatePromises = patientsToUpdate.map(async (patient) => {
+        patient.subscribedPackage = null;
+        return patient.save();
+      });
+
+      // Wait for all updates to complete
+      await Promise.all(updatePromises);
+    }
+    res.status(200).json({ message: "deleted package successfully" });
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -93,7 +105,7 @@ const updatePackage = async (req, res) => {
     );
     const packages = await Package.find({});
     res.status(201).json({
-      healthPackages: packages,
+      message: "updated successfully",
     });
   } catch (err) {
     res.status(400).json({
@@ -109,7 +121,7 @@ const getAllDoctors = async function (req, res) {
   const adminId = req.params.id;
   try {
     const doctors = await Doctor.find({});
-    res.status(200).json({ doctors: doctors });
+    res.status(200).json(doctors);
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -122,7 +134,7 @@ const getAllPatients = async function (req, res) {
   const adminId = req.params.id;
   try {
     const patients = await Patient.find({});
-    res.status(200).json({ patients: patients });
+    res.status(200).json(patients);
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -133,24 +145,23 @@ const getAllPatients = async function (req, res) {
 
 const deleteAdmin = async (req, res) => {
   try {
-    const adminId = req.params.id;
+    const adminId = req.params.adminId;
+    const username = req.params.adminUser;
     const filter = {
-      username: req.query.username,
+      username,
     };
 
-    const deleteAdminResult = await Admin.deleteMany(filter);
-    const allAdmins = await Admin.find({ _id: { $ne: adminId } });
+    const deleteAdminResult = await Admin.findOneAndDelete(filter);
+    console.log(deleteAdminResult);
 
     if (deleteAdminResult.length === 0) {
       res.status(404).json({
         status: "fail",
-        admins: allAdmins,
         message: "No such admin in the system",
       });
     } else {
       res.status(200).json({
         status: "success",
-        admins: allAdmins,
         message: "Admin successfully deleted.",
       });
     }
@@ -164,9 +175,10 @@ const deleteAdmin = async (req, res) => {
 
 const deletePatient = async (req, res) => {
   try {
-    const adminId = req.params.id;
+    const adminId = req.params.adminId;
+    const username = req.params.patientUser;
     const filter = {
-      username: req.query.username,
+      username,
     };
     const deletedPatientResult = await Patient.findOneAndDelete(filter);
     const deleteRelatedAppointments = await Appointment.deleteMany({
@@ -200,11 +212,13 @@ const deletePatient = async (req, res) => {
 
 const deleteDoctor = async (req, res) => {
   try {
-    const adminId = req.params.id;
+    const adminId = req.params.adminId;
+    const username = req.params.doctorUser;
     const filter = {
-      username: req.query.username,
+      username,
     };
     const deleteDoctorResult = await Doctor.findOneAndDelete(filter);
+
     const deleteRelatedAppointments = await Appointment.deleteMany({
       doctor: deleteDoctorResult._id,
     });

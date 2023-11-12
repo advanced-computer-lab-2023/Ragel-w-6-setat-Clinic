@@ -226,28 +226,23 @@ const registerForAnAppointmentFamilyMember = async (req, res) => {
 
 const addFamilyMember = async (req, res) => {
   const patientId = req.params.id;
-
   const { fName, lName, nationalID, gender, dateOfBirth, relationship } =
     req.body;
-
-  const validRelationships = ["wife", "husband", "son", "daughter"];
 
   try {
     const patient = await Patient.findById(patientId);
 
-    if (!patient) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Patient not found",
+    // Check if the nationalID already exists in familyMembers
+    const isDuplicateNationalID = patient.familyMembers.some(
+      (member) => member.nationalID === nationalID
+    );
+
+    if (isDuplicateNationalID) {
+      return res.status(400).json({
+        status: "error",
+        message: "Family member with the same national ID already exists.",
       });
     }
-
-    // if (!validRelationships.includes(relationship)) {
-    //   res.render("addFamilyMember", {
-    //     message:
-    //       "Invalid relationship. Allowed values are wife, husband, son, or daughter.",
-    //   });
-    // }
 
     const newFamilyMember = {
       fName: fName,
@@ -265,9 +260,10 @@ const addFamilyMember = async (req, res) => {
       message: "Family Member added successfully!",
     });
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({
       status: "error",
-      message: err.message,
+      message: "Make sure all fields are filled",
     });
   }
 };
@@ -571,6 +567,86 @@ const selectDoctor = async (req, res) => {
   }
 };
 
+// sprint 2
+
+const findOutRelationship = (relationship) => {
+  switch (relationship) {
+    case "wife":
+      return "husband";
+    case "husband":
+      return "wife";
+    case "child":
+      return "parent";
+    case "sibling":
+      return "sibling";
+    case "parent":
+      return "child";
+    default:
+      throw new Error("Invalid relationship");
+  }
+};
+
+const linkFamilyMember = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const patientId = req.params.id;
+
+    const currentPatient = await Patient.findById(patientId);
+
+    const patientToLink = await Patient.findOne({ email });
+    if (!patientToLink) {
+      return res.status(400).json({ message: "Patient to link not found" });
+    }
+
+    // Check if the family member already exists
+    const existingFamilyMember = currentPatient.familyMembers.find(
+      (member) => member.email === patientToLink.email
+    );
+
+    if (existingFamilyMember) {
+      return res.status(400).json({ message: "Family member already linked" });
+    }
+
+    const matchingNationalIDMember = currentPatient.familyMembers.find(
+      (member) => member.nationalID === patientToLink.nationalID
+    );
+
+    if (!matchingNationalIDMember) {
+      return res
+        .status(400)
+        .json({ message: "You must add family member first" });
+    }
+
+    matchingNationalIDMember.email = email;
+    await currentPatient.save();
+
+    const oppositeRelationship = findOutRelationship(
+      matchingNationalIDMember.relationship
+    );
+
+    patientToLink.familyMembers.push({
+      email: currentPatient.email,
+      fName: currentPatient.fName,
+      lName: currentPatient.lName,
+      nationalID: currentPatient.nationalID,
+      gender: currentPatient.gender,
+      dateOfBirth: currentPatient.dateOfBirth,
+      relationship: oppositeRelationship,
+    });
+
+    await patientToLink.save();
+
+    return res
+      .status(201)
+      .json({ message: "Family members both got linked successfully" });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while linking a family member" });
+  }
+};
+
 // SARAS REQS
 
 //sprint 1
@@ -583,12 +659,14 @@ const getFamilyMembers = async (req, res) => {
     const patient = await Patient.findById(patientID);
 
     // Extract family members from the patient object
-    const familyMembers = patient.familyMembers;
+    const familyMembers = patient.familyMembers.filter(
+      (member) => member.email
+    );
 
     if (!familyMembers) {
       return res.status(200).json({ patientFamily: [] });
     } else {
-      res.status(200).json({ patientFamily: familyMembers });
+      res.status(200).json(familyMembers);
     }
   } catch (error) {
     console.error(error);
@@ -828,4 +906,5 @@ export {
   subscribeToHealthPackage,
   subscribeHealthPackageForFamilyMember,
   getFamilyHealthPackages,
+  linkFamilyMember,
 };

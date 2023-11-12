@@ -17,7 +17,8 @@
 */
 
 // reactstrap components
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useContext, useEffect } from "react";
 import {
   ListGroup,
   ListGroupItem,
@@ -32,14 +33,88 @@ import {
   Container,
   Row,
   Col,
+  Alert,
 } from "reactstrap";
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
 
+//contexts to use
+import { UserContext } from "../../contexts/UserContext";
+
 const AddFamilyMember = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const toggle = () => setIsOpen(!isOpen);
+
+  const [email, setEmail] = useState("");
+  const [fName, setFirstName] = useState("");
+  const [lName, setLastName] = useState("");
+  const [nationalID, setNationalID] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [gender, setGender] = useState("male");
+  const [relationship, setRelationship] = useState("husband");
+  const [familyMembers, setFamilyMembers] = useState([]);
+
+  const { user } = useContext(UserContext);
+
+  useEffect(() => {
+    const fetchFamilyMembers = async () => {
+      try {
+        const response = await fetch(`/patients/familyMembers/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setFamilyMembers(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    fetchFamilyMembers();
+  }, [familyMembers]);
+
+  const handleLinkFamilyMember = async () => {
+    try {
+      const response = await axios.post(
+        `/patients/linkFamilyMember/${user._id}`,
+        {
+          email,
+        }
+      );
+      console.log("Linked Succesfully:", response.data.message); // Log the response data
+      // Clear the form inputs after successful addition
+      alert("Linked Succesfully: " + response.data.message);
+      setEmail("");
+    } catch (error) {
+      alert("Linked failed: " + error.response.data.message);
+    }
+  };
+
+  const handleAddFamilyMember = async () => {
+    try {
+      const response = await axios.post(
+        `/patients/addFamilyMember/${user._id}`,
+        {
+          fName,
+          lName,
+          nationalID,
+          dateOfBirth,
+          gender,
+          relationship,
+        }
+      );
+      console.log("Added Succesfully:", response.data.message); // Log the response data
+      // Clear the form inputs after successful addition
+      alert("Added Succesfully: " + response.data.message);
+      setFirstName("");
+      setLastName("");
+      setNationalID("");
+      setDateOfBirth(null);
+      setGender("");
+      setRelationship("");
+    } catch (error) {
+      alert("Added failed: " + error.response.data.message);
+    }
+  };
 
   return (
     <>
@@ -67,7 +142,7 @@ const AddFamilyMember = () => {
                     <Button
                       color="primary"
                       href="#pablo"
-                      onClick={(e) => e.preventDefault()}
+                      onClick={handleAddFamilyMember}
                       size="sm"
                     >
                       Add Family Member
@@ -88,8 +163,13 @@ const AddFamilyMember = () => {
                             First name
                           </label>
                           <Input
+                            required
                             className="form-control-alternative"
                             type="text"
+                            value={fName}
+                            onChange={(e) => {
+                              setFirstName(e.target.value);
+                            }}
                           />
                         </FormGroup>
                       </Col>
@@ -102,8 +182,11 @@ const AddFamilyMember = () => {
                             Last name
                           </label>
                           <Input
+                            required
                             className="form-control-alternative"
                             type="text"
+                            value={lName}
+                            onChange={(e) => setLastName(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -115,17 +198,25 @@ const AddFamilyMember = () => {
                             National ID
                           </label>
                           <Input
+                            required
                             className="form-control-alternative"
                             type="text"
+                            value={nationalID}
+                            onChange={(e) => setNationalID(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
                       <Col lg="6">
                         <FormGroup>
-                          <label className="form-control-label">Age</label>
+                          <label className="form-control-label">
+                            Date of Birth
+                          </label>
                           <Input
+                            required
                             className="form-control-alternative"
-                            type="number"
+                            type="date"
+                            value={dateOfBirth}
+                            onChange={(e) => setDateOfBirth(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -140,6 +231,8 @@ const AddFamilyMember = () => {
                           <select
                             id="dropdown"
                             className="form-control-alternative"
+                            value={gender}
+                            onChange={(e) => setGender(e.target.value)}
                           >
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -155,11 +248,14 @@ const AddFamilyMember = () => {
                           <select
                             id="dropdown"
                             className="form-control-alternative"
+                            value={relationship}
+                            onChange={(e) => setRelationship(e.target.value)}
                           >
                             <option value="wife">Wife</option>
                             <option value="husband">Husband</option>
-                            <option value="son">Son</option>
-                            <option value="daughter">Daughter</option>
+                            <option value="child">Child</option>
+                            <option value="sibling">Sibling</option>
+                            <option value="parent">Parent</option>
                           </select>
                         </FormGroup>
                       </Col>
@@ -183,6 +279,8 @@ const AddFamilyMember = () => {
                           <Input
                             className="form-control-alternative"
                             type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -200,9 +298,13 @@ const AddFamilyMember = () => {
                               <Card>
                                 <CardBody>
                                   <ListGroup>
-                                    <ListGroupItem>Habiba Samir</ListGroupItem>
-                                    <ListGroupItem>Shahd Amer</ListGroupItem>
-                                    <ListGroupItem>Hana Younis</ListGroupItem>
+                                    {familyMembers
+                                      ? familyMembers.map((member, index) => (
+                                          <ListGroupItem
+                                            key={index}
+                                          >{`${member.fName} ${member.lName}`}</ListGroupItem>
+                                        ))
+                                      : ""}
                                   </ListGroup>
                                 </CardBody>
                               </Card>
@@ -216,7 +318,7 @@ const AddFamilyMember = () => {
                         <Button
                           color="primary"
                           href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={handleLinkFamilyMember}
                           size="sm"
                         >
                           Link Family Member

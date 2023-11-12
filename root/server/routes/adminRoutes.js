@@ -18,18 +18,18 @@ import { body, validationResult } from "express-validator";
 const router = express.Router();
 
 router.post("/addAdmin/:id", createAdmin);
-router.get("/packageManagement/:id", getAllPackages);
+router.get("/getAllPackages/:id", getAllPackages);
 router.post("/packageManagement/:id", createPackage);
 router.delete("/packageManagement/:userid/:packageid", deletePackage);
 router.patch("/packageManagement/:userid/:packageid", updatePackage);
-router.get("/allAdmins", getAllAdmins);
+router.get("/allAdmins/:id", getAllAdmins);
 
 //LOJAINS ROUTES
-router.delete("/deleteAdmin/:id", deleteAdmin);
-router.delete("/deletePatient/:id", deletePatient);
-router.delete("/deleteDoctor/:id", deleteDoctor);
+router.delete("/deleteAdmin/:adminId/:adminUser", deleteAdmin);
+router.delete("/deletePatient/:adminId/:patientUser", deletePatient);
+router.delete("/deleteDoctor/:adminId/:doctorUser", deleteDoctor);
 router.get("/viewUnregisteredDoctors/:id", viewUnregisteredDoctors);
-router.get("/deleteDoctor/:id", getAllDoctors);
-router.get("/deletePatient/:id", getAllPatients);
+router.get("/allDoctors/:id", getAllDoctors);
+router.get("/allPatients/:id", getAllPatients);
 
 export default router;

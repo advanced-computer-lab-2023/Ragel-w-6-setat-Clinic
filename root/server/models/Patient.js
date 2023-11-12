@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const familyMemberSchema = new Schema({
   email: {
     type: String,
+    unique: true,
   },
   fName: {
     type: String,
@@ -15,6 +16,7 @@ const familyMemberSchema = new Schema({
   },
   nationalID: {
     type: String,
+    unique: true,
     required: true,
   },
   gender: {
@@ -77,6 +79,11 @@ const patientSchema = new Schema({
   lName: {
     type: String,
     required: true,
+  },
+  nationalID: {
+    type: String,
+    required: true,
+    unique: true,
   },
   dateOfBirth: {
     type: Date,

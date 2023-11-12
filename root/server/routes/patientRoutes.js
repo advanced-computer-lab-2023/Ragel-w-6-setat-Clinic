@@ -23,6 +23,7 @@ import {
   subscribeToHealthPackage,
   subscribeHealthPackageForFamilyMember,
   getFamilyHealthPackages,
+  linkFamilyMember,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -66,6 +67,10 @@ router.get("/filterMyAppointments/:id", filterMyAppointments);
 router.get("/getMyAppointments/:id", getMyAppointments);
 router.get("/filterDoctors/:id", filterDoctors);
 router.get("/doctorDetails/:patientid/:doctorid", selectDoctor);
+
+// sprint 2
+
+router.post("/linkFamilyMember/:id", linkFamilyMember);
 
 // SARA ROUTES
 
