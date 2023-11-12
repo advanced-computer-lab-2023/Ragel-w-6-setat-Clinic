@@ -7,6 +7,44 @@ import Package from "../models/Package.js";
 
 
 //req 28
+
+const paySubscriptiontWallet = async (req, res) => {
+  try {
+    const patientId = req.params.id;
+    const patient = await Patient.findById(patientId);
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    const subscribedPackage = patient.subscribedPackage;
+
+    if (!subscribedPackage || subscribedPackage.length === 0) {
+      return res.status(400).json({ error: 'No pending subscription for this patient' });
+    }
+
+    const packagePrice = await Package.findOne({ name: subscribedPackage[0].packageName });
+
+    if (!packagePrice) {
+      return res.status(404).json({ error: 'Package not found' });
+    }
+
+    const paymentAmount = packagePrice.price;
+
+    if (patient.wallet >= paymentAmount) {
+      patient.wallet -= paymentAmount;
+      subscribedPackage[0].status = 'subscribed';  // Fix here
+      await patient.save();
+      return res.status(200).json({ message: 'Payment successful from wallet' });
+    } else {
+      return res.status(400).json({ error: 'Insufficient wallet balance' });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'An error occurred while processing the payment' });
+  }
+};
+
 const subscribeToHealthPackage = async (req, res) => {
     const patientId = req.params.id;
     const { packageName, subscriptionStatus, renewalDate, cancellationDate } =
@@ -46,38 +84,8 @@ const subscribeToHealthPackage = async (req, res) => {
   };
 
 
-//req 31
-/*const statusHealth = async (req, res) => {
-  try {
-    const patientID = req.params.id;
-    const patient = await Patient.findById(patientID);
-    if (!patient) {
-      return res.status(404).json({ message: "There is no patient with this id" });
-    }
-    const subscribedPackage = patient.subscribedPackage;
-    console.log(subscribedPackage);
-    if (!subscribedPackage || subscribedPackage.length === 0) {
-      return res.status(404).json({ message: "The patient is not subscribed to any health package" });
-    } else {
-      const healthCareStatus = [
-        {
-          packageName: patient.subscribedPackage[0].packageName,
-          subscriptionStatus: patient.subscribedPackage[0].subscriptionStatus,
-          renewalDate: patient.subscribedPackage[0].renewalDate,
-          cancellationDate: patient.subscribedPackage[0].cancellationDate,
-        }
-      ];
-      res.status(200).json(healthCareStatus);
-    }
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: error.message, // Changed 'err' to 'error' here
-    });
-  }
-};
-*/
 
+//req 31
 const statusHealth = async (req, res) => {
   try {
     console.log("HEREEEE");
@@ -89,15 +97,17 @@ const statusHealth = async (req, res) => {
       return res.status(404).json({ message: "Patient not found" });
     }
 
-    const patientPackage = [
+    const patientPackage = patient.subscribedPackage.length > 0 ? [
       {
         packageName: patient.subscribedPackage[0].packageName,
         subscriptionStatus: patient.subscribedPackage[0].subscriptionStatus,
-        renewalDate: patient.subscribedPackage[0].renewalDate,
-        cancellationDate: patient.subscribedPackage[0].cancellationDate,
-      },
-    ];
+        // Example: handling renewalDate and cancellationDate in patientPackage
+        renewalDate: patient.subscribedPackage[0].renewalDate || "Not determined",
+        cancellationDate: patient.subscribedPackage[0].cancellationDate || "Not determined",
 
+      },
+    ] : [];
+    
     console.log("here is the patient package", patientPackage);
 
     const familyMembers = patient.familyMembers;
@@ -108,19 +118,24 @@ const statusHealth = async (req, res) => {
     for (const member of familyMembers) {
       const registeredPatient = await Patient.findOne({ email: member.email });
 
-      if (registeredPatient && registeredPatient.subscribedPackage.length > 0) {
+      if (registeredPatient && registeredPatient.subscribedPackage && registeredPatient.subscribedPackage.length > 0) {
         const familyMemberPackage = {
           packageName: registeredPatient.subscribedPackage[0].packageName,
           subscriptionStatus: registeredPatient.subscribedPackage[0].subscriptionStatus,
-          renewalDate: registeredPatient.subscribedPackage[0].renewalDate,
-          cancellationDate: registeredPatient.subscribedPackage[0].cancellationDate,
+          // Example: handling renewalDate and cancellationDate in patientPackage
+         renewalDate: patient.subscribedPackage[0].renewalDate || "Not determined",
+        cancellationDate: patient.subscribedPackage[0].cancellationDate || "Not determined",
+  
         };
-
+      
         familyMembersPackages.push(familyMemberPackage);
       }
     }
 
-    console.log(familyMembersPackages);
+    
+
+    
+    console.log("hereee2"+ familyMembersPackages);
 
     res.status(200).json({
       patientPackage,
@@ -221,6 +236,7 @@ const getFamilyMembers = async (req, res) => {
         });
       }
     }
+    console.log(registeredFamilyMembers);
 if (registeredFamilyMembers.length === 0) {
       return res.status(404).json({ message: "There are no Family Members registered" });
 }
@@ -315,6 +331,7 @@ export { createPatient,
     getSingleDoctor,
      getMyHealthPackages,
       statusHealth,
-       subscribeToHealthPackage};
+       subscribeToHealthPackage,
+       paySubscriptiontWallet};
 
   

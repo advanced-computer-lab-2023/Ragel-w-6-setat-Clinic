@@ -1,5 +1,5 @@
 import express from "express";
-import { createPatient, getFamilyMembers, getAllDoctors, getSingleDoctor, getMyHealthPackages, statusHealth, subscribeToHealthPackage } from "../controllers/patientController.js";
+import { createPatient, getFamilyMembers, getAllDoctors, getSingleDoctor, getMyHealthPackages, statusHealth, subscribeToHealthPackage, paySubscriptiontWallet } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
@@ -12,7 +12,8 @@ router.get("/viewDoctors/:id", getAllDoctors);
 router.get('/healthPackages/:id', getMyHealthPackages);
 router.get('/healthStatus/:id', statusHealth);
 router.post('/subscribe/:id', subscribeToHealthPackage);
-//router.get('/selectdoctor/:userid/:doctorid',getSingleDoctor);
+router.post('/subscribedWallet/:id', paySubscriptiontWallet);
+
 export default router;
 
 
