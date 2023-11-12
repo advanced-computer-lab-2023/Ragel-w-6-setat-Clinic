@@ -1,5 +1,4 @@
-// reactstrap components
-import { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import ReactDatetime from "react-datetime";
 import {
   Button,
@@ -17,22 +16,43 @@ import {
   Badge,
   Media,
   Table,
+  Label,
+  Input,
 } from "reactstrap";
-// core components
 import UserHeader from "components/Headers/UserHeader.js";
-// core components
-import { chartOptions, parseOptions } from "variables/charts.js";
-
-//contexts to use
 import { UserContext } from "../../contexts/UserContext";
 
 const FilterPrescriptions = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggle = () => setDropdownOpen((prevState) => !prevState);
-
   const { user } = useContext(UserContext);
-//VIEW PRESCRIPTIONS
-  const [prescriptionDetails, setprescriptionDetails] = useState(null);
+
+  const [prescriptionDetails, setPrescriptionDetails] = useState(null);
+  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedFilledStatus, setSelectedFilledStatus] = useState("");
+  const [doctorOptions, setDoctorOptions] = useState([]);
+  const [selectedPrescriptions, setSelectedPrescriptions] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctorOptions = async () => {
+      try {
+        const response = await fetch(`/patients/getAllDoctors/${user._id}`);
+        const json = await response.json();
+
+        if (response.ok) {
+          // Assuming the response includes an array of doctors
+          setDoctorOptions(json.doctors);
+        } else {
+          console.error("Error fetching doctor options:", response.statusText);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    fetchDoctorOptions();
+  }, [user._id]);
 
   useEffect(() => {
     const fetchPrescriptionDetails = async () => {
@@ -41,7 +61,7 @@ const FilterPrescriptions = () => {
         const json = await response.json();
 
         if (response.ok) {
-          setprescriptionDetails(json.prescriptions); // Assuming the prescriptions are in a "prescriptions" property
+          setPrescriptionDetails(json.prescriptions);
         } else {
           console.error("Error fetching data:", response.statusText);
         }
@@ -53,31 +73,32 @@ const FilterPrescriptions = () => {
     fetchPrescriptionDetails();
   }, [user._id]);
 
+  const handleFilterPrescriptions = async () => {
+    try {
+      const response = await fetch(
+        `/patients/filterThePrescription/${user._id}?doctor=${selectedDoctor}&date=${selectedDate}&isFilled=${selectedFilledStatus}`
+      );
+      const json = await response.json();
 
-  const [getDoctorsNames, setgetDoctorsNames] = useState(null);
-
-  useEffect(() => {
-    const fetchDoctorNames = async () => {
-      try {
-        const response = await fetch(`/patients/getAllDoctors/${user._id}`);
-        const json = await response.json();
-
-        if (response.ok) {
-          setgetDoctorsNames(json.doctors); // Assuming the prescriptions are in a "prescriptions" property
-        } else {
-          console.error("Error fetching data:", response.statusText);
-        }
-      } catch (error) {
-        console.error("An error occurred:", error);
+      if (response.ok) {
+        setPrescriptionDetails(json.prescriptions);
+      } else {
+        console.error("Error fetching data:", response);
       }
-    };
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
 
-    fetchDoctorNames();
-  }, [user._id]);
-
-
-
-
+  const handlePrescriptionSelection = (prescriptionId) => {
+    setSelectedPrescriptions((prevSelection) => {
+      if (prevSelection.includes(prescriptionId)) {
+        return prevSelection.filter((id) => id !== prescriptionId);
+      } else {
+        return [...prevSelection, prescriptionId];
+      }
+    });
+  };
 
   return (
     <>
@@ -87,10 +108,8 @@ const FilterPrescriptions = () => {
           minHeight: "100px",
         }}
       >
-        {/* Mask */}
         <span className="mask bg-gradient-default opacity-8" />
       </div>
-      {/* Page content */}
       <Container className="mt--7" fluid>
         <Row>
           <Col className="order-xl-1" xl="8">
@@ -107,12 +126,16 @@ const FilterPrescriptions = () => {
                           <label className="form-control-label">Doctor:</label>
                           <br />
                           <select
-                            id="dropdown"
+                            id="dropdownDoctor"
                             className="form-control-alternative"
+                            onChange={(e) => setSelectedDoctor(e.target.value)}
                           >
-                            {/* from backend */}
-                            <option value="Ahmed">Ahmed</option>
-                            <option value="Mohamed">Mohamed</option>
+                            <option value="">All</option>
+                            {doctorOptions.map((doctor, index) => (
+                              <option key={index} value={doctor.username}>
+                                {doctor.username}
+                              </option>
+                            ))}
                           </select>
                         </FormGroup>
                       </Col>
@@ -133,6 +156,9 @@ const FilterPrescriptions = () => {
                                 placeholder: "Date",
                               }}
                               timeFormat={false}
+                              onChange={(date) =>
+                                setSelectedDate(date.format("YYYY-MM-DD"))
+                              }
                             />
                           </InputGroup>
                         </FormGroup>
@@ -146,12 +172,15 @@ const FilterPrescriptions = () => {
                           </label>
                           <br />
                           <select
-                            id="dropdown"
+                            id="dropdownFilledStatus"
                             className="form-control-alternative"
+                            onChange={(e) =>
+                              setSelectedFilledStatus(e.target.value)
+                            }
                           >
-                            {/* from backend */}
-                            <option value={true}>Filled</option>
-                            <option value={false}>Unfiled</option>
+                            <option value="">All</option>
+                            <option value="true">Filled</option>
+                            <option value="false">Unfilled</option>
                           </select>
                         </FormGroup>
                       </Col>
@@ -161,7 +190,7 @@ const FilterPrescriptions = () => {
                         <Button
                           color="primary"
                           href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={handleFilterPrescriptions}
                           size="sm"
                         >
                           Filter Prescriptions
@@ -178,52 +207,79 @@ const FilterPrescriptions = () => {
                       <CardHeader className="border-0">
                         <h3 className="mb-0">Prescriptions</h3>
                       </CardHeader>
-                      <Table className="align-items-center table-flush" responsive hover>
-                      <thead className="thead-light">
-                <tr>
-                  <th scope="col">Doctor</th>
-                  <th scope="col">Medication</th>
-                  <th scope="col">Dosage</th>
-                  <th scope="col">Date</th> {/* Change this line */}
-                  <th scope="col">Notes</th>
-                  <th scope="col">Is Filled</th> {/* Change this line */}
-                </tr>
-              </thead>
-              <tbody>
-                {Array.isArray(prescriptionDetails) && prescriptionDetails.length > 0 ? (
-                  prescriptionDetails.map((prescription, index) => (
-                    <tr key={index}>
-                      <td>
-                        <Media className="align-items-center">
-                          <Media>
-                            <span className="mb-0 text-sm">
-                              {prescription.doctor.username}
-                            </span>
-                          </Media>
-                        </Media>
-                      </td>
-                      <td>{prescription.medication}</td>
-                      <td>{prescription.dosage}</td>
-                      <td>{prescription.date}</td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <span className="mr-2">{prescription.notes}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <span className="mr-2">{prescription.isFilled.toString()}</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6">No prescriptions available.</td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
+                      <Table
+                        className="align-items-center table-flush"
+                        responsive
+                        hover
+                      >
+                        <thead className="thead-light">
+                          <tr>
+                            <th scope="col">Select</th>
+                            <th scope="col">Doctor</th>
+                            <th scope="col">Medication</th>
+                            <th scope="col">Dosage</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Notes</th>
+                            <th scope="col">Is Filled</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Array.isArray(prescriptionDetails) &&
+                          prescriptionDetails.length > 0 ? (
+                            prescriptionDetails.map((prescription, index) => (
+                              <tr key={index}>
+                                <td>
+                                  <FormGroup check>
+                                    <Label check>
+                                      <Input
+                                        type="checkbox"
+                                        checked={selectedPrescriptions.includes(
+                                          prescription._id
+                                        )}
+                                        onChange={() =>
+                                          handlePrescriptionSelection(
+                                            prescription._id
+                                          )
+                                        }
+                                      />
+                                    </Label>
+                                  </FormGroup>
+                                </td>
+                                <td>
+                                  <Media className="align-items-center">
+                                    <Media>
+                                      <span className="mb-0 text-sm">
+                                        {prescription.doctor.username}
+                                      </span>
+                                    </Media>
+                                  </Media>
+                                </td>
+                                <td>{prescription.medication}</td>
+                                <td>{prescription.dosage}</td>
+                                <td>{prescription.date}</td>
+                                <td>
+                                  <div className="d-flex align-items-center">
+                                    <span className="mr-2">
+                                      {prescription.notes}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td>
+                                  <div className="d-flex align-items-center">
+                                    <span className="mr-2">
+                                      {prescription.isFilled.toString()}
+                                    </span>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="7">No prescriptions available.</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </Table>
                     </Card>
                   </div>
                 </Row>
