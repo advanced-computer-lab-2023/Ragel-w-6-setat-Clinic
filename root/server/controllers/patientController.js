@@ -92,27 +92,31 @@ const createPatient = async (req, res) => {
   }
 };
 
+const getAllPackages = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    const packages = await Package.find({});
+    res.status(200).json(packages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+// sprint 2
 const cancelHealthPackageSubscription = async (req, res) => {
   const patientId = req.params.patientid;
   try {
     const patient = await Patient.findById(patientId);
-    patient.subscribedPackage = null;
-
-    const familyMembers = patient.familyMembers;
-    if (familyMembers && familyMembers.length > 0) {
-      for (const familyMember of familyMembers) {
-        const familyMemberEmail = familyMember.email;
-        if (familyMemberEmail) {
-          const familyMemberDoc = await Patient.findOne({
-            email: familyMemberEmail,
-          });
-          if (familyMemberDoc) {
-            familyMemberDoc.subscribedPackage = null;
-            await familyMemberDoc.save();
-          }
-        }
-      }
+    if (patient.subscribedPackage.cancellationDate) {
+      return res
+        .status(500)
+        .json({ message: "Patient has already cancelled this health package" });
     }
+
+    patient.subscribedPackage.cancellationDate =
+      patient.subscribedPackage.renewalDate;
+    patient.subscribedPackage.renewalDate = null;
+    patient.subscribedPackage.subscriptionStatus = "cancelled";
     await patient.save();
 
     res.status(200).json({
@@ -622,28 +626,181 @@ const getAllDoctors = async (req, res) => {
 const getMyHealthPackages = async (req, res) => {
   try {
     const patientID = req.params.id;
-    const patient = await Patient.findById(patientID).populate(
-      "subscribedPackage"
-    );
-
-    if (!patient) {
-      return res
-        .status(404)
-        .json({ message: "There is no patient with this id" });
-    }
+    const patient = await Patient.findById(patientID);
 
     const subscribedPackage = patient.subscribedPackage;
-
-    if (!subscribedPackage) {
-      return res.status(404).json({
-        message: "The patient is not subscribed to any health package",
-      });
-    } else {
-      res.status(200).json(subscribedPackage);
+    if (subscribedPackage.cancellationDate) {
+      const cancellationDate = subscribedPackage.cancellationDate;
+      const currentDate = new Date();
+      const isToday =
+        cancellationDate.getFullYear() === currentDate.getFullYear() &&
+        cancellationDate.getMonth() === currentDate.getMonth() &&
+        cancellationDate.getDate() === currentDate.getDate();
+      if (isToday) {
+        patient.subscribedPackage = null;
+        await patient.save();
+        subscribedPackage = null;
+      }
     }
+
+    res.status(200).json(subscribedPackage);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const getFamilyHealthPackages = async (req, res) => {
+  try {
+    const patientID = req.params.id;
+    const patient = await Patient.findById(patientID);
+
+    // Filter family members who have an email (indicating they are patients)
+    const familyPatients = patient.familyMembers.filter(
+      (member) => member.email
+    );
+
+    // Initialize an array to store family packages
+    const familyPackages = [];
+
+    // Iterate over family members
+    for (const familyMember of familyPatients) {
+      const familyPatient = await Patient.findOne({
+        email: familyMember.email,
+      });
+
+      // Check if family patient has a subscribed package
+      if (familyPatient && familyPatient.subscribedPackage) {
+        const subscribedPackage = familyPatient.subscribedPackage;
+        if (subscribedPackage.cancellationDate) {
+          const cancellationDate = subscribedPackage.cancellationDate;
+          const currentDate = new Date();
+          const isToday =
+            cancellationDate.getFullYear() === currentDate.getFullYear() &&
+            cancellationDate.getMonth() === currentDate.getMonth() &&
+            cancellationDate.getDate() === currentDate.getDate();
+          if (isToday) {
+            familyPatient.subscribedPackage = null;
+            await familyPatient.save();
+            subscribedPackage = null;
+          } else {
+            familyPackages.push({
+              fName: familyMember.fName,
+              lName: familyMember.lName,
+              email: familyMember.email,
+              familyMemberId: familyPatient._id.toString(),
+              subscribedPackage: familyPatient.subscribedPackage,
+            });
+          }
+        } else {
+          familyPackages.push({
+            fName: familyMember.fName,
+            lName: familyMember.lName,
+            email: familyMember.email,
+            familyMemberId: familyPatient._id.toString(),
+            subscribedPackage: familyPatient.subscribedPackage,
+          });
+        }
+      }
+    }
+    res.status(200).json(familyPackages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const subscribeToHealthPackage = async (req, res) => {
+  const patientId = req.params.patientId;
+  const packageId = req.params.packageId;
+  try {
+    const patient = await Patient.findById(patientId);
+
+    if (patient.subscribedPackage) {
+      return res
+        .status(500)
+        .json({ message: "Patient is already subscribed to a health package" });
+    }
+
+    const today = new Date();
+    const oneYearFromToday = new Date(today);
+    oneYearFromToday.setFullYear(oneYearFromToday.getFullYear() + 1);
+
+    const packageToBeSubscribed = await Package.findById(packageId);
+    const newPackage = {
+      packageId: packageToBeSubscribed._id,
+      packageName: packageToBeSubscribed.name,
+      subscriptionStatus: "subscribed",
+      renewalDate: oneYearFromToday, // Format as "YYYY-MM-DD"
+      cancellationDate: null,
+    };
+
+    patient.subscribedPackage = newPackage;
+    await patient.save();
+    res.status(200).json({ message: "Subscription successful" });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const subscribeHealthPackageForFamilyMember = async (req, res) => {
+  const patientId = req.params.patientId;
+  const packageId = req.params.packageId;
+  try {
+    const { email } = req.body;
+    const currentPatient = await Patient.findById(patientId);
+
+    const familyPatient = await Patient.findOne({ email });
+
+    if (!familyPatient) {
+      return res
+        .status(404)
+        .json({ message: "Family member as patient not found" });
+    }
+
+    // Check if the family member is linked to patient
+    const linkedFamilyMember = currentPatient.familyMembers.find(
+      (member) => member.email === familyPatient.email
+    );
+
+    if (!linkedFamilyMember) {
+      return res
+        .status(400)
+        .json({ message: "Family member is not linked to this patient" });
+    }
+
+    if (familyPatient.subscribedPackage) {
+      return res.status(500).json({
+        message: "Family Member is already subscribed to a health package",
+      });
+    }
+
+    const today = new Date();
+    const oneYearFromToday = new Date(today);
+    oneYearFromToday.setFullYear(oneYearFromToday.getFullYear() + 1);
+
+    const packageToBeSubscribed = await Package.findById(packageId);
+    const newPackage = {
+      packageId: packageToBeSubscribed._id,
+      packageName: packageToBeSubscribed.name,
+      subscriptionStatus: "subscribed",
+      renewalDate: oneYearFromToday.toISOString().split("T")[0], // Format as "YYYY-MM-DD"
+      cancellationDate: null,
+    };
+
+    familyPatient.subscribedPackage = newPackage;
+    await familyPatient.save();
+    res
+      .status(200)
+      .json({ message: "Subscription for family member successful" });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
   }
 };
 
@@ -667,4 +824,8 @@ export {
   registerForAnAppointmentPatient,
   registerForAnAppointmentFamilyMember,
   getMyHealthPackages,
+  getAllPackages,
+  subscribeToHealthPackage,
+  subscribeHealthPackageForFamilyMember,
+  getFamilyHealthPackages,
 };

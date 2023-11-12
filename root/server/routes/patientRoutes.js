@@ -19,6 +19,10 @@ import {
   registerForAnAppointmentPatient,
   registerForAnAppointmentFamilyMember,
   getMyHealthPackages,
+  getAllPackages,
+  subscribeToHealthPackage,
+  subscribeHealthPackageForFamilyMember,
+  getFamilyHealthPackages,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -28,8 +32,9 @@ const router = express.Router();
 
 router.post("/registeration", createPatient);
 router.get("/allPatients", getAllPatients);
+router.get("/allHealthPackages/:id", getAllPackages);
 router.patch(
-  "/subscribedHealthPackage/cancelHealthPackage/:patientid",
+  "/cancelHealthPackage/:patientid",
   cancelHealthPackageSubscription
 );
 router.get(
@@ -71,5 +76,14 @@ router.get("/viewDoctors/:id", getAllDoctors);
 // sprint 2
 
 router.get("/healthPackages/:id", getMyHealthPackages);
+router.get("/familyMembersHealthPackages/:id", getFamilyHealthPackages);
+router.patch(
+  "/subscribeHealthPackage/:patientId/:packageId",
+  subscribeToHealthPackage
+);
+router.patch(
+  "/subscribeHealthPackageForFamilyMember/:patientId/:packageId",
+  subscribeHealthPackageForFamilyMember
+);
 
 export default router;

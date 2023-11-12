@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 const familyMemberSchema = new Schema({
   email: {
     type: String,
-    default: "",
   },
   fName: {
     type: String,
@@ -30,6 +29,29 @@ const familyMemberSchema = new Schema({
   relationship: {
     type: String,
     required: true,
+  },
+});
+
+const subscribedPackageSchema = new Schema({
+  packageId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Package",
+  },
+  packageName: {
+    type: String,
+    required: true,
+  },
+  subscriptionStatus: {
+    type: String,
+    enum: ["subscribed", "unsubscribed", "cancelled"],
+  },
+  renewalDate: {
+    type: Date,
+    required: false,
+  },
+  cancellationDate: {
+    type: Date,
+    required: false,
   },
 });
 
@@ -98,9 +120,7 @@ const patientSchema = new Schema({
     default: 0,
   },
   subscribedPackage: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Package",
-    default: null,
+    type: subscribedPackageSchema,
   },
 });
 
