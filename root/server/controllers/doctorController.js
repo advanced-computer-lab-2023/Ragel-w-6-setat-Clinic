@@ -2,13 +2,14 @@ import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
 import Prescription from "../models/Prescription.js";
 import Appointments from "../models/Appointments.js";
-import DoctorContract from "../models/DoctorContract";
+import DoctorContract from "../models/DoctorContract.js";
 
+
+// Doctor can view upcoming appointments sprint #2
 const viewUpcomingAppointments = async (req, res) => {
     const doctorId = req.params.id;
   
     try {
-      // Check if the patient exists
       const doctor = await Doctor.findById(doctorId);
       if (!doctor) {
         return res.status(404).json({
@@ -19,16 +20,11 @@ const viewUpcomingAppointments = async (req, res) => {
   
       
       const appointments = await Appointments.find({
-        doctor: doctorId, status : "upcoming"
+        doctor: doctorId, status : "upcoming" 
       });
-  
-      // const doctorsSet = await Doctor.find({ isRegistered: true }).select(
-      //   "username"
-      // );
-  
+
       res.json({appointments : appointments});
     } catch (err) {
-      // Handle errors, for example, database connection issues
       res.status(500).json({
         status: "error",
         message: err.message,
@@ -36,11 +32,11 @@ const viewUpcomingAppointments = async (req, res) => {
     }
   };
 
+
+  // Doctor can view health records sprint #2
   const getHealthRecords = async (req, res) => {
     try {
-      const doctorId = req.params.id; // Get patient's email from the request body
-  
-      // Find the patient using the provided email in the familyMembers array
+      const doctorId = req.params.id; 
       const doctor = await Doctor.findById(doctorId);
   
       if (!doctor) {
@@ -62,43 +58,9 @@ const viewUpcomingAppointments = async (req, res) => {
     }
   };
 
-  const filterAppointments = async (req, res) => {
-    const doctorId = req.params.id;
-    try {
-      const filter = {};
-  
-      if (req.query.status) {
-        filter.status = req.query.status;
-      }
-  
-      if (req.params.id) {
-        filter.doctor = doctorId;
-      }
-  
-      if (req.query.date) {
-        var min_date = new Date(req.query.date);
-        var max_date = new Date(req.query.date);
-        min_date.setHours(0, 0, 0, 0);
-        max_date.setHours(23, 59, 59, 999);
-        filter.date = {
-          $gte: min_date,
-          $lt: max_date,
-        };
-      }
-  
-      const appointments = await Appointments.find(filter);
-  
-  
-      res.json({appointments : appointments});
-    } catch (err) {
-      res.status(500).json({
-        status: "error",
-        message: err.message,
-      });
-    }
-  };
 
 
+// Doctor can create new available appointments sprint #2
   const addAvailableAppointments = async (req, res) => {
     try {
       const { date, type } = req.query; // Extract date and type from the request body
@@ -110,7 +72,7 @@ const viewUpcomingAppointments = async (req, res) => {
         date,
         isAvailable: true,
         type, // Assign the extracted type to the appointment
-        status: "upcoming"
+        status: "available"
       });
   
       // Save the appointment to the database
@@ -129,10 +91,13 @@ const viewUpcomingAppointments = async (req, res) => {
       });
     }
   };
-  
+
+
+
+  // Doctor can view contract sprint #2
   const viewContract = async (req, res) => {
     const doctorId = req.params.id;
-  
+
     try {
     
       const doctor = await Doctor.findById(doctorId);
@@ -141,12 +106,11 @@ const viewUpcomingAppointments = async (req, res) => {
           status: "fail",
           message: "Doctor not found",
         });
-      }
-  
+      }  
+
       const contracts = await DoctorContract.find({
         doctorId: doctorId,
-      })
-  
+      });
   
       res.json({contracts : contracts});
     } catch (err) {
@@ -157,6 +121,8 @@ const viewUpcomingAppointments = async (req, res) => {
     }
   };
 
+
+  // Doctor can accept contract sprint #2
   const acceptContract = async (req, res) => {
     try {
       const doctorId = req.params.id; // Extract doctor ID from request params
@@ -187,10 +153,51 @@ const viewUpcomingAppointments = async (req, res) => {
       });
     }
   };
+
+
+
+  
+//   const filterAppointments = async (req, res) => {
+//     const doctorId = req.params.id;
+//     try {
+//       const filter = {};
+  
+//       if (req.query.status) {
+//         filter.status = req.query.status;
+//       }
+  
+//       if (req.params.id) {
+//         filter.doctor = doctorId;
+//       }
+  
+//       if (req.query.date) {
+//         var min_date = new Date(req.query.date);
+//         var max_date = new Date(req.query.date);
+//         min_date.setHours(0, 0, 0, 0);
+//         max_date.setHours(23, 59, 59, 999);
+//         filter.date = {
+//           $gte: min_date,
+//           $lt: max_date,
+//         };
+//       }
+  
+//       const appointments = await Appointments.find(filter);
+  
+  
+//       res.json({appointments : appointments});
+//     } catch (err) {
+//       res.status(500).json({
+//         status: "error",
+//         message: err.message,
+//       });
+//     }
+//   };
   
 export {
     viewUpcomingAppointments,
     getHealthRecords,
-    filterAppointments,
-    addAvailableAppointments
+    //filterAppointments,
+    addAvailableAppointments,
+    viewContract,
+    acceptContract
   };

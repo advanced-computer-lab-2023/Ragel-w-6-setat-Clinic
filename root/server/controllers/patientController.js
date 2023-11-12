@@ -6,12 +6,12 @@ import Appointments from "../models/Appointments.js";
 
 
 
-// Patient adds a family member using certain attributes req #14
+// Patient adds a family member using certain attributes req #14 sprint #1
 const addFamilyMember = async (req, res) => {
   const patientId = req.params.id;
 
-  const { fName, lName, nationalID, gender, dateOfBirth, relationship } =
-    req.body;
+  const { fName, lName, nationalID, gender, dateOfBirth, relationship } = req.body;
+
 
   const validRelationships = ["wife", "husband", "son", "daughter"];
 
@@ -24,13 +24,6 @@ const addFamilyMember = async (req, res) => {
         message: "Patient not found",
       });
     }
-
-    // if (!validRelationships.includes(relationship)) {
-    //   res.render("addFamilyMember", {
-    //     message:
-    //       "Invalid relationship. Allowed values are wife, husband, son, or daughter.",
-    //   });
-    // }
 
     const newFamilyMember = {
       fName: fName,
@@ -55,7 +48,7 @@ const addFamilyMember = async (req, res) => {
 };
 
 
-// Patient can view list of all prescriptions req #54
+// Patient can view list of all prescriptions req #54 sprint #1
 const viewPrescription = async (req, res) => {
   const patientId = req.params.id;
 
@@ -88,8 +81,8 @@ const viewPrescription = async (req, res) => {
   }
 };
 
-//QUERYYYYY
-// Filter Prescriptions based on date or doctor or filled or unfilled req #55
+
+// Filter Prescriptions based on date or doctor or filled or unfilled req #55 sprint #1
 const filterThePrescription = async (req, res) => {
   const patientId = req.params.id;
   try {
@@ -137,7 +130,7 @@ const filterThePrescription = async (req, res) => {
  
 
 
-// Patient can select a prescription from his/her list of prescriptions req #56
+// Patient can select a prescription from his/her list of prescriptions req #56 sprint #1
 const selectPrescription = async (req, res) => {
   const prescriptionId = req.params.prescriptionid;
   const patiendID = req.params.patientid;
@@ -166,6 +159,7 @@ const selectPrescription = async (req, res) => {
 };
 
 
+// Patient can view upcoming appoinments sprint #2
 const viewUpcomingAppointments = async (req, res) => {
   const patientId = req.params.id;
 
@@ -182,15 +176,10 @@ const viewUpcomingAppointments = async (req, res) => {
     
     const appointments = await Appointments.find({
       patient: patientId, status : "upcoming"
-    });
-
-    // const doctorsSet = await Doctor.find({ isRegistered: true }).select(
-    //   "username"
-    // );
+    }).populate("doctor");
 
     res.json({appointments : appointments});
   } catch (err) {
-    // Handle errors, for example, database connection issues
     res.status(500).json({
       status: "error",
       message: err.message,
@@ -200,11 +189,42 @@ const viewUpcomingAppointments = async (req, res) => {
 
 
 
+
+
+
+
+const viewPastAppointments = async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    // Check if the patient exists
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Patient not found",
+      });
+    }
+
+    
+    const appointments = await Appointments.find({
+      patient: patientId, status : "past"
+    }).populate("doctor");
+
+    res.json({appointments : appointments});
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+
+// Patient can view health records sprint #2
 const getHealthRecords = async (req, res) => {
   try {
-    const patientID = req.params.id; // Get patient's email from the request body
-
-    // Find the patient using the provided email in the familyMembers array
+    const patientID = req.params.id; 
     const patient = await Patient.findById(patientID);
 
     if (!patient) {
@@ -223,6 +243,44 @@ const getHealthRecords = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+
+const getAllDoctors = async (req, res) => {
+  try {
+    const patientID = req.params.id;
+    const patient = await Patient.findById(patientID);
+    const patientPackage = patient.subscribedPackage;
+    
+    let sessionDiscount = 0;
+    if (patientPackage) {
+      const packageOffered = await Package.findOne({ name: patientPackage });
+      if (packageOffered) {
+        sessionDiscount = packageOffered.sessionDiscount || 0;
+      }
+    }
+
+    const doctors = await Doctor.find().lean();
+
+    const doctorsDisplay = doctors.map((doctor) => {
+      const originalSessionPrice = doctor.sessionPrice;
+      const discountedPrice = originalSessionPrice - (originalSessionPrice * (sessionDiscount / 100));
+      return {
+        name: doctor.fName + " " + doctor.lName,
+        specialty: doctor.specialty,
+        sessionPrice: discountedPrice,
+      };
+    });
+
+    res.json({userID: patientID , doctors: doctorsDisplay});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+
+
+
 
 
 const filterAppointments = async (req, res) => {
@@ -249,7 +307,7 @@ const filterAppointments = async (req, res) => {
       };
     }
 
-    const appointments = await Appointments.find(filter);
+    const appointments = await Appointments.find(filter).populate("doctor");
 
 
     res.json({appointments : appointments});
@@ -268,5 +326,7 @@ export {
   selectPrescription,
   viewUpcomingAppointments,
   getHealthRecords,
+  getAllDoctors,
+  viewPastAppointments,
   filterAppointments
 };

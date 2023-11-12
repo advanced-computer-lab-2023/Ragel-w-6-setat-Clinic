@@ -5,7 +5,9 @@ import { addFamilyMember,
     viewUpcomingAppointments,
     selectPrescription,
     getHealthRecords,
-    filterAppointments} from "../controllers/patientController.js";
+    getAllDoctors,viewPastAppointments,
+    filterAppointments
+} from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
@@ -17,7 +19,9 @@ router.get("/viewPrescription/:id", viewPrescription);
 router.get("/filterThePrescription/:id", filterThePrescription);
 router.get("/selectPrescription/:patientid/:prescriptionid",selectPrescription);
 router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
+router.get("/viewPastAppointments/:id", viewPastAppointments);
 router.get("/getHealthRecords/:id", getHealthRecords);
+router.get("/getAllDoctors/:id", getAllDoctors);
 router.get("/filterAppointments/:id", filterAppointments);
 
 

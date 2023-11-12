@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const doctorContractSchema = new Schema({
   doctorId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: "Doctor",
     required: true
   },
