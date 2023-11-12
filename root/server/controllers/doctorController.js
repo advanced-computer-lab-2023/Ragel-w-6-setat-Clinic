@@ -32,6 +32,32 @@ const viewUpcomingAppointments = async (req, res) => {
     }
   };
 
+  const viewPastAppointments = async (req, res) => {
+    const doctorId = req.params.id;
+  
+    try {
+      const doctor = await Doctor.findById(doctorId);
+      if (!doctor) {
+        return res.status(404).json({
+          status: "fail",
+          message: "Doctor not found",
+        });
+      }
+  
+      
+      const appointments = await Appointments.find({
+        doctor: doctorId, status : "past" 
+      });
+
+      res.json({appointments : appointments});
+    } catch (err) {
+      res.status(500).json({
+        status: "error",
+        message: err.message,
+      });
+    }
+  };
+
 
   // Doctor can view health records sprint #2
   const getHealthRecords = async (req, res) => {
@@ -63,16 +89,21 @@ const viewUpcomingAppointments = async (req, res) => {
 // Doctor can create new available appointments sprint #2
   const addAvailableAppointments = async (req, res) => {
     try {
-      const { date, type } = req.query; // Extract date and type from the request body
-      const doctorId = req.params.doctorId; // Assuming you have the doctorId in the route parameters
+      const { date , price } = req.query; // Extract date and type from the request body
+      const doctorId = req.params.id; // Assuming you have the doctorId in the route parameters
+      const doctor = await Doctor.findById(doctorId);
+      const specialty = doctor.specialty;
+  
   
       // Create a new appointment
       const appointment = new Appointments({
         doctor: doctorId,
         date,
         isAvailable: true,
-        type, // Assign the extracted type to the appointment
+        type : specialty, // Assign the extracted type to the appointment
+        price,
         status: "available"
+        
       });
   
       // Save the appointment to the database
@@ -157,47 +188,48 @@ const viewUpcomingAppointments = async (req, res) => {
 
 
   
-//   const filterAppointments = async (req, res) => {
-//     const doctorId = req.params.id;
-//     try {
-//       const filter = {};
+  const filterAppointments = async (req, res) => {
+    const doctorId = req.params.id;
+    try {
+      const filter = {};
   
-//       if (req.query.status) {
-//         filter.status = req.query.status;
-//       }
+      if (req.query.status) {
+        filter.status = req.query.status;
+      }
   
-//       if (req.params.id) {
-//         filter.doctor = doctorId;
-//       }
+      if (req.params.id) {
+        filter.doctor = doctorId;
+      }
   
-//       if (req.query.date) {
-//         var min_date = new Date(req.query.date);
-//         var max_date = new Date(req.query.date);
-//         min_date.setHours(0, 0, 0, 0);
-//         max_date.setHours(23, 59, 59, 999);
-//         filter.date = {
-//           $gte: min_date,
-//           $lt: max_date,
-//         };
-//       }
+      if (req.query.date) {
+        var min_date = new Date(req.query.date);
+        var max_date = new Date(req.query.date);
+        min_date.setHours(0, 0, 0, 0);
+        max_date.setHours(23, 59, 59, 999);
+        filter.date = {
+          $gte: min_date,
+          $lt: max_date,
+        };
+      }
   
-//       const appointments = await Appointments.find(filter);
+      const appointments = await Appointments.find(filter).populate("patient");
   
   
-//       res.json({appointments : appointments});
-//     } catch (err) {
-//       res.status(500).json({
-//         status: "error",
-//         message: err.message,
-//       });
-//     }
-//   };
+      res.json({appointments : appointments});
+    } catch (err) {
+      res.status(500).json({
+        status: "error",
+        message: err.message,
+      });
+    }
+  };
   
 export {
     viewUpcomingAppointments,
     getHealthRecords,
-    //filterAppointments,
+    filterAppointments,
     addAvailableAppointments,
     viewContract,
-    acceptContract
+    acceptContract,
+    viewPastAppointments
   };

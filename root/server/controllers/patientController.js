@@ -71,7 +71,7 @@ const viewPrescription = async (req, res) => {
       "username"
     );
 
-    res.json({prescriptions : prescriptions});
+    res.json({prescriptions : prescriptions},{doctorsSet});
   } catch (err) {
     // Handle errors, for example, database connection issues
     res.status(500).json({
@@ -89,10 +89,10 @@ const filterThePrescription = async (req, res) => {
     const filter = {};
 
     if (req.query.doctor) {
-      const doctorsWithSpecificUsername = await Doctor.findOne({
+      const doctorWithSpecificUsername = await Doctor.findOne({
         username: req.query.doctor,
       });
-      filter.doctor = doctorsWithSpecificUsername._id;
+      filter.doctor = doctorWithSpecificUsername;
     }
 
     if (req.query.date) {
@@ -250,7 +250,7 @@ const getAllDoctors = async (req, res) => {
     const patientID = req.params.id;
     const patient = await Patient.findById(patientID);
     const patientPackage = patient.subscribedPackage;
-    
+
     let sessionDiscount = 0;
     if (patientPackage) {
       const packageOffered = await Package.findOne({ name: patientPackage });
@@ -263,20 +263,26 @@ const getAllDoctors = async (req, res) => {
 
     const doctorsDisplay = doctors.map((doctor) => {
       const originalSessionPrice = doctor.sessionPrice;
-      const discountedPrice = originalSessionPrice - (originalSessionPrice * (sessionDiscount / 100));
+      const discountedPrice =
+        originalSessionPrice -
+        (originalSessionPrice * (sessionDiscount / 100));
       return {
-        name: doctor.fName + " " + doctor.lName,
+        id: doctor._id,
+        username : doctor.username,
+        fName: doctor.fName ,
+        lName :  doctor.lName,
         specialty: doctor.specialty,
         sessionPrice: discountedPrice,
       };
     });
 
-    res.json({userID: patientID , doctors: doctorsDisplay});
+    res.json({ userID: patientID, doctors: doctorsDisplay });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
 
 
 
