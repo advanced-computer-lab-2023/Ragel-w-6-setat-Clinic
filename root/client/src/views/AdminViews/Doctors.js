@@ -179,7 +179,7 @@ const ViewDoctors = () => {
                 <tr>
                   <th scope="col">Name</th>
                   <th scope="col">Email</th>
-                  <th scope="col">Specialty</th>
+                  <th scope="col">Date of Birth</th>
                   <th scope="col">Registration Status</th>
                   <th scope="col">Hourly Rate</th>
                 </tr>
@@ -193,7 +193,7 @@ const ViewDoctors = () => {
                     >
                       <td>{`${doctor.fName} ${doctor.lName}`}</td>
                       <td>{doctor.email}</td>
-                      <td>{doctor.specialty}</td>
+                      <td>  {new Date(doctor.dateOfBirth).toDateString()}</td>
                       <td>
                         {doctor.isRegistered
                           ? 'Registered'
@@ -204,8 +204,8 @@ const ViewDoctors = () => {
                     {expandedDoctorId === doctor._id && (
                       <tr className="doctor-details">
                         <td colSpan="5">
-                          <strong>Date of Birth:</strong>{' '}
-                          {new Date(doctor.dateOfBirth).toDateString()}<br />
+                          <strong>Specialty:</strong>{' '}
+                          {doctor.specialty}<br />
                           <strong>Educational Background:</strong>{' '}
                           {doctor.educationalBackground}<br />
                           <strong>Affiliation:</strong> {doctor.affiliation}
