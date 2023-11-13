@@ -32,6 +32,28 @@ const FilterAppointments = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [fromDate, setFromDate] = useState("");
 
+
+
+  const fetchAllAppointments = async () => {
+    try {
+      const response = await fetch(`/patients/viewAppointments/${user._id}`);
+      const json = await response.json();
+  
+      if (response.ok) {
+        console.log(json.appointments);
+        setupcomingAppointments(json.appointments);
+      } else {
+        console.error("Error fetching data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchAllAppointments();
+  }, [user._id, selectedOption]);
+  
   useEffect(() => {
     const fetchAppointmentDetailsUp = async () => {
       try {
@@ -224,9 +246,9 @@ const FilterAppointments = () => {
                                   <th scope="row">
                                     <Media className="align-items-center">
                                       <Media>
-                                        <span className="mb-0 text-sm">
-                                          {appointment.doctor.fName}
-                                        </span>
+                                      <span className="mb-0 text-sm">
+  {appointment.doctor?.fName || 'No Doctor'}
+</span>
                                       </Media>
                                     </Media>
                                   </th>
@@ -255,9 +277,9 @@ const FilterAppointments = () => {
                                     <th scope="row">
                                       <Media className="align-items-center">
                                         <Media>
-                                          <span className="mb-0 text-sm">
-                                            {appointment.doctor.fName}
-                                          </span>
+                                        <span className="mb-0 text-sm">
+  {appointment.doctor?.fName || 'No Doctor'}
+</span>
                                         </Media>
                                       </Media>
                                     </th>

@@ -27,7 +27,7 @@ const FilterPrescriptions = () => {
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   const { user } = useContext(UserContext);
 
-  const [prescriptionDetails, setPrescriptionDetails] = useState(null);
+  const [prescriptionDetails, setPrescriptionDetails] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedFilledStatus, setSelectedFilledStatus] = useState("");
@@ -39,6 +39,8 @@ const FilterPrescriptions = () => {
       try {
         const response = await fetch(`/patients/getAllDoctors/${user._id}`);
         const json = await response.json();
+
+        console.log("Doctor Options Response:", json);  // ana ba debug
 
         if (response.ok) {
           // Assuming the response includes an array of doctors
@@ -57,6 +59,7 @@ const FilterPrescriptions = () => {
   useEffect(() => {
     const fetchPrescriptionDetails = async () => {
       try {
+        // Fetch all prescriptions by default
         const response = await fetch(`/patients/viewPrescription/${user._id}`);
         const json = await response.json();
 
@@ -126,7 +129,7 @@ const FilterPrescriptions = () => {
                           <label className="form-control-label">Doctor:</label>
                           <br />
                           <select
-                            id="dropdownDoctor"
+id="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ownDoctor"
                             className="form-control-alternative"
                             onChange={(e) => setSelectedDoctor(e.target.value)}
                           >

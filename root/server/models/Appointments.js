@@ -32,7 +32,7 @@ const appointmentSchema = new Schema({
   price: {
     type: Number,
     required: true,
-  }
+  },
 });
 
 const Appointment = mongoose.model("Appointment", appointmentSchema);

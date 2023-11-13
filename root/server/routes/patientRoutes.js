@@ -6,7 +6,7 @@ import { addFamilyMember,
     selectPrescription,
     getHealthRecords,
     getAllDoctors,viewPastAppointments,
-    filterAppointments
+    filterAppointments,viewAppointments
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -23,6 +23,7 @@ router.get("/viewPastAppointments/:id", viewPastAppointments);
 router.get("/getHealthRecords/:id", getHealthRecords);
 router.get("/getAllDoctors/:id", getAllDoctors);
 router.get("/filterAppointments/:id", filterAppointments);
+router.get("/viewAppointments/:id", viewAppointments);
 
 
 

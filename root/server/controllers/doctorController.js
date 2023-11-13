@@ -5,6 +5,37 @@ import Appointments from "../models/Appointments.js";
 import DoctorContract from "../models/DoctorContract.js";
 
 
+
+//view all appointments
+const viewAppointments = async (req, res) => {
+  const doctorId = req.params.id;
+
+  try {
+    const doctor = await Doctor.findById(doctorId);
+    if (!doctor) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Doctor not found",
+      });
+    }
+
+    
+    const appointments = await Appointments.find({
+      doctor: doctorId
+    }).populate("patient");
+
+    console.log(appointments);
+
+    res.json({appointments : appointments});
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+
 // Doctor can view upcoming appointments sprint #2
 const viewUpcomingAppointments = async (req, res) => {
     const doctorId = req.params.id;
@@ -21,7 +52,9 @@ const viewUpcomingAppointments = async (req, res) => {
       
       const appointments = await Appointments.find({
         doctor: doctorId, status : "upcoming" 
-      });
+      }).populate("patient");
+
+      console.log(appointments);
 
       res.json({appointments : appointments});
     } catch (err) {
@@ -46,8 +79,8 @@ const viewUpcomingAppointments = async (req, res) => {
   
       
       const appointments = await Appointments.find({
-        doctor: doctorId, status : "past" 
-      });
+        doctor: doctorId, status : "completed" 
+      }).populate("patient");
 
       res.json({appointments : appointments});
     } catch (err) {
@@ -92,15 +125,14 @@ const viewUpcomingAppointments = async (req, res) => {
       const { date , price } = req.query; // Extract date and type from the request body
       const doctorId = req.params.id; // Assuming you have the doctorId in the route parameters
       const doctor = await Doctor.findById(doctorId);
-      const specialty = doctor.specialty;
   
   
       // Create a new appointment
       const appointment = new Appointments({
         doctor: doctorId,
+        patient : null,
         date,
         isAvailable: true,
-        type : specialty, // Assign the extracted type to the appointment
         price,
         status: "available"
         
@@ -231,5 +263,6 @@ export {
     addAvailableAppointments,
     viewContract,
     acceptContract,
-    viewPastAppointments
+    viewPastAppointments,
+    viewAppointments
   };

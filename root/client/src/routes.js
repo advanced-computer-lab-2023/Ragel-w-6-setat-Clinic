@@ -36,7 +36,7 @@ import Wallet from "views/PatientViews/wallet";
 import DoctorProfile from "views/DoctorViews/doctorProfile";
 import SearchForPatients from "views/DoctorViews/searchForPatients";
 import DoctorAppointments from "views/DoctorViews/doctorAppointments";
-import DoctorContracts from "views/DoctorViews/doctorAppointments";
+import DoctorContracts from "views/DoctorViews/employmentContract";
 
 // admin views
 
@@ -136,7 +136,7 @@ var routes = [
     path: "/myContract",
     name: "My Contract",
     icon: "ni ni-fat-add",
-    component: <DoctorAppointments />,
+    component: <DoctorContracts />,
     layout: "/doctor",
   },
 

@@ -69,11 +69,13 @@ const viewPrescription = async (req, res) => {
 
     const doctorsSet = await Doctor.find({ isRegistered: true }).select(
       "username"
-    );
+    ); // ??? what for
 
-    res.json({prescriptions : prescriptions},{doctorsSet});
+    res.status(200).json({
+      status: "success",
+      prescriptions: prescriptions,
+    });
   } catch (err) {
-    // Handle errors, for example, database connection issues
     res.status(500).json({
       status: "error",
       message: err.message,
@@ -159,6 +161,38 @@ const selectPrescription = async (req, res) => {
 };
 
 
+//view all appointments
+const viewAppointments = async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    // Check if the patient exists
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Patient not found",
+      });
+    }
+
+    
+    const appointments = await Appointments.find({
+      patient: patientId
+    }).populate("doctor");
+
+    res.json({appointments : appointments});
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+
+
+
+
 // Patient can view upcoming appoinments sprint #2
 const viewUpcomingAppointments = async (req, res) => {
   const patientId = req.params.id;
@@ -208,7 +242,7 @@ const viewPastAppointments = async (req, res) => {
 
     
     const appointments = await Appointments.find({
-      patient: patientId, status : "past"
+      patient: patientId, status : "completed"
     }).populate("doctor");
 
     res.json({appointments : appointments});
@@ -334,5 +368,6 @@ export {
   getHealthRecords,
   getAllDoctors,
   viewPastAppointments,
-  filterAppointments
+  filterAppointments,
+  viewAppointments
 };
