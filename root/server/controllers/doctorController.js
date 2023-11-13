@@ -144,10 +144,10 @@ const searchForPatient = async (req, res) => {
       return isFNameMatch && isLNameMatch;
     });
 
-    res.status(200).json({ patients: filteredPatients });
+    res.status(200).json(filteredPatients);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -213,10 +213,10 @@ const upcomingAppointments = async (req, res) => {
         return await Patient.findById(patientId);
       })
     );
-    res.status(200).json({ patients: patientsWithUpcomingAppointments });
+    res.status(200).json(patientsWithUpcomingAppointments);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -233,22 +233,18 @@ const getMyPatients = async (req, res) => {
     for (const appointment of appointments) {
       if (appointment.patient !== null) {
         const patientId = appointment.patient;
-        try {
-          const patient = await Patient.findById(patientId).exec();
-          const isPatientExists = doctorPatients.some((docPatient) =>
-            docPatient._id.equals(patient._id)
-          );
-          if (!isPatientExists) {
-            doctorPatients.push(patient);
-          }
-        } catch (error) {
-          console.error("Error finding patient:", error);
-          // Handle error if necessary
+
+        const patient = await Patient.findById(patientId).exec();
+        const isPatientExists = doctorPatients.some((docPatient) =>
+          docPatient._id.equals(patient._id)
+        );
+        if (!isPatientExists) {
+          doctorPatients.push(patient);
         }
       }
     }
 
-    res.status(200).json({ patients: doctorPatients });
+    res.status(200).json(doctorPatients);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });

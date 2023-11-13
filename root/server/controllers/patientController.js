@@ -21,7 +21,9 @@ async function doctorsDisplay(patientID, doctors) {
   const patientPackage = patient.subscribedPackage;
   let sessionDiscount = 0;
   if (patientPackage) {
-    const packageOffered = await Package.findById({ _id: patientPackage });
+    const packageOffered = await Package.findById({
+      _id: patientPackage.packageId,
+    });
     if (packageOffered) {
       sessionDiscount = packageOffered.sessionDiscount || 0;
     }
@@ -379,6 +381,48 @@ const selectPrescription = async (req, res) => {
   }
 };
 
+//sprint 2
+const viewUpcomingAppointments = async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    // Check if the patient exists
+    const patient = await Patient.findById(patientId);
+
+    const appointments = await Appointments.find({
+      patient: patientId,
+      status: "upcoming",
+    }).populate("doctor");
+
+    res.json({ appointments: appointments });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const viewPastAppointments = async (req, res) => {
+  const patientId = req.params.id;
+
+  try {
+    // Check if the patient exists
+    const patient = await Patient.findById(patientId);
+
+    const appointments = await Appointments.find({
+      patient: patientId,
+      status: "completed",
+    }).populate("doctor");
+
+    res.json({ appointments: appointments });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
 // MARIAMS REQS
 
 const searchForDoctor = async (req, res) => {
@@ -393,17 +437,29 @@ const searchForDoctor = async (req, res) => {
   if (req.query.lName != "") {
     filter.lName = req.query.lName;
   }
-  filter.isRegistered = true;
 
   try {
-    const allDoctors = await Doctor.find().lean();
+    const allDoctors = await Doctor.find({ isRegistered: true }).lean();
     const uniqueSpecialtiesSet = new Set();
     allDoctors.forEach((doctor) => {
       uniqueSpecialtiesSet.add(doctor.specialty);
     });
     const uniqueSpecialties = [...uniqueSpecialtiesSet];
 
-    const doctors = await Doctor.find(filter);
+    const doctors = allDoctors.filter((doctor) => {
+      const isFNameMatch =
+        !filter.fName ||
+        doctor.fName.toLowerCase().includes(filter.fName.toLowerCase());
+      const isLNameMatch =
+        !filter.lName ||
+        doctor.lName.toLowerCase().includes(filter.lName.toLowerCase());
+      const isSpecialtyMatch =
+        !filter.specialty ||
+        doctor.specialty.toLowerCase().includes(filter.specialty.toLowerCase());
+
+      return isFNameMatch && isLNameMatch && isSpecialtyMatch;
+    });
+
     const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
 
     if (doctors.length === 0) {
@@ -907,4 +963,6 @@ export {
   subscribeHealthPackageForFamilyMember,
   getFamilyHealthPackages,
   linkFamilyMember,
+  viewUpcomingAppointments,
+  viewPastAppointments,
 };

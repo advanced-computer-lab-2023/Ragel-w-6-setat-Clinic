@@ -24,6 +24,8 @@ import {
   subscribeHealthPackageForFamilyMember,
   getFamilyHealthPackages,
   linkFamilyMember,
+  viewUpcomingAppointments,
+  viewPastAppointments,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -59,6 +61,10 @@ router.get(
   "/selectPrescription/:patientid/:prescriptionid",
   selectPrescription
 );
+
+//sprint 2
+router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
+router.get("/viewPastAppointments/:id", viewPastAppointments);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);
