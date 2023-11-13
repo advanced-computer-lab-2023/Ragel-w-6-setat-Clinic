@@ -17,9 +17,8 @@
 */
 
 // reactstrap components
-// reactstrap components
 import axios from "axios";
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   ListGroup,
   ListGroupItem,
@@ -34,49 +33,99 @@ import {
   Container,
   Row,
   Col,
+  Alert,
 } from "reactstrap";
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
-import { UserContext } from "../../contexts/UserContext.js";
 
-
-// ... (previous imports)
-
-// ... (previous imports)
-
+//contexts to use
+import { UserContext } from "../../contexts/UserContext";
 
 const AddFamilyMember = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchedFamilyMember, setSearchedFamilyMember] = useState([]);
-  const [searchEmail, setSearchEmail] = useState('');
-  const { user } = useContext(UserContext);
+  const toggle = () => setIsOpen(!isOpen);
+
+  const [email, setEmail] = useState("");
+  const [fName, setFirstName] = useState("");
+  const [lName, setLastName] = useState("");
+  const [nationalID, setNationalID] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [gender, setGender] = useState("male");
+  const [relationship, setRelationship] = useState("husband");
   const [familyMembers, setFamilyMembers] = useState([]);
+
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     const fetchFamilyMembers = async () => {
       try {
-        console.log(user._id)
-        const response = await axios.get(`/patients/familyMembers/${user._id}`);
-        setFamilyMembers(response.data);
+        const response = await fetch(`/patients/familyMembers/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setFamilyMembers(json);
+        }
       } catch (error) {
-        console.error('Error fetching family members:', error);
-        console.log(error.response)
+        console.error("An error occurred:", error);
       }
     };
 
     fetchFamilyMembers();
-  }, [user._id]);
+  }, [familyMembers]);
 
-  const toggle = () => setIsOpen(!isOpen);
+  const handleLinkFamilyMember = async () => {
+    try {
+      const response = await axios.post(
+        `/patients/linkFamilyMember/${user._id}`,
+        {
+          email,
+        }
+      );
+      console.log("Linked Succesfully:", response.data.message); // Log the response data
+      // Clear the form inputs after successful addition
+      alert("Linked Succesfully: " + response.data.message);
+      setEmail("");
+    } catch (error) {
+      alert("Linked failed: " + error.response.data.message);
+    }
+  };
+
+  const handleAddFamilyMember = async () => {
+    try {
+      const response = await axios.post(
+        `/patients/addFamilyMember/${user._id}`,
+        {
+          fName,
+          lName,
+          nationalID,
+          dateOfBirth,
+          gender,
+          relationship,
+        }
+      );
+      console.log("Added Succesfully:", response.data.message); // Log the response data
+      // Clear the form inputs after successful addition
+      alert("Added Succesfully: " + response.data.message);
+      setFirstName("");
+      setLastName("");
+      setNationalID("");
+      setDateOfBirth(null);
+      setGender("");
+      setRelationship("");
+    } catch (error) {
+      alert("Added failed: " + error.response.data.message);
+    }
+  };
 
   return (
     <>
-      <div className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+      <div
+        className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
         style={{
           minHeight: "100px",
           backgroundSize: "cover",
           backgroundPosition: "center top",
-        }}>
+        }}
+      >
         {/* Mask */}
         <span className="mask bg-gradient-default opacity-8" />
         {/* Header container */}
@@ -93,7 +142,7 @@ const AddFamilyMember = () => {
                     <Button
                       color="primary"
                       href="#pablo"
-                      onClick={(e) => e.preventDefault()}
+                      onClick={handleAddFamilyMember}
                       size="sm"
                     >
                       Add Family Member
@@ -114,8 +163,13 @@ const AddFamilyMember = () => {
                             First name
                           </label>
                           <Input
+                            required
                             className="form-control-alternative"
                             type="text"
+                            value={fName}
+                            onChange={(e) => {
+                              setFirstName(e.target.value);
+                            }}
                           />
                         </FormGroup>
                       </Col>
@@ -128,8 +182,11 @@ const AddFamilyMember = () => {
                             Last name
                           </label>
                           <Input
+                            required
                             className="form-control-alternative"
                             type="text"
+                            value={lName}
+                            onChange={(e) => setLastName(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -141,17 +198,25 @@ const AddFamilyMember = () => {
                             National ID
                           </label>
                           <Input
+                            required
                             className="form-control-alternative"
                             type="text"
+                            value={nationalID}
+                            onChange={(e) => setNationalID(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
                       <Col lg="6">
                         <FormGroup>
-                          <label className="form-control-label">Age</label>
+                          <label className="form-control-label">
+                            Date of Birth
+                          </label>
                           <Input
+                            required
                             className="form-control-alternative"
-                            type="number"
+                            type="date"
+                            value={dateOfBirth}
+                            onChange={(e) => setDateOfBirth(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -166,6 +231,8 @@ const AddFamilyMember = () => {
                           <select
                             id="dropdown"
                             className="form-control-alternative"
+                            value={gender}
+                            onChange={(e) => setGender(e.target.value)}
                           >
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -175,17 +242,20 @@ const AddFamilyMember = () => {
                       <Col lg="6">
                         <FormGroup>
                           <label className="form-control-label" for="dropdown">
-                            Relationship:
+                            Relationaship:
                           </label>
                           <br />
                           <select
                             id="dropdown"
                             className="form-control-alternative"
+                            value={relationship}
+                            onChange={(e) => setRelationship(e.target.value)}
                           >
                             <option value="wife">Wife</option>
                             <option value="husband">Husband</option>
-                            <option value="son">Son</option>
-                            <option value="daughter">Daughter</option>
+                            <option value="child">Child</option>
+                            <option value="sibling">Sibling</option>
+                            <option value="parent">Parent</option>
                           </select>
                         </FormGroup>
                       </Col>
@@ -209,38 +279,50 @@ const AddFamilyMember = () => {
                           <Input
                             className="form-control-alternative"
                             type="email"
-                            value={familyMembers.email}
-                            onChange={(e) => setSearchEmail(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
                       <Col lg="6">
                         <FormGroup>
-                          <Button
-                            color="primary"
-                            onClick={toggle}
-                            style={{ marginBottom: "1rem" }}
-                          >
-                            View all registered family members
-                          </Button>
-                          <Collapse isOpen={isOpen}>
-              <Card>
-                <CardBody>
-                  {familyMembers.length > 0 ? (
-                    <ul>
-                      {familyMembers.map((member) => (
-                        <li key={member.email}>
-                          <strong>Name:</strong> {member.fName} {member.lName}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No registered family members.</p>
-                  )}
-                </CardBody>
-              </Card>
-                          </Collapse>
+                          <React.StrictMode>
+                            <Button
+                              color="primary"
+                              onClick={toggle}
+                              style={{ marginBottom: "1rem" }}
+                            >
+                              View all registered family members
+                            </Button>
+                            <Collapse isOpen={isOpen}>
+                              <Card>
+                                <CardBody>
+                                  <ListGroup>
+                                    {familyMembers
+                                      ? familyMembers.map((member, index) => (
+                                          <ListGroupItem
+                                            key={index}
+                                          >{`${member.fName} ${member.lName}`}</ListGroupItem>
+                                        ))
+                                      : ""}
+                                  </ListGroup>
+                                </CardBody>
+                              </Card>
+                            </Collapse>
+                          </React.StrictMode>
                         </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg="6">
+                        <Button
+                          color="primary"
+                          href="#pablo"
+                          onClick={handleLinkFamilyMember}
+                          size="sm"
+                        >
+                          Link Family Member
+                        </Button>
                       </Col>
                     </Row>
                   </div>

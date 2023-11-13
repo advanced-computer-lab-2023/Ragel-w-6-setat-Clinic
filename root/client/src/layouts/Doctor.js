@@ -26,7 +26,7 @@ import Sidebar from "components/Sidebar/Sidebar.js";
 
 import routes from "routes.js";
 
-const Admin = (props) => {
+const Doctor = (props) => {
   const mainContent = React.useRef(null);
   const location = useLocation();
 
@@ -38,7 +38,7 @@ const Admin = (props) => {
 
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
+      if (prop.layout === "/doctor") {
         return (
           <Route path={prop.path} element={prop.component} key={key} exact />
         );
@@ -64,9 +64,9 @@ const Admin = (props) => {
     <>
       <Sidebar
         {...props}
-        routes={routes.filter((route) => route.layout === "/admin")}
+        routes={routes.filter((route) => route.layout === "/doctor")}
         logo={{
-          innerLink: "/admin/index",
+          innerLink: "/doctor/index",
           imgSrc: require("../assets/img/brand/argon-react.png"),
           imgAlt: "...",
         }}
@@ -74,11 +74,12 @@ const Admin = (props) => {
       <div className="main-content" ref={mainContent}>
         <Routes>
           {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/admin/index" replace />} />
+          <Route path="*" element={<Navigate to="/doctor/index" replace />} />
         </Routes>
+        <Container fluid></Container>
       </div>
     </>
   );
 };
 
-export default Admin;
+export default Doctor;

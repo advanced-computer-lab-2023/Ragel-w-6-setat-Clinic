@@ -1,5 +1,7 @@
 // reactstrap components
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useContext, useEffect } from "react";
+import { Link } from "react-router-dom";
 import ReactDatetime from "react-datetime";
 import {
   Button,
@@ -21,10 +23,80 @@ import {
 } from "reactstrap";
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
+import { UserContext } from "contexts/UserContext";
 
 const SearchForDoctors = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggle = () => setDropdownOpen((prevState) => !prevState);
+
+  const { user } = useContext(UserContext);
+  const [doctors, setDoctors] = useState([]);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [specialtyFilter, setSpecialtyFilter] = useState("");
+  const [specialtySearch, setSpecialtySearch] = useState("");
+  const [date, setDate] = useState("");
+  const [uniqueSpecialties, setUniqueSpecialties] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await fetch(`/patients/viewDoctors/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setDoctors(json.doctors);
+          setUniqueSpecialties(json.uniqueSpecialties);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+        alert(error.response.data.message);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(
+        `/patients/searchForDoctors/${user._id}`,
+        {
+          params: {
+            fName: firstName,
+            lName: lastName,
+            specialty: specialtySearch,
+          },
+        }
+      );
+
+      if (response.data.doctors) {
+        setDoctors(response.data.doctors);
+      }
+      setFirstName("");
+      setLastName("");
+      setSpecialtySearch("");
+    } catch (err) {
+      alert("Internal Server Error: " + err.response.data.message);
+    }
+  };
+
+  const handleFilter = async () => {
+    try {
+      const response = await axios.get(`/patients/filterDoctors/${user._id}`, {
+        params: {
+          specialty: specialtyFilter,
+          date: date,
+        },
+      });
+      if (response.data.doctors) {
+        setDoctors(response.data.doctors);
+      }
+      setSpecialtyFilter("");
+      setDate("");
+    } catch (err) {
+      alert("Internal Server Error: " + err.response.data.message);
+    }
+  };
 
   return (
     <>
@@ -58,9 +130,20 @@ const SearchForDoctors = () => {
                           <select
                             id="dropdown"
                             className="form-control-alternative"
+                            value={specialtyFilter}
+                            onChange={(e) => setSpecialtyFilter(e.target.value)}
                           >
-                            <option value="upcoming">Cardiologist</option>
-                            <option value="rescheduled">Children</option>
+                            <option value="">Select Specialty</option>
+                            {uniqueSpecialties
+                              ? uniqueSpecialties.map((uniqueSpecialty) => (
+                                  <option
+                                    key={uniqueSpecialty}
+                                    value={uniqueSpecialty}
+                                  >
+                                    {uniqueSpecialty}
+                                  </option>
+                                ))
+                              : ""}
                           </select>
                         </FormGroup>
                       </Col>
@@ -72,6 +155,8 @@ const SearchForDoctors = () => {
                           <Input
                             className="form-control-alternative"
                             type="text"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -94,6 +179,8 @@ const SearchForDoctors = () => {
                                 placeholder: "From Date",
                               }}
                               timeFormat={true}
+                              value={date}
+                              onChange={(value) => setDate(value)}
                             />
                           </InputGroup>
                         </FormGroup>
@@ -106,6 +193,8 @@ const SearchForDoctors = () => {
                           <Input
                             className="form-control-alternative"
                             type="text"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -114,8 +203,7 @@ const SearchForDoctors = () => {
                       <Col lg="6">
                         <Button
                           color="primary"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={handleFilter}
                           size="sm"
                         >
                           Filter Doctors
@@ -129,6 +217,8 @@ const SearchForDoctors = () => {
                           <Input
                             className="form-control-alternative"
                             type="text"
+                            value={specialtySearch}
+                            onChange={(e) => setSpecialtySearch(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -138,8 +228,7 @@ const SearchForDoctors = () => {
                       <Col lg="6">
                         <Button
                           color="primary"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={handleSearch}
                           size="sm"
                         >
                           Search Doctors
@@ -168,22 +257,29 @@ const SearchForDoctors = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <th scope="row">
-                              <Media className="align-items-center">
-                                <Media>
-                                  <span className="mb-0 text-sm">
-                                    Dr. Hassan Soubra
-                                  </span>
+                          {doctors.map((doctor) => (
+                            <tr>
+                              <th scope="row">
+                                <Media className="align-items-center">
+                                  <Media>
+                                    {" "}
+                                    <Link
+                                      to={`/patient/doctorProfile/${doctor._id}`}
+                                    >
+                                      <span className="mb-0 text-sm">
+                                        Dr. {doctor.name}
+                                      </span>{" "}
+                                    </Link>
+                                  </Media>
                                 </Media>
-                              </Media>
-                            </th>
-                            <td>$2,500 USD</td>
-                            <td>
-                              <i className="bg-warning" />
-                              Cardiologist
-                            </td>
-                          </tr>
+                              </th>
+                              <td>{doctor.sessionPrice} EGP</td>
+                              <td>
+                                <i className="bg-warning" />
+                                {doctor.specialty}
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </Table>
                     </Card>

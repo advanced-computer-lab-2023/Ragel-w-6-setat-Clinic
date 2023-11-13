@@ -26,7 +26,7 @@ import Sidebar from "components/Sidebar/Sidebar.js";
 
 import routes from "routes.js";
 
-const Admin = (props) => {
+const Patient = (props) => {
   const mainContent = React.useRef(null);
   const location = useLocation();
 
@@ -64,7 +64,9 @@ const Admin = (props) => {
     <>
       <Sidebar
         {...props}
-        routes={routes.filter((route) => route.layout === "/patient")}
+        routes={routes.filter(
+          (route) => route.layout === "/patient" && !route.excludeFromSidebar
+        )}
         logo={{
           innerLink: "/patient/index",
           imgSrc: require("../assets/img/brand/argon-react.png"),
@@ -82,4 +84,4 @@ const Admin = (props) => {
   );
 };
 
-export default Admin;
+export default Patient;

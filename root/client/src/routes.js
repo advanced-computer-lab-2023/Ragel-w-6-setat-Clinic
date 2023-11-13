@@ -22,6 +22,8 @@ import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
+
+// patient views
 import SubscribedPackage from "views/PatientViews/viewSubscribedPackage.js";
 import AddFamilyMember from "views/PatientViews/addFamilyMember.js";
 import FilterAppointments from "views/PatientViews/filterAppointments.js";
@@ -29,10 +31,22 @@ import HealthPackages from "views/PatientViews/healthPackages";
 import SearchForDoctors from "views/PatientViews/searchForDoctors";
 import FilterPrescriptions from "views/PatientViews/filterPrescriptions";
 import Wallet from "views/PatientViews/wallet";
+import DoctorDetails from "views/PatientViews/doctorDetails";
+
+// doctor views
+import DoctorProfile from "views/DoctorViews/doctorProfile";
+import SearchForPatients from "views/DoctorViews/searchForPatients";
+import DoctorAppointments from "views/DoctorViews/doctorAppointments";
+import WalletDoctor from "views/DoctorViews/wallet";
+import PatientDetails from "views/DoctorViews/patientDetails";
+
+// admin views
+
+import AllUsers from "views/AdminViews/allUsers";
+import ManageHealthPackages from "views/AdminViews/healthPackagesManagement";
 
 var routes = [
   //patient routes
-
   {
     path: "/index",
     name: "Dashboard",
@@ -41,14 +55,14 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/healthStatus/:id",
+    path: "/mySubscribedPackage/",
     name: "Subscribed Package",
     icon: "ni ni-basket",
     component: <SubscribedPackage />,
     layout: "/patient",
   },
   {
-    path: "/familyMembers/:id",
+    path: "/addFamilyMember",
     name: "Add a Family Member",
     icon: "ni ni-single-02",
     component: <AddFamilyMember />,
@@ -62,7 +76,7 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/subscribe/:id",
+    path: "/healthPackagesOptions",
     name: "Health Package Options",
     icon: "ni ni-box-2",
     component: <HealthPackages />,
@@ -83,13 +97,66 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "subscribedWallet/:id",
+    path: "/wallet",
     name: "My Wallet",
     icon: "ni ni-money-coins",
     component: <Wallet />,
     layout: "/patient",
   },
+  {
+    path: "/doctorProfile/:doctorid",
+    name: "Doctor Profile",
+    icon: "ni ni-money-coins",
+    component: <DoctorDetails />,
+    layout: "/patient",
+    excludeFromSidebar: true,
+  },
 
+  //doctor routes
+
+  {
+    path: "/index",
+    name: "Dashboard",
+    icon: "ni ni-tv-2 text-primary",
+    component: <Index />,
+    layout: "/doctor",
+  },
+  {
+    path: "/myProfile",
+    name: "My Profile",
+    icon: "ni ni-circle-08",
+    component: <DoctorProfile />,
+    layout: "/doctor",
+  },
+  {
+    path: "/myPatients",
+    name: "My Patients",
+    icon: "ni ni-single-02",
+    component: <SearchForPatients />,
+    layout: "/doctor",
+  },
+  {
+    path: "/myAppointments",
+    name: "My Appointments",
+    icon: "ni ni-fat-add",
+    component: <DoctorAppointments />,
+    layout: "/doctor",
+  },
+  {
+    path: "/wallet",
+    name: "My Wallet",
+    icon: "ni ni-money-coins",
+    component: <WalletDoctor />,
+    layout: "/doctor",
+  },
+  {
+    path : "/selectedPatient/:patientid",
+    name : "Patient Details",
+    icon : "ni ni-circle-08 text-pink",
+    component : <PatientDetails />,
+    layout : "/doctor",
+  }
+,
   //admin routes
   {
     path: "/index",
@@ -99,33 +166,21 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/icons",
-    name: "Icons",
-    icon: "ni ni-planet text-blue",
-    component: <Icons />,
+    path: "/allUsers",
+    name: "System Users",
+    icon: "ni ni-circle-08 text-pink",
+    component: <AllUsers />,
     layout: "/admin",
   },
   {
-    path: "/maps",
-    name: "Maps",
-    icon: "ni ni-pin-3 text-orange",
-    component: <Maps />,
+    path: "/healthPackagesManagement",
+    name: "Health Packages Management",
+    icon: "ni ni-box-2",
+    component: <ManageHealthPackages />,
     layout: "/admin",
   },
-  {
-    path: "/user-profile",
-    name: "User Profile",
-    icon: "ni ni-single-02 text-yellow",
-    component: <Profile />,
-    layout: "/admin",
-  },
-  {
-    path: "/tables",
-    name: "Tables",
-    icon: "ni ni-bullet-list-67 text-red",
-    component: <Tables />,
-    layout: "/admin",
-  },
+
+  // auth routes
   {
     path: "/login",
     name: "Login",
@@ -140,5 +195,6 @@ var routes = [
     component: <Register />,
     layout: "/auth",
   },
+
 ];
 export default routes;
