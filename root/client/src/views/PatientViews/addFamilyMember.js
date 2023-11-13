@@ -40,21 +40,27 @@ import UserHeader from "components/Headers/UserHeader.js";
 import { UserContext } from "../../contexts/UserContext.js";
 
 
+// ... (previous imports)
+
+// ... (previous imports)
+
+
 const AddFamilyMember = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [familyMembers, setFamilyMembers] = useState([]);
   const [searchedFamilyMember, setSearchedFamilyMember] = useState([]);
   const [searchEmail, setSearchEmail] = useState('');
   const { user } = useContext(UserContext);
+  const [familyMembers, setFamilyMembers] = useState([]);
 
   useEffect(() => {
     const fetchFamilyMembers = async () => {
       try {
+        console.log(user._id)
         const response = await axios.get(`/patients/familyMembers/${user._id}`);
         setFamilyMembers(response.data);
-        console.log(response.data);
       } catch (error) {
         console.error('Error fetching family members:', error);
+        console.log(error.response)
       }
     };
 
@@ -63,33 +69,14 @@ const AddFamilyMember = () => {
 
   const toggle = () => setIsOpen(!isOpen);
 
-  const handleSearch = async () => {
-    try {
-      const response = await axios.get(`/patients/familyMember/${user._id}/${searchEmail}`);
-      
-      if (response.data && response.data.registeredFamilyMembers && response.data.registeredFamilyMembers.length > 0) {
-        setSearchedFamilyMember(response.data.registeredFamilyMembers);
-        console.log(response.data);
-        toggle();
-      } else {
-        console.log('Family member not found.');
-      }
-    } catch (error) {
-      console.error('Error searching for family member:', error);
-    }
-  };
-
-  
   return (
     <>
-      <div
-        className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
+      <div className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
         style={{
           minHeight: "100px",
           backgroundSize: "cover",
           backgroundPosition: "center top",
-        }}
-      >
+        }}>
         {/* Mask */}
         <span className="mask bg-gradient-default opacity-8" />
         {/* Header container */}
@@ -188,7 +175,7 @@ const AddFamilyMember = () => {
                       <Col lg="6">
                         <FormGroup>
                           <label className="form-control-label" for="dropdown">
-                            Relationaship:
+                            Relationship:
                           </label>
                           <br />
                           <select
@@ -222,40 +209,37 @@ const AddFamilyMember = () => {
                           <Input
                             className="form-control-alternative"
                             type="email"
-                            value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
+                            value={familyMembers.email}
+                            onChange={(e) => setSearchEmail(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
                       <Col lg="6">
                         <FormGroup>
-                          <React.StrictMode>
-                            <Button
-                              color="primary"
-                              onClick={toggle}
-                              style={{ marginBottom: "1rem" }}
-                            >
-                              View all registered family members
-                            </Button>
-                            <Collapse isOpen={isOpen}>
-        <Card>
-          <CardBody>
-            {searchedFamilyMember && searchedFamilyMember.length > 0 ? (
-              <div>
-                <h4>Registered Family Members</h4>
-                {searchedFamilyMember.map((familyMember) => (
-                  <p key={familyMember.email}>
-                    Name: {familyMember.fname} {familyMember.lname}<br />
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p>No family members found.</p>
-            )}
-          </CardBody>
-        </Card>
-      </Collapse>
-                          </React.StrictMode>
+                          <Button
+                            color="primary"
+                            onClick={toggle}
+                            style={{ marginBottom: "1rem" }}
+                          >
+                            View all registered family members
+                          </Button>
+                          <Collapse isOpen={isOpen}>
+              <Card>
+                <CardBody>
+                  {familyMembers.length > 0 ? (
+                    <ul>
+                      {familyMembers.map((member) => (
+                        <li key={member.email}>
+                          <strong>Name:</strong> {member.fName} {member.lName}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No registered family members.</p>
+                  )}
+                </CardBody>
+              </Card>
+                          </Collapse>
                         </FormGroup>
                       </Col>
                     </Row>
