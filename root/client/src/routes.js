@@ -103,11 +103,12 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/doctorProfile",
+    path: "/doctorProfile/:doctorid",
     name: "Doctor Profile",
     icon: "ni ni-money-coins",
     component: <DoctorDetails />,
     layout: "/patient",
+    excludeFromSidebar: true,
   },
 
   //doctor routes

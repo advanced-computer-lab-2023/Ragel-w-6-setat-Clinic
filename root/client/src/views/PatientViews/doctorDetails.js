@@ -19,6 +19,8 @@
 // reactstrap components
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
+
 import {
   Button,
   Card,
@@ -45,6 +47,7 @@ const DoctorDetails = () => {
   const [modal, setModal] = useState(false);
   const toggleModal = () => setModal(!modal);
   const { user } = useContext(UserContext);
+  const { doctorid } = useParams();
   // State to store doctor details
   const [doctorDetails, setDoctorDetails] = useState({
     username: "",
@@ -70,7 +73,7 @@ const DoctorDetails = () => {
     const fetchDoctorDetails = async () => {
       try {
         const response = await fetch(
-          `/patients/doctorDetails/${user._id}/${user.doctorId}`
+          `/patients/doctorDetails/${user._id}/${doctorid}`
         );
         const json = await response.json();
         // Update the state with the fetched doctor details
@@ -89,7 +92,7 @@ const DoctorDetails = () => {
     const fetchAvailableAppointments = async () => {
       try {
         const response = await fetch(
-          `/patients/doctorDetails/availableAppointment/${user._id}/${user.doctorId}`
+          `/patients/doctorDetails/availableAppointment/${user._id}/${doctorid}`
         );
         const json = await response.json();
         // Update the state with the fetched doctor details

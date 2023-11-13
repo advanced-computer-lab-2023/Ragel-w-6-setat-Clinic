@@ -262,9 +262,14 @@ const SearchForDoctors = () => {
                               <th scope="row">
                                 <Media className="align-items-center">
                                   <Media>
-                                    <span className="mb-0 text-sm">
-                                      Dr. {doctor.name}
-                                    </span>
+                                    {" "}
+                                    <Link
+                                      to={`/patient/doctorProfile/${doctor._id}`}
+                                    >
+                                      <span className="mb-0 text-sm">
+                                        Dr. {doctor.name}
+                                      </span>{" "}
+                                    </Link>
                                   </Media>
                                 </Media>
                               </th>
