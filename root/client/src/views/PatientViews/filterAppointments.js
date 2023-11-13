@@ -28,7 +28,8 @@ const FilterAppointments = () => {
 
   const [upcomingAppointments, setupcomingAppointments] = useState(null);
   const [pastAppointments, setpastAppointments] = useState(null);
-  const [selectedOption, setSelectedOption] = useState("upcoming");
+  const [allAppointments, setallAppointments] = useState(null);
+  const [selectedOption, setSelectedOption] = useState("all");
   const [statusFilter, setStatusFilter] = useState("");
   const [fromDate, setFromDate] = useState("");
 
@@ -41,7 +42,7 @@ const FilterAppointments = () => {
   
       if (response.ok) {
         console.log(json.appointments);
-        setupcomingAppointments(json.appointments);
+        setallAppointments(json.appointments);
       } else {
         console.error("Error fetching data:", response.statusText);
       }
@@ -89,13 +90,14 @@ const FilterAppointments = () => {
       }
     };
 
-    if (selectedOption === "upcoming") {
+    if (selectedOption === "all") {
+      fetchAllAppointments();
+    } else if (selectedOption === "upcoming") {
       fetchAppointmentDetailsUp();
     } else if (selectedOption === "past") {
       fetchAppointmentDetailsPast();
     }
   }, [user._id, selectedOption]);
-
   const handleFilterAppointments = async () => {
     try {
       const response = await fetch(
@@ -300,7 +302,41 @@ const FilterAppointments = () => {
                                     </td>
                                   </tr>
                                 ))
-                              ) : (
+                              ) : selectedOption === "all" &&
+                              Array.isArray(allAppointments) &&
+                              allAppointments.length > 0 ? (
+                                allAppointments.map((appointment, index) => (
+                                  <tr key={index}>
+                                    <th scope="row">
+                                      <Media className="align-items-center">
+                                        <Media>
+                                        <span className="mb-0 text-sm">
+    {appointment.doctor?.fName || 'No Doctor'}
+  </span>
+                                        </Media>
+                                      </Media>
+                                    </th>
+                                    <td>{appointment.price}</td>
+                                    <td>
+                                      <Badge color="" className="badge-dot mr-4">
+                                        <i className="bg-warning" />
+                                        {appointment.status}
+                                      </Badge>
+                                    </td>
+                                    <td>{appointment.date}</td>
+                                    <td>
+                                      <div className="d-flex align-items-center">
+                                        <span className="mr-2">
+                                          {appointment.type}
+                                        </span>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))
+                              
+                              
+                              
+                              ): (
                                 <tr>
                                   <td colSpan="5">
                                     No appointments available.

@@ -31,12 +31,13 @@ const DoctorAppointments = () => {
   const [modal, setModal] = useState(false);
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentPrice, setAppointmentPrice] = useState("");
-  const [allAppointments, setAllAppointments] = useState([]);
   const [upcomingAppointments, setupcomingAppointments] = useState(null);
   const [pastAppointments, setpastAppointments] = useState(null);
+  const [allAppointments, setallAppointments] = useState(null);
   const [selectedOption, setSelectedOption] = useState("all");
   const [statusFilter, setStatusFilter] = useState("");
   const [fromDate, setFromDate] = useState("");
+
 
   const toggleModal = () => setModal(!modal);
   const { user } = useContext(UserContext);
@@ -45,11 +46,10 @@ const DoctorAppointments = () => {
     try {
       const response = await fetch(`/doctors/viewAppointments/${user._id}`);
       const json = await response.json();
-
+  
       if (response.ok) {
         console.log(json.appointments);
-        setAllAppointments(json.appointments);
-        setupcomingAppointments(json.appointments); // Initially, set both upcoming and past appointments to all appointments
+        setallAppointments(json.appointments);
       } else {
         console.error("Error fetching data:", response.statusText);
       }
@@ -57,48 +57,49 @@ const DoctorAppointments = () => {
       console.error("An error occurred:", error);
     }
   };
-
+  
   useEffect(() => {
     fetchAllAppointments();
-  }, [user._id]);
-
-  const fetchAppointmentDetailsUp = async () => {
-    try {
-      const response = await fetch(
-        `/doctors/viewUpcomingAppointments/${user._id}`
-      );
-      const json = await response.json();
-
-      if (response.ok) {
-        console.log(json.appointments);
-        setupcomingAppointments(json.appointments);
-      } else {
-        console.error("Error fetching data:", response.statusText);
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
-    }
-  };
-
-  const fetchAppointmentDetailsPast = async () => {
-    try {
-      const response = await fetch(
-        `/doctors/viewPastAppointments/${user._id}`
-      );
-      const json = await response.json();
-
-      if (response.ok) {
-        setpastAppointments(json.appointments);
-      } else {
-        console.error("Error fetching data:", response.statusText);
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
-    }
-  };
+  }, [user._id, selectedOption]);
 
   useEffect(() => {
-    if (selectedOption === "upcoming") {
+    const fetchAppointmentDetailsUp = async () => {
+      try {
+        const response = await fetch(
+          `/doctors/viewUpcomingAppointments/${user._id}`
+        );
+        const json = await response.json();
+
+        if (response.ok) {
+          setupcomingAppointments(json.appointments);
+        } else {
+          console.error("Error fetching data:", response.statusText);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    const fetchAppointmentDetailsPast = async () => {
+      try {
+        const response = await fetch(
+          `/doctors/viewPastAppointments/${user._id}`
+        );
+        const json = await response.json();
+
+        if (response.ok) {
+          setpastAppointments(json.appointments);
+        } else {
+          console.error("Error fetching data:", response.statusText);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    if (selectedOption === "all") {
+      fetchAllAppointments();
+    } else if (selectedOption === "upcoming") {
       fetchAppointmentDetailsUp();
     } else if (selectedOption === "past") {
       fetchAppointmentDetailsPast();
@@ -107,12 +108,9 @@ const DoctorAppointments = () => {
 
   const handleFilterAppointments = async () => {
     try {
-      let url = `/doctors/filterAppointments/${user._id}?date=${fromDate}`;
-      if (statusFilter) {
-        url += `&status=${statusFilter}`;
-      }
-
-      const response = await fetch(url);
+      const response = await fetch(
+        `/doctors/filterAppointments/${user._id}?status=${statusFilter}&date=${fromDate}`
+      );
       const json = await response.json();
 
       if (response.ok) {
@@ -128,6 +126,7 @@ const DoctorAppointments = () => {
       console.error("An error occurred:", error);
     }
   };
+
 
   const handleAddAppointment = async () => {
     try {
@@ -367,45 +366,109 @@ const DoctorAppointments = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {Array.isArray(allAppointments) &&
-                          allAppointments.length > 0 ? (
-                            allAppointments.map((appointment, index) => (
-                              <tr key={index}>
-                                <th scope="row">
-                                  <Media className="align-items-center">
-                                    <Media>
+                        {selectedOption === "upcoming" &&
+                            Array.isArray(upcomingAppointments) &&
+                            upcomingAppointments.length > 0 ? (
+                              upcomingAppointments.map((appointment, index) => (
+                                <tr key={index}>
+                                  <th scope="row">
+                                    <Media className="align-items-center">
+                                      <Media>
                                       <span className="mb-0 text-sm">
-                                        {appointment.patient?.fName ||
-                                          "No Patient"}
-                                      </span>
+  {appointment.patient?.fName || 'No Doctor'}
+</span>
+                                      </Media>
                                     </Media>
-                                  </Media>
-                                </th>
-                                <td>{appointment.price}</td>
-                                <td>
-                                  <Badge
-                                    color=""
-                                    className="badge-dot mr-4"
-                                  >
-                                    <i className="bg-warning" />
-                                    {appointment.status}
-                                  </Badge>
-                                </td>
-                                <td>{appointment.date}</td>
-                                <td>
-                                  <div className="d-flex align-items-center">
-                                    <span className="mr-2">
-                                      {appointment.type}
-                                    </span>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan="5">No appointments available.</td>
-                            </tr>
-                          )}
+                                  </th>
+                                  <td>{appointment.price}</td>
+                                  <td>
+                                    <Badge color="" className="badge-dot mr-4">
+                                      <i className="bg-warning" />
+                                      {appointment.status}
+                                    </Badge>
+                                  </td>
+                                  <td>{appointment.date}</td>
+                                  <td>
+                                    <div className="d-flex align-items-center">
+                                      <span className="mr-2">
+                                        {appointment.type}
+                                      </span>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))
+                            ) : selectedOption === "past" &&
+                              Array.isArray(pastAppointments) &&
+                              pastAppointments.length > 0 ? (
+                                pastAppointments.map((appointment, index) => (
+                                  <tr key={index}>
+                                    <th scope="row">
+                                      <Media className="align-items-center">
+                                        <Media>
+                                        <span className="mb-0 text-sm">
+  {appointment.patient?.fName || 'No Doctor'}
+</span>
+                                        </Media>
+                                      </Media>
+                                    </th>
+                                    <td>{appointment.price}</td>
+                                    <td>
+                                      <Badge color="" className="badge-dot mr-4">
+                                        <i className="bg-success" />
+                                        {appointment.status}
+                                      </Badge>
+                                    </td>
+                                    <td>{appointment.date}</td>
+                                    <td>
+                                      <div className="d-flex align-items-center">
+                                        <span className="mr-2">
+                                          {appointment.type}
+                                        </span>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))
+                              ) : selectedOption === "all" &&
+                              Array.isArray(allAppointments) &&
+                              allAppointments.length > 0 ? (
+                                allAppointments.map((appointment, index) => (
+                                  <tr key={index}>
+                                    <th scope="row">
+                                      <Media className="align-items-center">
+                                        <Media>
+                                        <span className="mb-0 text-sm">
+    {appointment.patient?.fName || 'No Doctor'}
+  </span>
+                                        </Media>
+                                      </Media>
+                                    </th>
+                                    <td>{appointment.price}</td>
+                                    <td>
+                                      <Badge color="" className="badge-dot mr-4">
+                                        <i className="bg-warning" />
+                                        {appointment.status}
+                                      </Badge>
+                                    </td>
+                                    <td>{appointment.date}</td>
+                                    <td>
+                                      <div className="d-flex align-items-center">
+                                        <span className="mr-2">
+                                          {appointment.type}
+                                        </span>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))
+                              
+                              
+                              
+                              ): (
+                                <tr>
+                                  <td colSpan="5">
+                                    No appointments available.
+                                  </td>
+                                </tr>
+                              )}
                         </tbody>
                       </Table>
                     </Card>
