@@ -1,75 +1,79 @@
-/*!
+import React, { useState, useContext } from 'react';
+import axios from 'axios';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Alert } from 'reactstrap';
+import { UserContext } from '../../contexts/UserContext.js';
 
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
 
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
 
-* Coded by Creative Tim
 
-=========================================================
+const PayWithWalletButton = ({ onPaymentSuccess }) => {
+  const { user } = useContext(UserContext);
+  const [modal, setModal] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+ 
+  const toggle = () => setModal(!modal);
 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-import { useState } from "react";
-// node.js library that concatenates classes (strings)
-// javascipt plugin for creating charts
-import Chart from "chart.js";
-// reactstrap components
-import { Card, CardTitle, CardBody, Container, Row, Col } from "reactstrap";
-
-// core components
-import { chartOptions, parseOptions } from "variables/charts.js";
-
-const Wallet = (props) => {
-  if (window.Chart) {
-    parseOptions(Chart, chartOptions());
-  }
+  const handlePayment = async () => {
+    try {
+      const response = await axios.post(`/patients/subscribedWallet/${user._id}`, {});
+      if (response.status === 200) {
+        setPaymentStatus('success');
+        toggle();
+        if (onPaymentSuccess) {
+          onPaymentSuccess();
+        }
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400 && error.response.data.error === 'Insufficient wallet balance') {
+        setPaymentStatus('insufficientBalance');
+      } else {
+        setPaymentStatus('error');
+        // Handle other errors (display an error message, etc.)
+        console.error('Payment error:', error);
+      }
+    }
+  };
 
   return (
-    <>
-      <div
-        className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
-        style={{
-          minHeight: "100px",
-        }}
-      >
-        {/* Mask */}
-        <span className="mask bg-gradient-default opacity-8" />
-      </div>
-      <Container className="mt--7" fluid>
-        <Row>
-          <Col lg="6" xl="3">
-            <Card className="card-stats mb-4 mb-xl-0">
-              <CardBody>
-                <Row>
-                  <div className="col">
-                    <CardTitle
-                      tag="h5"
-                      className="text-uppercase text-muted mb-0"
-                    >
-                      Wallet Amount
-                    </CardTitle>
-                    <span className="h2 font-weight-bold mb-0">924</span>
-                  </div>
-                  <Col className="col-auto">
-                    <div className="icon icon-shape bg-blue text-white rounded-circle shadow">
-                      <i className="fas fa-percent" />
-                    </div>
-                  </Col>
-                </Row>
-              </CardBody>
-            </Card>
-          </Col>
-          ;
-        </Row>
-      </Container>
-    </>
+    <div>
+      <Button color="primary" onClick={toggle}>
+        Pay with Wallet
+      </Button>
+
+      <Modal isOpen={modal} toggle={toggle}>
+        <ModalHeader toggle={toggle}>Confirm Payment</ModalHeader>
+        <ModalBody>
+          Are you sure you want to proceed with the payment using your wallet?
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={handlePayment}>
+            Confirm Payment
+          </Button>{' '}
+          <Button color="secondary" onClick={toggle}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      {paymentStatus === 'success' && (
+        <Alert color="success" style={{ marginTop: '1rem' }}>
+          Payment successful from wallet.
+        </Alert>
+      )}
+
+      {paymentStatus === 'insufficientBalance' && (
+        <Alert color="danger" style={{ marginTop: '1rem' }}>
+          Insufficient wallet balance. Please add funds to your wallet.
+        </Alert>
+      )}
+
+      {paymentStatus === 'error' && (
+        <Alert color="danger" style={{ marginTop: '1rem' }}>
+          An error occurred during the payment. Please try again. (No pending appointment)
+        </Alert>
+      )}
+    </div>
   );
 };
 
-export default Wallet;
+export default PayWithWalletButton;

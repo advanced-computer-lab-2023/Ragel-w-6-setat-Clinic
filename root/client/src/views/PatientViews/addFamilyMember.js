@@ -17,7 +17,9 @@
 */
 
 // reactstrap components
-import React, { useState } from "react";
+// reactstrap components
+import axios from "axios";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   ListGroup,
   ListGroupItem,
@@ -35,12 +37,49 @@ import {
 } from "reactstrap";
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
+import { UserContext } from "../../contexts/UserContext.js";
+
 
 const AddFamilyMember = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [familyMembers, setFamilyMembers] = useState([]);
+  const [searchedFamilyMember, setSearchedFamilyMember] = useState([]);
+  const [searchEmail, setSearchEmail] = useState('');
+  const { user } = useContext(UserContext);
+
+  useEffect(() => {
+    const fetchFamilyMembers = async () => {
+      try {
+        const response = await axios.get(`/patients/familyMembers/${user._id}`);
+        setFamilyMembers(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching family members:', error);
+      }
+    };
+
+    fetchFamilyMembers();
+  }, [user._id]);
 
   const toggle = () => setIsOpen(!isOpen);
 
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(`/patients/familyMember/${user._id}/${searchEmail}`);
+      
+      if (response.data && response.data.registeredFamilyMembers && response.data.registeredFamilyMembers.length > 0) {
+        setSearchedFamilyMember(response.data.registeredFamilyMembers);
+        console.log(response.data);
+        toggle();
+      } else {
+        console.log('Family member not found.');
+      }
+    } catch (error) {
+      console.error('Error searching for family member:', error);
+    }
+  };
+
+  
   return (
     <>
       <div
@@ -183,6 +222,8 @@ const AddFamilyMember = () => {
                           <Input
                             className="form-control-alternative"
                             type="email"
+                            value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -197,16 +238,23 @@ const AddFamilyMember = () => {
                               View all registered family members
                             </Button>
                             <Collapse isOpen={isOpen}>
-                              <Card>
-                                <CardBody>
-                                  <ListGroup>
-                                    <ListGroupItem>Habiba Samir</ListGroupItem>
-                                    <ListGroupItem>Shahd Amer</ListGroupItem>
-                                    <ListGroupItem>Hana Younis</ListGroupItem>
-                                  </ListGroup>
-                                </CardBody>
-                              </Card>
-                            </Collapse>
+        <Card>
+          <CardBody>
+            {searchedFamilyMember && searchedFamilyMember.length > 0 ? (
+              <div>
+                <h4>Registered Family Members</h4>
+                {searchedFamilyMember.map((familyMember) => (
+                  <p key={familyMember.email}>
+                    Name: {familyMember.fname} {familyMember.lname}<br />
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <p>No family members found.</p>
+            )}
+          </CardBody>
+        </Card>
+      </Collapse>
                           </React.StrictMode>
                         </FormGroup>
                       </Col>

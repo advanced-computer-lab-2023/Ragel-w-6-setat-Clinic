@@ -26,7 +26,6 @@ import { Line, Bar } from "react-chartjs-2";
 //to get the route 
 import axios from "axios";
 //for the route
-import { useParams } from 'react-router-dom';
 import {UserContext} from "../../contexts/UserContext.js";
 // reactstrap components
 import {
@@ -43,6 +42,8 @@ import {
 import { chartOptions, parseOptions } from "variables/charts.js";
 
 
+// ... (other imports)
+
 const SubscribedPackages = () => {
   const { user } = useContext(UserContext);
   const [packageInfo, setPackageInfo] = useState(null);
@@ -51,6 +52,7 @@ const SubscribedPackages = () => {
     const fetchPackageInfo = async () => {
       try {
         const response = await axios.get(`/patients/healthStatus/${user._id}`);
+        console.log(response.data);
         if (response.status === 200) {
           setPackageInfo(response.data);
         } else {
@@ -71,7 +73,7 @@ const SubscribedPackages = () => {
   return (
     <div>
       <h3>Patient's Subscribed Package</h3>
-      {packageInfo ? (
+      {packageInfo && packageInfo.patientPackage ? (
         <>
           {packageInfo.patientPackage.map((package1) => (
             <div key={package1.packageName}>
@@ -89,14 +91,14 @@ const SubscribedPackages = () => {
               </p>
             </div>
           ))}
-                 <Button style={{ backgroundColor: "#F8F6F4" }}>Cancel</Button>
+          <Button style={{ backgroundColor: "#F8F6F4" }}>Cancel</Button>
         </>
       ) : (
         <div>No subscribed packages found</div>
       )}
 
       <h3>Family Members' Subscribed Packages</h3>
-      {packageInfo ? (
+      {packageInfo && packageInfo.familyMembersPackages ? (
         <>
           {packageInfo.familyMembersPackages.map((familyMemberPackage) => (
             <div key={familyMemberPackage.packageName}>
@@ -116,7 +118,7 @@ const SubscribedPackages = () => {
               </p>
             </div>
           ))}
-            <Button style={{ backgroundColor: "#F8F6F4" }}>Cancel</Button>
+          <Button style={{ backgroundColor: "#F8F6F4" }}>Cancel</Button>
         </>
       ) : (
         <div>No subscribed packages found for family members</div>

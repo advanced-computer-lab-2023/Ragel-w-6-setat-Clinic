@@ -32,6 +32,7 @@ import Wallet from "views/PatientViews/wallet";
 
 var routes = [
   //patient routes
+
   {
     path: "/index",
     name: "Dashboard",
@@ -47,7 +48,7 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/addFamilyMember",
+    path: "/familyMembers/:id",
     name: "Add a Family Member",
     icon: "ni ni-single-02",
     component: <AddFamilyMember />,
@@ -61,7 +62,7 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/healthPackagesOptions",
+    path: "/subscribe/:id",
     name: "Health Package Options",
     icon: "ni ni-box-2",
     component: <HealthPackages />,
@@ -82,7 +83,7 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/wallet",
+    path: "subscribedWallet/:id",
     name: "My Wallet",
     icon: "ni ni-money-coins",
     component: <Wallet />,
