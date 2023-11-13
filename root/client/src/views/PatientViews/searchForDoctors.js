@@ -80,6 +80,24 @@ const SearchForDoctors = () => {
     }
   };
 
+  const handleFilter = async () => {
+    try {
+      const response = await axios.get(`/patients/filterDoctors/${user._id}`, {
+        params: {
+          specialty: specialtyFilter,
+          date: date,
+        },
+      });
+      if (response.data.doctors) {
+        setDoctors(response.data.doctors);
+      }
+      setSpecialtyFilter("");
+      setDate("");
+    } catch (err) {
+      alert("Internal Server Error: " + err.response.data.message);
+    }
+  };
+
   return (
     <>
       <div
@@ -162,7 +180,7 @@ const SearchForDoctors = () => {
                               }}
                               timeFormat={true}
                               value={date}
-                              onChange={(e) => setDate(e.target.value)}
+                              onChange={(value) => setDate(value)}
                             />
                           </InputGroup>
                         </FormGroup>
@@ -185,8 +203,7 @@ const SearchForDoctors = () => {
                       <Col lg="6">
                         <Button
                           color="primary"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={handleFilter}
                           size="sm"
                         >
                           Filter Doctors

@@ -490,7 +490,7 @@ const filterDoctors = async (req, res) => {
     const doctorIDS = [];
     const specificDate = new Date(date.toString() + ":00.000+00:00");
 
-    if (date) {
+    if (date != "") {
       const appointmentsByDate = await Appointments.find({
         date: specificDate,
         isAvailable: true,
@@ -502,7 +502,7 @@ const filterDoctors = async (req, res) => {
       });
     }
 
-    if (specialty) {
+    if (specialty != "") {
       filter.specialty = specialty;
     }
 
@@ -523,6 +523,7 @@ const filterDoctors = async (req, res) => {
     const doctors = await Doctor.find(filter).exec();
 
     const doctorsToDisplay = await doctorsDisplay(patientId, doctors);
+
     if (doctors.length === 0) {
       res.status(200).json({
         status: "success",
