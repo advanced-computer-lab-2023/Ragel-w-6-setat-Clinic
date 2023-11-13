@@ -40,7 +40,7 @@ const Wallet = (props) => {
   useEffect(() => {
     const fetchWallet = async () => {
       try {
-        const response = await fetch(`/patients/myWalletAmount/${user._id}`);
+        const response = await fetch(`/doctors/myWalletAmount/${user._id}`);
         const json = await response.json();
         if (response.ok) {
           setWalletAmount(json);

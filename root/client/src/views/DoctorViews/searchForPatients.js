@@ -40,6 +40,8 @@ const SearchForPatients = () => {
   const [patients, setPatients] = useState([]);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [followupDate, setFollowupDate] = useState("");
+  const [followupPrice, setFollowupPrice] = useState("");
 
   useEffect(() => {
     const fetchDoctorsPatients = async () => {
@@ -95,6 +97,25 @@ const SearchForPatients = () => {
       setLastName("");
     } catch (err) {
       alert("Internal Server Error: " + err.response.data.message);
+    }
+  };
+
+  const scheduleFollowUp = async (patientId) => {
+    try {
+      const response = await axios.post(
+        `/doctors/scheduleFollowUp/${user._id}/${patientId}`,
+        {
+          date: followupDate,
+          price: followupPrice,
+        }
+      );
+      alert(response.data.message);
+      setFollowupDate("");
+      setFollowupPrice("");
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(error.response.data.message);
+      alert(error.response.data.message);
     }
   };
 
@@ -237,6 +258,10 @@ const SearchForPatients = () => {
                                                 placeholder: "From Date",
                                               }}
                                               timeFormat={true}
+                                              value={followupDate}
+                                              onChange={(value) =>
+                                                setFollowupDate(value)
+                                              }
                                             />
                                           </InputGroup>
                                         </FormGroup>
@@ -251,6 +276,10 @@ const SearchForPatients = () => {
                                           <Input
                                             className="form-control-alternative"
                                             type="number"
+                                            value={followupPrice}
+                                            onChange={(e) =>
+                                              setFollowupPrice(e.target.value)
+                                            }
                                           />
                                         </FormGroup>
                                       </Col>
@@ -259,7 +288,9 @@ const SearchForPatients = () => {
                                   <ModalFooter>
                                     <Button
                                       color="primary"
-                                      onClick={toggleModal}
+                                      onClick={() =>
+                                        scheduleFollowUp(patient._id)
+                                      }
                                     >
                                       Schedule
                                     </Button>{" "}

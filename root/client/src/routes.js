@@ -31,11 +31,13 @@ import HealthPackages from "views/PatientViews/healthPackages";
 import SearchForDoctors from "views/PatientViews/searchForDoctors";
 import FilterPrescriptions from "views/PatientViews/filterPrescriptions";
 import Wallet from "views/PatientViews/wallet";
+import DoctorDetails from "views/PatientViews/doctorDetails";
 
 // doctor views
 import DoctorProfile from "views/DoctorViews/doctorProfile";
 import SearchForPatients from "views/DoctorViews/searchForPatients";
 import DoctorAppointments from "views/DoctorViews/doctorAppointments";
+import WalletDoctor from "views/DoctorViews/wallet";
 
 // admin views
 
@@ -100,6 +102,13 @@ var routes = [
     component: <Wallet />,
     layout: "/patient",
   },
+  {
+    path: "/doctorProfile",
+    name: "Doctor Profile",
+    icon: "ni ni-money-coins",
+    component: <DoctorDetails />,
+    layout: "/patient",
+  },
 
   //doctor routes
 
@@ -129,6 +138,13 @@ var routes = [
     name: "My Appointments",
     icon: "ni ni-fat-add",
     component: <DoctorAppointments />,
+    layout: "/doctor",
+  },
+  {
+    path: "/wallet",
+    name: "My Wallet",
+    icon: "ni ni-money-coins",
+    component: <WalletDoctor />,
     layout: "/doctor",
   },
 

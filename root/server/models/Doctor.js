@@ -52,6 +52,10 @@ const doctorSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  wallet: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Doctor = mongoose.model("Doctor", doctorSchema);

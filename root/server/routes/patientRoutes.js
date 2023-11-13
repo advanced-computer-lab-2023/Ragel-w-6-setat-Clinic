@@ -10,7 +10,7 @@ import {
   searchForDoctor,
   filterMyAppointments,
   filterAvailableAppointments,
-  selectDoctor,
+  doctorDetails,
   getFamilyMembers,
   getAllDoctors,
   getMyAppointments,
@@ -26,6 +26,7 @@ import {
   linkFamilyMember,
   viewUpcomingAppointments,
   viewPastAppointments,
+  getWalletAmount,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -52,6 +53,7 @@ router.patch(
   "/registerForAnAppointmentFamilyMember/:patientid/:appointmentid",
   registerForAnAppointmentFamilyMember
 );
+router.get("/myWalletAmount/:id", getWalletAmount);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);
@@ -72,7 +74,7 @@ router.get("/filterAvailableAppointments", filterAvailableAppointments);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
 router.get("/getMyAppointments/:id", getMyAppointments);
 router.get("/filterDoctors/:id", filterDoctors);
-router.get("/doctorDetails/:patientid/:doctorid", selectDoctor);
+router.get("/doctorDetails/:patientid/:doctorid", doctorDetails);
 
 // sprint 2
 

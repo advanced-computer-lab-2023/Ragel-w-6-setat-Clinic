@@ -11,6 +11,7 @@ import {
   getSinglePatient,
   getMyAppointments,
   scheduleFollowUp,
+  getWalletAmount,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 
@@ -22,7 +23,8 @@ router.post("/registeration", createDoctor);
 router.patch("/updateProfile/:id", updateDoctorProfile);
 router.get("/allDoctors", getAllDoctors);
 router.get("/doctorProfile/:id", doctorDetails);
-router.post("/scheduleFollowUp/:doctorid", scheduleFollowUp);
+router.post("/scheduleFollowUp/:doctorid/:patientid", scheduleFollowUp);
+router.get("/myWalletAmount/:id", getWalletAmount);
 
 // MARIAMS ROUTES
 

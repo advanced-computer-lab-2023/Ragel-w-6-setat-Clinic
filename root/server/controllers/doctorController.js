@@ -72,13 +72,10 @@ const updateDoctorProfile = async (req, res) => {
 
 const scheduleFollowUp = async (req, res) => {
   const doctorId = req.params.doctorid;
-  const patientUsername = req.body.patientUsername;
+  const patientId = req.params.patientid;
 
   try {
-    const patient = await Patient.findOne({ username: patientUsername });
-    if (!patient) {
-      return res.status(404).json({ message: "Patient not found" });
-    }
+    const patient = await Patient.findById(patientId);
 
     const appointment = await Appointments.create({
       patient: patient._id,
@@ -87,6 +84,7 @@ const scheduleFollowUp = async (req, res) => {
       isAvailable: false,
       type: "follow-up",
       status: "upcoming",
+      price: req.body.price,
     });
 
     res.status(201).json({
@@ -94,7 +92,21 @@ const scheduleFollowUp = async (req, res) => {
       message: "Appointment created successfully.",
     });
   } catch (error) {
-    console.error(error);
+    res.status(500).json({ message: "Fill the options please" });
+  }
+};
+
+const getWalletAmount = async (req, res) => {
+  const doctorId = req.params.id;
+  console.log("heree");
+  try {
+    // Find the doctor by ID and select the 'wallet' field
+    const doctor = await Doctor.findById(doctorId).select("wallet").exec();
+    // Return the wallet amount
+    console.log(doctor.wallet);
+    res.status(200).json(doctor.wallet);
+  } catch (err) {
+    console.error("Error retrieving wallet amount:", err);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -285,4 +297,5 @@ export {
   getSinglePatient,
   getMyAppointments,
   scheduleFollowUp,
+  getWalletAmount,
 };

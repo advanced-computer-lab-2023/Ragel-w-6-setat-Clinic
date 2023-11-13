@@ -48,7 +48,9 @@ async function doctorDisplay(patientID, doctor) {
   const patientPackage = patient.subscribedPackage;
   let sessionDiscount = 0;
   if (patientPackage) {
-    const packageOffered = await Package.findById({ _id: patientPackage });
+    const packageOffered = await Package.findById({
+      _id: patientPackage.packageId,
+    });
     if (packageOffered) {
       sessionDiscount = packageOffered.sessionDiscount || 0;
     }
@@ -141,10 +143,8 @@ const viewSelectedDoctorAvailableAppointments = async (req, res) => {
       doctor: doctorId,
       isAvailable: true,
     });
-    res.status(200).json({
-      status: "success",
-      appointments: appointments,
-    });
+
+    res.status(200).json(appointments);
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -183,7 +183,7 @@ const registerForAnAppointmentPatient = async (req, res) => {
 const registerForAnAppointmentFamilyMember = async (req, res) => {
   const patientId = req.params.patientid;
   const appointmentId = req.params.appointmentid;
-  const familyMemberEmail = req.body.familymemberemail;
+  const familyMemberEmail = req.body.familymemberEmail;
   try {
     const appointment = await Appointments.findById(appointmentId);
     if (!appointment.isAvailable) {
@@ -221,6 +221,19 @@ const registerForAnAppointmentFamilyMember = async (req, res) => {
       status: "fail",
       message: err.message,
     });
+  }
+};
+
+const getWalletAmount = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    // Find the doctor by ID and select the 'wallet' field
+    const patient = await Patient.findById(patientId).select("wallet").exec();
+    // Return the wallet amount
+    res.status(200).json(patient.wallet);
+  } catch (err) {
+    console.error("Error retrieving wallet amount:", err);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -607,7 +620,7 @@ const getMyAppointments = async (req, res) => {
   }
 };
 
-const selectDoctor = async (req, res) => {
+const doctorDetails = async (req, res) => {
   const patientId = req.params.patientid;
   const doctorId = req.params.doctorid;
   try {
@@ -617,7 +630,7 @@ const selectDoctor = async (req, res) => {
     }
 
     const doc = await doctorDisplay(patientId, doctor);
-    res.status(200).json({ doctor: doc });
+    res.status(200).json(doc);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -950,7 +963,7 @@ export {
   searchForDoctor,
   filterMyAppointments,
   filterAvailableAppointments,
-  selectDoctor,
+  doctorDetails,
   getFamilyMembers,
   getAllDoctors,
   getMyAppointments,
@@ -966,4 +979,5 @@ export {
   linkFamilyMember,
   viewUpcomingAppointments,
   viewPastAppointments,
+  getWalletAmount,
 };
