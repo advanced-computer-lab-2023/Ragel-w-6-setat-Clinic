@@ -19,7 +19,7 @@ const router = express.Router();
 // HABIBAS ROUTES
 
 router.post("/registeration", createDoctor);
-router.patch("/doctorProfile/:id", updateDoctorProfile);
+router.patch("/updateProfile/:id", updateDoctorProfile);
 router.get("/allDoctors", getAllDoctors);
 router.get("/doctorProfile/:id", doctorDetails);
 router.post("/scheduleFollowUp/:doctorid", scheduleFollowUp);

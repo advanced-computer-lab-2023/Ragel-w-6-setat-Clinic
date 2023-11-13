@@ -19,8 +19,17 @@ const getAllDoctors = async (req, res) => {
 const doctorDetails = async function (req, res) {
   const doctorid = req.params.id;
   try {
-    const doctor = await Doctor.findById(doctorid);
-    res.status(200).json({ doctor: doctor });
+    const doctor = await Doctor.findById(doctorid).select([
+      "username",
+      "email",
+      "fName",
+      "lName",
+      "educationalBackground",
+      "hourlyRate",
+      "affiliation",
+      "specialty",
+    ]);
+    res.status(200).json(doctor);
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -52,8 +61,7 @@ const updateDoctorProfile = async (req, res) => {
         ...req.body,
       }
     );
-    const doctorid = req.params.userid;
-    res.status(200).json({ doctor: doctor });
+    res.status(200).json(doctor);
   } catch (err) {
     res.status(400).json({
       status: "fail",
