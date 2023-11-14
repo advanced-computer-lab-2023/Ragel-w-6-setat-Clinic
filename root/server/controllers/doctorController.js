@@ -262,7 +262,9 @@ const viewUpcomingAppointments = async (req, res) => {
     const doctorId = req.params.id;
     try {
       const doctor = await Doctor.findById(doctorId);
-      doctor.educationalBackground.push(req.file.filename);
+      doctor.documentID.push(req.file.filename);
+      doctor.medicalLicense.push(req.file.filename);
+      doctor.medicalDegree.push(req.file.filename);
       await doctor.save();
       res.status(200).json({
         status: "success",

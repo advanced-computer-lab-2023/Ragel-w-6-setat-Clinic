@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const Schema = mongoose.Schema;
 
 const doctorSchema = new Schema({
@@ -30,14 +29,14 @@ const doctorSchema = new Schema({
     required: true,
   },
   educationalBackground: {
-    type: Array,
-    default: [],
-  },
-  medicalCertificate: {
-    type: Array,
-    default: [],
+    type: String,
+    required: true,
   },
   hourlyRate: {
+    type: Number,
+    required: true,
+  },
+  sessionPrice: {
     type: Number,
     required: true,
   },
@@ -52,6 +51,22 @@ const doctorSchema = new Schema({
   isRegistered: {
     type: Boolean,
     default: false,
+  },
+  wallet: {
+    type: Number,
+    default: 0,
+  },
+  documentID: {
+    type: String,
+    required: true,
+  },
+  medicalLicense: {
+    type: String,
+    required: true,
+  },
+  medicalDegree: {
+    type: String,
+    required: true,
   },
 });
 

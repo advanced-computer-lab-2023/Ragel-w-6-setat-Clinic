@@ -23,18 +23,7 @@ const DoctorInfo = () => {
     window.open(`http://localhost:4000/uploads/` + path);
   };
 
-  const fetchEducationalBackground = async (username) => {
-    try {
-      const response = await fetch(`/admins/getEducationalBackground/${user._id}?username=${username}`);
-      const json = await response.json();
-      if (response.ok) {
-        setEducationalBackground(json);
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
-      alert("Server Error");
-    }
-  };
+  
 
   const fetchUnregisteredDoctors = async () => {
     try {
@@ -55,14 +44,7 @@ const DoctorInfo = () => {
     fetchUnregisteredDoctors();
   }, [user._id]);
 
-  useEffect(() => {
-    fetchEducationalBackground(doctorUsername);
-  }, [doctorUsername, user._id]);
-
-  const handleLoadDocuments = async (username) => {
-    setDoctorUsername(username);
-    await fetchEducationalBackground(username);
-  };
+ 
 
   return (
     <>
@@ -108,6 +90,9 @@ const DoctorInfo = () => {
                             <th scope="col">Affiliation</th>
                             <th scope="col">Specialty</th>
                             <th scope="col">Registered</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Medical Licenses</th>
+                            <th scope="col">Degree</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -118,56 +103,44 @@ const DoctorInfo = () => {
                               <td>{doctor.fName}</td>
                               <td>{doctor.lName}</td>
                               <td>{new Date(doctor.dateOfBirth).toLocaleDateString()}</td>
-                              <td>
-                              {educationalBackground.length > 0 ? (
-                educationalBackground.map((history, index) => (
-                  <React.Fragment key={index}>
-                    <div className="col-lg-6 col-xl-3">
-                      <Card className="card-stats mb-4 mb-xl-0 mt-3">
-                        <CardBody>
-                          <Row>
-                            <div className="col">
-                              <CardTitle
-                                tag="h5"
-                                className="text-uppercase text-muted mb-0"
-                              >
-                                Document {index + 1}
-                              </CardTitle>
-                              <span className="h2 font-weight-bold mb-0">
-                                <Button
-                                  className="mt-3"
-                                  color="primary"
-                                  onClick={() => handleLoadDocuments(doctor.username)}
-                                  size="sm"
-                                >
-                                  Load Doctor Documents
-                                </Button>
-                                <Button
-                                  className="mt-3"
-                                  color="primary"
-                                  onClick={() => showDocument(history)}
-                                  size="sm"
-                                >
-                                  View Document
-                                </Button>
-                              </span>
-                            </div>
-                          </Row>
-                        </CardBody>
-                      </Card>
-                    </div>
-                  </React.Fragment>
-                ))
-              ) : (
-                <span>No educational background available</span>
-              )}
-                              </td>
+                              <td>{doctor.educationalBackground}</td>
                               <td>{doctor.hourlyRate}</td>
                               <td>{doctor.affiliation}</td>
                               <td>{doctor.specialty}</td>
                               <td>
-                                {doctor.isRegistered ? "Yes" : "No"}
+                                {"not registered"}
                               </td>
+                              <td>
+                              <Button
+                                  className="mt-3"
+                                  color="primary"
+                                  onClick={() => showDocument(doctor.documentID)}
+                                  size="sm"
+                                >
+                                  View Document
+                                </Button>
+                                </td>
+                                <td>
+                                <Button
+                                  className="mt-3"
+                                  color="primary"
+                                  onClick={() => showDocument(doctor.medicalLicense)}
+                                  size="sm"
+                                >
+                                  View Document
+                                </Button>
+                                </td>
+                                <td>
+                                <Button
+                                  className="mt-3"
+                                  color="primary"
+                                  onClick={() => showDocument(doctor.medicalDegree)}
+                                  size="sm"
+                                >
+                                  View Document
+                                </Button>
+                                </td>
+                              
                             </tr>
                           ))}
                         </tbody>
