@@ -38,6 +38,7 @@ import DoctorProfile from "views/DoctorViews/doctorProfile";
 import SearchForPatients from "views/DoctorViews/searchForPatients";
 import DoctorAppointments from "views/DoctorViews/doctorAppointments";
 import WalletDoctor from "views/DoctorViews/wallet";
+import PatientDetails from "views/DoctorViews/patientDetails";
 
 // admin views
 
@@ -147,6 +148,14 @@ var routes = [
     icon: "ni ni-money-coins",
     component: <WalletDoctor />,
     layout: "/doctor",
+  },
+  {
+    path: "/patientDetails/:patientid",
+    name: "Patient Profile",
+    icon: "ni ni-money-coins",
+    component: <PatientDetails />,
+    layout: "/doctor",
+    excludeFromSidebar: true,
   },
 
   //admin routes

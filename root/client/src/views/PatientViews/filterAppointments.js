@@ -1,6 +1,6 @@
-// reactstrap components
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import ReactDatetime from "react-datetime";
+import axios from "axios";
 import {
   Button,
   Card,
@@ -18,12 +18,83 @@ import {
   Media,
   Table,
 } from "reactstrap";
-// core components
 import UserHeader from "components/Headers/UserHeader.js";
+import { chartOptions, parseOptions } from "variables/charts.js";
+import { UserContext } from "../../contexts/UserContext";
 
 const FilterAppointments = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggle = () => setDropdownOpen((prevState) => !prevState);
+  const { user } = useContext(UserContext);
+
+  const [allAppointments, setAllAppointments] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+
+  useEffect(() => {
+    const fetchAllAppointments = async () => {
+      try {
+        const response = await fetch(`/patients/viewAppointments/${user._id}`);
+        const json = await response.json();
+
+        if (response.ok) {
+          console.log(json.appointments);
+          setAllAppointments(json.appointments);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+    fetchAllAppointments();
+  }, []);
+
+  const fetchUpcomingAppointments = async () => {
+    try {
+      const response = await axios.get(
+        `/patients/viewUpcomingAppointments/${user._id}`
+      );
+
+      if (response.data) {
+        setAllAppointments(response.data);
+      }
+      setStatusFilter("");
+      setFromDate("");
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
+  const fetchPastAppointments = async () => {
+    try {
+      const response = await axios.get(
+        `/patients/viewPastAppointments/${user._id}`
+      );
+
+      if (response.data) {
+        setAllAppointments(response.data);
+      }
+      setStatusFilter("");
+      setFromDate("");
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
+  const handleFilterAppointments = async () => {
+    try {
+      const response = await axios.get(
+        `/patients/filterMyAppointments/${user._id}?status=${statusFilter}&date=${fromDate}`
+      );
+
+      if (response.data) {
+        setAllAppointments(response.data);
+      }
+      setStatusFilter("");
+      setFromDate("");
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
 
   return (
     <>
@@ -36,7 +107,6 @@ const FilterAppointments = () => {
         {/* Mask */}
         <span className="mask bg-gradient-default opacity-8" />
       </div>
-      {/* Page content */}
       <Container className="mt--7" fluid>
         <Row>
           <Col className="order-xl-1" xl="8">
@@ -55,7 +125,10 @@ const FilterAppointments = () => {
                           <select
                             id="dropdown"
                             className="form-control-alternative"
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
                           >
+                            <option value="">All</option>
                             <option value="upcoming">Upcoming</option>
                             <option value="rescheduled">Rescheduled</option>
                             <option value="cancelled">Cancelled</option>
@@ -78,10 +151,10 @@ const FilterAppointments = () => {
                               </InputGroupText>
                             </InputGroupAddon>
                             <ReactDatetime
-                              inputProps={{
-                                placeholder: "From Date",
-                              }}
+                              key={fromDate}
                               timeFormat={false}
+                              value={fromDate}
+                              onChange={(date) => setFromDate(date)}
                             />
                           </InputGroup>
                         </FormGroup>
@@ -92,7 +165,7 @@ const FilterAppointments = () => {
                         <Button
                           color="primary"
                           href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={handleFilterAppointments}
                           size="sm"
                         >
                           Filter Appointments
@@ -101,8 +174,7 @@ const FilterAppointments = () => {
                       <Col lg="3">
                         <Button
                           color="primary"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={fetchUpcomingAppointments}
                           size="sm"
                         >
                           Show Upcoming Appointments
@@ -112,7 +184,7 @@ const FilterAppointments = () => {
                         <Button
                           color="primary"
                           href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={fetchPastAppointments}
                           size="sm"
                         >
                           Show Past Appointments
@@ -122,7 +194,6 @@ const FilterAppointments = () => {
                   </div>
                   <hr className="my-4" />
                 </Form>
-                {/* Table */}
                 <Row>
                   <div className="col">
                     <Card className="shadow">
@@ -143,30 +214,38 @@ const FilterAppointments = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <th scope="row">
-                              <Media className="align-items-center">
-                                <Media>
-                                  <span className="mb-0 text-sm">
-                                    Dr. Hassan Soubra
-                                  </span>
+                          {allAppointments.map((appointment, index) => (
+                            <tr key={index}>
+                              <th scope="row">
+                                <Media className="align-items-center">
+                                  <Media>
+                                    <span className="mb-0 text-sm">
+                                      {appointment.doctor.fName}
+                                    </span>
+                                  </Media>
                                 </Media>
-                              </Media>
-                            </th>
-                            <td>$2,500 USD</td>
-                            <td>
-                              <Badge color="" className="badge-dot mr-4">
-                                <i className="bg-warning" />
-                                upcoming
-                              </Badge>
-                            </td>
-                            <td>23-12-2023</td>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <span className="mr-2">Follow-up</span>
-                              </div>
-                            </td>
-                          </tr>
+                              </th>
+                              <td>{appointment.price}</td>
+                              <td>
+                                <Badge color="" className="badge-dot mr-4">
+                                  {appointment.status === "completed" ? (
+                                    <i className="bg-success" />
+                                  ) : (
+                                    <i className="bg-warning" />
+                                  )}
+                                  {appointment.status}
+                                </Badge>
+                              </td>
+                              <td>{appointment.date}</td>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="mr-2">
+                                    {appointment.type}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </Table>
                     </Card>

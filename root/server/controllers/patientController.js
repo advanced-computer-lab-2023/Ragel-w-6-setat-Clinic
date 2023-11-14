@@ -289,12 +289,6 @@ const viewPrescription = async (req, res) => {
   try {
     // Check if the patient exists
     const patient = await Patient.findById(patientId);
-    if (!patient) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Patient not found",
-      });
-    }
 
     // Find all the prescriptions for the patient
     const prescriptions = await Prescription.find({
@@ -322,14 +316,11 @@ const filterThePrescription = async (req, res) => {
   try {
     const filter = {};
 
-    if (req.query.doctor) {
-      const doctorsWithSpecificUsername = await Doctor.findOne({
-        username: req.query.doctor,
-      });
-      filter.doctor = doctorsWithSpecificUsername._id;
+    if (req.query.doctor != "") {
+      filter.doctor = req.query.doctor;
     }
 
-    if (req.query.date) {
+    if (req.query.date != "") {
       var min_date = new Date(req.query.date);
       var max_date = new Date(req.query.date);
       min_date.setHours(0, 0, 0, 0);
@@ -339,19 +330,13 @@ const filterThePrescription = async (req, res) => {
         $lt: max_date,
       };
     }
-    if (req.query.isFilled) {
+    if (req.query.isFilled != "") {
       filter.isFilled = req.query.isFilled;
     }
 
-    if (req.params.id) {
-      filter.patient = req.params.id;
-    }
+    filter.patient = req.params.id;
 
     const prescriptions = await Prescription.find(filter).populate("doctor");
-
-    const doctorsSet = await Doctor.find({ isRegistered: true }).select(
-      "username"
-    );
 
     res.status(200).json({
       status: "success",
@@ -399,15 +384,12 @@ const viewUpcomingAppointments = async (req, res) => {
   const patientId = req.params.id;
 
   try {
-    // Check if the patient exists
-    const patient = await Patient.findById(patientId);
-
     const appointments = await Appointments.find({
       patient: patientId,
       status: "upcoming",
     }).populate("doctor");
 
-    res.json({ appointments: appointments });
+    res.status(200).json(appointments);
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -420,15 +402,12 @@ const viewPastAppointments = async (req, res) => {
   const patientId = req.params.id;
 
   try {
-    // Check if the patient exists
-    const patient = await Patient.findById(patientId);
-
     const appointments = await Appointments.find({
       patient: patientId,
       status: "completed",
     }).populate("doctor");
 
-    res.json({ appointments: appointments });
+    res.status(200).json(appointments);
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -581,7 +560,7 @@ const filterMyAppointments = async (req, res) => {
   try {
     const filter = {};
 
-    if (req.query.date) {
+    if (req.query.date != "") {
       var min_date = new Date(req.query.date);
       var max_date = new Date(req.query.date);
       min_date.setHours(0, 0, 0, 0);
@@ -592,7 +571,7 @@ const filterMyAppointments = async (req, res) => {
       };
     }
 
-    if (req.query.status) {
+    if (req.query.status != "") {
       filter.status = req.query.status;
     }
 
@@ -600,23 +579,30 @@ const filterMyAppointments = async (req, res) => {
 
     const appointments = await Appointments.find(filter).populate("doctor");
 
-    res.status(200).json({ appointments: appointments });
+    res.status(200).json(appointments);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-const getMyAppointments = async (req, res) => {
+const viewAppointments = async (req, res) => {
+  const patientId = req.params.id;
+
   try {
-    const patientId = req.params.id;
+    // Check if the patient exists
+    const patient = await Patient.findById(patientId);
+
     const appointments = await Appointments.find({
       patient: patientId,
     }).populate("doctor");
-    res.status(200).json({ appointments: appointments });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+
+    res.json({ appointments: appointments });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
   }
 };
 
@@ -966,7 +952,7 @@ export {
   doctorDetails,
   getFamilyMembers,
   getAllDoctors,
-  getMyAppointments,
+  viewAppointments,
   cancelHealthPackageSubscription,
   viewSelectedDoctorAvailableAppointments,
   registerForAnAppointmentPatient,

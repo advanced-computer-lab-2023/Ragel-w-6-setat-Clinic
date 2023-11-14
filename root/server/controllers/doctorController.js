@@ -98,12 +98,11 @@ const scheduleFollowUp = async (req, res) => {
 
 const getWalletAmount = async (req, res) => {
   const doctorId = req.params.id;
-  console.log("heree");
+
   try {
     // Find the doctor by ID and select the 'wallet' field
     const doctor = await Doctor.findById(doctorId).select("wallet").exec();
     // Return the wallet amount
-    console.log(doctor.wallet);
     res.status(200).json(doctor.wallet);
   } catch (err) {
     console.error("Error retrieving wallet amount:", err);
@@ -215,17 +214,23 @@ const upcomingAppointments = async (req, res) => {
       doctor: doctorId,
       status: "upcoming",
       //  date: { $gte: new Date() }, // Filter for appointments with dates in the future
-    });
-    const patientIds = upcomingAppointments.map((Appointment) => {
-      return Appointment.patient;
-    });
-    // Find patients based on their IDs using Promise.all
-    const patientsWithUpcomingAppointments = await Promise.all(
-      patientIds.map(async (patientId) => {
-        return await Patient.findById(patientId);
-      })
-    );
-    res.status(200).json(patientsWithUpcomingAppointments);
+    }).populate("patient");
+    const doctorPatientsWithUpcomingAppointments = [];
+
+    for (const appointment of upcomingAppointments) {
+      if (appointment.patient !== null) {
+        const patientId = appointment.patient;
+
+        const patient = await Patient.findById(patientId).exec();
+        const isPatientExists = doctorPatientsWithUpcomingAppointments.some(
+          (docPatient) => docPatient._id.equals(patient._id)
+        );
+        if (!isPatientExists) {
+          doctorPatientsWithUpcomingAppointments.push(patient);
+        }
+      }
+    }
+    res.status(200).json(doctorPatientsWithUpcomingAppointments);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -277,11 +282,82 @@ const getSinglePatient = async (req, res) => {
 
     if (appointment != null) {
       const patient = await Patient.findById(patientID).exec();
-      res.status(200).json({ patient: patient });
+      res.status(200).json(patient);
     }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// LOJAINS REQS
+
+const viewUpcomingAppointments = async (req, res) => {
+  const doctorId = req.params.id;
+
+  try {
+    const appointments = await Appointments.find({
+      doctor: doctorId,
+      status: "upcoming",
+    }).populate("patient");
+
+    res.json({ appointments: appointments });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const viewPastAppointments = async (req, res) => {
+  const doctorId = req.params.id;
+
+  try {
+    const appointments = await Appointments.find({
+      doctor: doctorId,
+      status: "completed",
+    }).populate("patient");
+
+    res.json({ appointments: appointments });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+// Doctor can create new available appointments sprint #2
+const addAvailableAppointments = async (req, res) => {
+  try {
+    const { date, price } = req.query; // Extract date and type from the request body
+    const doctorId = req.params.id; // Assuming you have the doctorId in the route parameters
+    const doctor = await Doctor.findById(doctorId);
+
+    // Create a new appointment
+    const appointment = new Appointments({
+      doctor: doctorId,
+      patient: null,
+      date,
+      isAvailable: true,
+      price,
+      status: "available",
+    });
+
+    // Save the appointment to the database
+    await appointment.save();
+
+    res.status(201).json({
+      status: "success",
+      message: "Appointment created successfully",
+      data: appointment,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to create appointment",
+    });
   }
 };
 
@@ -298,4 +374,7 @@ export {
   getMyAppointments,
   scheduleFollowUp,
   getWalletAmount,
+  viewUpcomingAppointments,
+  viewPastAppointments,
+  addAvailableAppointments,
 };

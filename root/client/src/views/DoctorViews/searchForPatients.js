@@ -86,7 +86,7 @@ const SearchForPatients = () => {
   const filterUpcomingAppointments = async () => {
     try {
       const response = await axios.get(
-        `/doctors/upcomingappointments/${user._id}`
+        `/doctors/upcomingAppointments/${user._id}`
       );
       if (response.data && response.data.length > 0) {
         setPatients(response.data);
@@ -219,9 +219,13 @@ const SearchForPatients = () => {
                               <th scope="row">
                                 <Media className="align-items-center">
                                   <Media>
-                                    <span className="mb-0 text-sm">
-                                      {`${patient.fName} ${patient.lName}`}
-                                    </span>
+                                    <Link
+                                      to={`/doctor/patientDetails/${patient._id}`}
+                                    >
+                                      <span className="mb-0 text-sm">
+                                        {`${patient.fName} ${patient.lName}`}
+                                      </span>
+                                    </Link>
                                   </Media>
                                 </Media>
                               </th>

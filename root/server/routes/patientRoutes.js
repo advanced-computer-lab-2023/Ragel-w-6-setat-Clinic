@@ -13,7 +13,6 @@ import {
   doctorDetails,
   getFamilyMembers,
   getAllDoctors,
-  getMyAppointments,
   cancelHealthPackageSubscription,
   viewSelectedDoctorAvailableAppointments,
   registerForAnAppointmentPatient,
@@ -27,6 +26,7 @@ import {
   viewUpcomingAppointments,
   viewPastAppointments,
   getWalletAmount,
+  viewAppointments,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -67,12 +67,12 @@ router.get(
 //sprint 2
 router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
 router.get("/viewPastAppointments/:id", viewPastAppointments);
+router.get("/viewAppointments/:id", viewAppointments);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);
 router.get("/filterAvailableAppointments", filterAvailableAppointments);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
-router.get("/getMyAppointments/:id", getMyAppointments);
 router.get("/filterDoctors/:id", filterDoctors);
 router.get("/doctorDetails/:patientid/:doctorid", doctorDetails);
 

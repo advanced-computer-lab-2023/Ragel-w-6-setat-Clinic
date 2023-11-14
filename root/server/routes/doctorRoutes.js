@@ -12,6 +12,9 @@ import {
   getMyAppointments,
   scheduleFollowUp,
   getWalletAmount,
+  viewUpcomingAppointments,
+  viewPastAppointments,
+  addAvailableAppointments,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 
@@ -30,12 +33,18 @@ router.get("/myWalletAmount/:id", getWalletAmount);
 
 router.get("/searchForPatients/:id", searchForPatient);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
-router.get("/upcomingappointments/:id", upcomingAppointments);
+router.get("/upcomingAppointments/:id", upcomingAppointments);
 router.get("/getMyAppointments/:id", getMyAppointments);
 
 //SARAS ROUTES
 
 router.get("/selectedPatient/:doctorid/:patientid", getSinglePatient);
 router.get("/viewMyPatients/:id", getMyPatients);
+
+//LOJAINS ROUTES
+
+router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
+router.get("/viewPastAppointments/:id", viewPastAppointments);
+router.post("/addAvailableAppointments/:id", addAvailableAppointments);
 
 export default router;

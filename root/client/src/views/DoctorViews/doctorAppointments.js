@@ -1,5 +1,4 @@
-// reactstrap components
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import ReactDatetime from "react-datetime";
 import {
   Button,
@@ -23,15 +22,107 @@ import {
   ModalFooter,
   Input,
 } from "reactstrap";
-// core components
+
 import UserHeader from "components/Headers/UserHeader.js";
+import { chartOptions, parseOptions } from "variables/charts.js";
+import { UserContext } from "../../contexts/UserContext";
 
 const DoctorAppointments = () => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const toggle = () => setDropdownOpen((prevState) => !prevState);
   const [modal, setModal] = useState(false);
+  const [appointmentDate, setAppointmentDate] = useState("");
+  const [appointmentPrice, setAppointmentPrice] = useState("");
+  const [allAppointments, setAllAppointments] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
 
   const toggleModal = () => setModal(!modal);
+  const { user } = useContext(UserContext);
+
+  useEffect(() => {
+    const fetchAllAppointments = async () => {
+      try {
+        const response = await fetch(`/doctors/getMyAppointments/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setAllAppointments(json.appointments);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    fetchAllAppointments();
+  }, []);
+
+  const fetchAppointmentDetailsUp = async () => {
+    try {
+      const response = await fetch(
+        `/doctors/viewUpcomingAppointments/${user._id}`
+      );
+      const json = await response.json();
+
+      if (response.ok) {
+        setAllAppointments(json.appointments);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
+  const fetchAppointmentDetailsPast = async () => {
+    try {
+      const response = await fetch(`/doctors/viewPastAppointments/${user._id}`);
+      const json = await response.json();
+
+      if (response.ok) {
+        setAllAppointments(json.appointments);
+      } else {
+        console.error("Error fetching data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
+  const handleFilterAppointments = async () => {
+    try {
+      const response = await fetch(
+        `/doctors/filterMyAppointments/${user._id}?status=${statusFilter}&date=${fromDate}`
+      );
+      const json = await response.json();
+
+      setAllAppointments(json.appointments);
+
+      setStatusFilter("");
+      setFromDate("");
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
+  const handleAddAppointment = async () => {
+    try {
+      const response = await fetch(
+        `/doctors/addAvailableAppointments/${user._id}?date=${appointmentDate}&price=${appointmentPrice}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Handle successful response, e.g., show a success message
+        console.log("Appointment added successfully");
+        toggleModal(); // Close the modal after adding the appointment
+        setAppointmentDate("");
+        setAppointmentPrice("");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
 
   return (
     <>
@@ -63,11 +154,15 @@ const DoctorAppointments = () => {
                           <select
                             id="dropdown"
                             className="form-control-alternative"
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
                           >
+                            <option value="">All</option>
                             <option value="upcoming">Upcoming</option>
                             <option value="rescheduled">Rescheduled</option>
                             <option value="cancelled">Cancelled</option>
                             <option value="completed">Completed</option>
+                            <option value="available">Available</option>
                           </select>
                         </FormGroup>
                       </Col>
@@ -86,10 +181,15 @@ const DoctorAppointments = () => {
                               </InputGroupText>
                             </InputGroupAddon>
                             <ReactDatetime
+                              id={fromDate}
                               inputProps={{
                                 placeholder: "From Date",
                               }}
                               timeFormat={false}
+                              value={fromDate}
+                              onChange={(date) =>
+                                setFromDate(date.format("YYYY-MM-DD"))
+                              }
                             />
                           </InputGroup>
                         </FormGroup>
@@ -99,8 +199,7 @@ const DoctorAppointments = () => {
                       <Col lg="6">
                         <Button
                           color="primary"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={handleFilterAppointments}
                           size="sm"
                         >
                           Filter Appointments
@@ -109,8 +208,7 @@ const DoctorAppointments = () => {
                       <Col lg="3">
                         <Button
                           color="primary"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={fetchAppointmentDetailsUp}
                           size="sm"
                         >
                           Show Upcoming Appointments
@@ -119,8 +217,7 @@ const DoctorAppointments = () => {
                       <Col lg="3">
                         <Button
                           color="primary"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={fetchAppointmentDetailsPast}
                           size="sm"
                         >
                           Show Past Appointments
@@ -171,6 +268,10 @@ const DoctorAppointments = () => {
                                             placeholder: "From Date",
                                           }}
                                           timeFormat={true}
+                                          value={appointmentDate}
+                                          onChange={(date) =>
+                                            setAppointmentDate(date)
+                                          }
                                         />
                                       </InputGroup>
                                     </FormGroup>
@@ -185,13 +286,20 @@ const DoctorAppointments = () => {
                                       <Input
                                         className="form-control-alternative"
                                         type="number"
+                                        value={appointmentPrice}
+                                        onChange={(e) =>
+                                          setAppointmentPrice(e.target.value)
+                                        }
                                       />
                                     </FormGroup>
                                   </Col>
                                 </Row>
                               </ModalBody>
                               <ModalFooter>
-                                <Button color="primary" onClick={toggleModal}>
+                                <Button
+                                  color="primary"
+                                  onClick={handleAddAppointment}
+                                >
                                   Add Appointment
                                 </Button>{" "}
                                 <Button color="secondary" onClick={toggleModal}>
@@ -216,30 +324,35 @@ const DoctorAppointments = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <th scope="row">
-                              <Media className="align-items-center">
-                                <Media>
-                                  <span className="mb-0 text-sm">
-                                    Lojain Tarek
-                                  </span>
+                          {allAppointments.map((appointment, index) => (
+                            <tr key={index}>
+                              <th scope="row">
+                                <Media className="align-items-center">
+                                  <Media>
+                                    <span className="mb-0 text-sm">
+                                      {appointment.patient?.fName ||
+                                        "No Patient"}
+                                    </span>
+                                  </Media>
                                 </Media>
-                              </Media>
-                            </th>
-                            <td>$2,500 USD</td>
-                            <td>
-                              <Badge color="" className="badge-dot mr-4">
-                                <i className="bg-warning" />
-                                upcoming
-                              </Badge>
-                            </td>
-                            <td>23-12-2023</td>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <span className="mr-2">Follow-up</span>
-                              </div>
-                            </td>
-                          </tr>
+                              </th>
+                              <td>{appointment.price}</td>
+                              <td>
+                                <Badge color="" className="badge-dot mr-4">
+                                  <i className="bg-warning" />
+                                  {appointment.status}
+                                </Badge>
+                              </td>
+                              <td>{appointment.date}</td>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <span className="mr-2">
+                                    {appointment.type}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </Table>
                     </Card>
