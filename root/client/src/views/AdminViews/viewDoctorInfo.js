@@ -17,24 +17,22 @@ const DoctorInfo = () => {
   const [doctorUsername, setDoctorUsername] = useState("");
   const [educationalBackground, setEducationalBackground] = useState([]);
   const [unregisteredDoctors, setUnregisteredDoctors] = useState([]);
+  const [acceptedDoctors, setAcceptedDoctors] = useState([]);
   const { user } = useContext(UserContext);
 
   const showDocument = async (path) => {
     window.open(`http://localhost:4000/uploads/` + path);
   };
 
-  
-
   const fetchUnregisteredDoctors = async () => {
     try {
       const response = await axios.get(`/admins/viewUnregisteredDoctors/${user._id}`);
       setUnregisteredDoctors(response.data);
 
-      // Set the doctorUsername for the first doctor when component mounts
+      // Set the doctorUsername for the first doctor when the component mounts
       if (response.data.length > 0) {
         setDoctorUsername(response.data[0].username);
       }
-     
     } catch (error) {
       console.error("Error fetching unregistered doctors:", error);
     }
@@ -44,7 +42,27 @@ const DoctorInfo = () => {
     fetchUnregisteredDoctors();
   }, [user._id]);
 
- 
+  const handleAccept = async (username) => {
+    try {
+      await axios.patch(`/admins/setToRegistered/${user._id}?username=${username}`);
+      setAcceptedDoctors((prevAcceptedDoctors) => [...prevAcceptedDoctors, username]);
+      console.log(`Doctor ${username} accepted successfully`);
+    } catch (error) {
+      console.error("Error accepting doctor:", error);
+      // Handle error, show a message, etc.
+    }
+  };
+
+  const handleReject = async (username) => {
+    try {
+      await axios.delete(`/admins/deleteDoctor/${user._id}?username=${username}`);
+      console.log(`Doctor ${username} rejected and deleted successfully`);
+      fetchUnregisteredDoctors(); // Refresh the list after deletion
+    } catch (error) {
+      console.error("Error rejecting and deleting doctor:", error);
+      // Handle error, show a message, etc.
+    }
+  };
 
   return (
     <>
@@ -89,10 +107,12 @@ const DoctorInfo = () => {
                             <th scope="col">Hourly Rate</th>
                             <th scope="col">Affiliation</th>
                             <th scope="col">Specialty</th>
-                            <th scope="col">Registered</th>
                             <th scope="col">ID</th>
                             <th scope="col">Medical Licenses</th>
                             <th scope="col">Degree</th>
+                            <th scope="col">Currently accepted</th>
+                            <th scope="col">Accept</th>
+                            <th scope="col">Reject</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -108,10 +128,7 @@ const DoctorInfo = () => {
                               <td>{doctor.affiliation}</td>
                               <td>{doctor.specialty}</td>
                               <td>
-                                {"not registered"}
-                              </td>
-                              <td>
-                              <Button
+                                <Button
                                   className="mt-3"
                                   color="primary"
                                   onClick={() => showDocument(doctor.documentID)}
@@ -119,8 +136,8 @@ const DoctorInfo = () => {
                                 >
                                   View Document
                                 </Button>
-                                </td>
-                                <td>
+                              </td>
+                              <td>
                                 <Button
                                   className="mt-3"
                                   color="primary"
@@ -129,8 +146,8 @@ const DoctorInfo = () => {
                                 >
                                   View Document
                                 </Button>
-                                </td>
-                                <td>
+                              </td>
+                              <td>
                                 <Button
                                   className="mt-3"
                                   color="primary"
@@ -139,8 +156,30 @@ const DoctorInfo = () => {
                                 >
                                   View Document
                                 </Button>
-                                </td>
-                              
+                              </td>
+                              <td>
+                                {acceptedDoctors.includes(doctor.username) ? "Yes" : "No"}
+                              </td>
+                              <td>
+                                <Button
+                                  className="mt-3"
+                                  color="success"
+                                  onClick={() => handleAccept(doctor.username)}
+                                  size="sm"
+                                >
+                                  Accept
+                                </Button>
+                              </td>
+                              <td>
+                                <Button
+                                  className="mt-3"
+                                  color="danger"
+                                  onClick={() => handleReject(doctor.username)}
+                                  size="sm"
+                                >
+                                  Reject
+                                </Button>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
