@@ -4,6 +4,8 @@ import express from "express";
 import patientRoutes from "./routes/patientRoutes.js";
 import doctorRoutes from "./routes/doctorRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import multer from "multer";
+import path from "path";
 dotenv.config({ path: "./.env" });
 
 let uri = process.env.MONGODB_URI;
@@ -15,6 +17,7 @@ const app = express();
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static("./public"));
 
 app.use("/patients", patientRoutes);
 app.use("/doctors", doctorRoutes);

@@ -1,4 +1,6 @@
 import express from "express";
+import multer from "multer";
+import path from "path";
 import {
   createPatient,
   viewPrescription,
@@ -27,8 +29,26 @@ import {
   viewPastAppointments,
   getWalletAmount,
   viewAppointments,
+  uploadDocument,
+  getMedicalHistory,
+  removeDocument,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
+
+// multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./public/uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    ); //Appending extension
+  },
+});
+
+const upload = multer({ storage: storage });
 
 const router = express.Router();
 
@@ -54,6 +74,9 @@ router.patch(
   registerForAnAppointmentFamilyMember
 );
 router.get("/myWalletAmount/:id", getWalletAmount);
+router.post("/uploadDocument/:id", upload.single("file"), uploadDocument);
+router.get("/myMedicalHistory/:id", getMedicalHistory);
+router.patch("/removeDocument/:patientid/:documentid", removeDocument);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);

@@ -32,6 +32,7 @@ import SearchForDoctors from "views/PatientViews/searchForDoctors";
 import FilterPrescriptions from "views/PatientViews/filterPrescriptions";
 import Wallet from "views/PatientViews/wallet";
 import DoctorDetails from "views/PatientViews/doctorDetails";
+import MedicalHistory from "views/PatientViews/viewMedicalHistory";
 
 // doctor views
 import DoctorProfile from "views/DoctorViews/doctorProfile";
@@ -110,6 +111,13 @@ var routes = [
     component: <DoctorDetails />,
     layout: "/patient",
     excludeFromSidebar: true,
+  },
+  {
+    path: "/myMedicalHistory",
+    name: "My Medical History",
+    icon: "ni ni-money-coins",
+    component: <MedicalHistory />,
+    layout: "/patient",
   },
 
   //doctor routes

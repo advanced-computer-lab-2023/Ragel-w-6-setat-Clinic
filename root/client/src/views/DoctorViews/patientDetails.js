@@ -226,7 +226,9 @@ const PatientDetails = () => {
                       </Col>
                     </Row>
                   </div>
+                  <hr className="my-4" />
                 </Form>
+                {/* patient documents */}
               </CardBody>
             </Card>
           </Col>
