@@ -359,6 +359,54 @@ const filterAppointments = async (req, res) => {
   }
 };
 
+
+
+const uploadDocument = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    const patient = await Patient.findById(patientId);
+    patient.medicalHistory.push(req.file.filename);
+    await patient.save();
+    res.status(200).json({
+      status: "success",
+      message: "Document uploaded successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const getMedicalHistory = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    const patient = await Patient.findById(patientId);
+    res.status(200).json(patient.medicalHistory);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const removeDocument = async (req, res) => {
+  const patientId = req.params.patientid;
+  const documentId = req.params.documentid;
+  try {
+    const patient = await Patient.findById(patientId);
+
+    // Remove the document from the medicalHistory array
+    patient.medicalHistory = patient.medicalHistory.filter(
+      (document) => document !== documentId
+    );
+    await patient.save();
+
+    res.status(200).json({ message: "Document removed successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 export {
   addFamilyMember,
   viewPrescription,
@@ -369,5 +417,8 @@ export {
   getAllDoctors,
   viewPastAppointments,
   filterAppointments,
-  viewAppointments
+  viewAppointments,
+  uploadDocument,
+  removeDocument,
+  getMedicalHistory
 };

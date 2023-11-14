@@ -1,4 +1,6 @@
 import express from "express";
+import multer from "multer";
+import path from "path";
 import { addFamilyMember,
     viewPrescription,
     filterThePrescription,
@@ -6,9 +8,26 @@ import { addFamilyMember,
     selectPrescription,
     getHealthRecords,
     getAllDoctors,viewPastAppointments,
-    filterAppointments,viewAppointments
+    filterAppointments,viewAppointments, uploadDocument,
+    removeDocument,
+    getMedicalHistory
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
+
+//multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./public/uploads");
+    },
+    filename: (req, file, cb) => {
+      cb(
+        null,
+        file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+      ); //Appending extension
+    },
+  });
+  
+  const upload = multer({ storage: storage });
 
 const router = express.Router();
 
@@ -24,6 +43,10 @@ router.get("/getHealthRecords/:id", getHealthRecords);
 router.get("/getAllDoctors/:id", getAllDoctors);
 router.get("/filterAppointments/:id", filterAppointments);
 router.get("/viewAppointments/:id", viewAppointments);
+router.post("/uploadDocument/:id", upload.single("file"), uploadDocument);
+router.get("/myMedicalHistory/:id", getMedicalHistory);
+router.patch("/removeDocument/:patientid/:documentid", removeDocument);
+
 
 
 

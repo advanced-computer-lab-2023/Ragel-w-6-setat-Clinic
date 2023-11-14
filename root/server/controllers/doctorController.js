@@ -218,6 +218,7 @@ const viewUpcomingAppointments = async (req, res) => {
   };
 
 
+  
 
   
   const filterAppointments = async (req, res) => {
@@ -255,6 +256,43 @@ const viewUpcomingAppointments = async (req, res) => {
       });
     }
   };
+
+
+  const uploadDocument = async (req, res) => {
+    const doctorId = req.params.id;
+    try {
+      const doctor = await Doctor.findById(doctorId);
+      doctor.educationalBackground.push(req.file.filename);
+      await doctor.save();
+      res.status(200).json({
+        status: "success",
+        message: "Document uploaded successfully.",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Server error" });
+    }
+  };
+
+
+  const removeDocument = async (req, res) => {
+    const doctorId = req.params.patientid;
+    const documentId = req.params.documentid;
+    try {
+      const doctor = await Patient.findById(doctorId);
+  
+      // Remove the document from the medicalHistory array
+      doctor.educationalBackground = doctor.educationalBackground.filter(
+        (document) => document !== documentId
+      );
+      await doctor.save();
+  
+      res.status(200).json({ message: "Document removed successfully" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Server error" });
+    }
+  };
   
 export {
     viewUpcomingAppointments,
@@ -264,5 +302,7 @@ export {
     viewContract,
     acceptContract,
     viewPastAppointments,
+    uploadDocument,
+   removeDocument,
     viewAppointments
   };

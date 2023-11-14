@@ -31,6 +31,7 @@ import HealthPackages from "views/PatientViews/healthPackages";
 import SearchForDoctors from "views/PatientViews/searchForDoctors";
 import FilterPrescriptions from "views/PatientViews/filterPrescriptions";
 import Wallet from "views/PatientViews/wallet";
+import MedicalHistory from "views/PatientViews/viewMedicalHistory";
 
 // doctor views
 import DoctorProfile from "views/DoctorViews/doctorProfile";
@@ -42,6 +43,7 @@ import DoctorContracts from "views/DoctorViews/employmentContract";
 
 import AllUsers from "views/AdminViews/allUsers";
 import ManageHealthPackages from "views/AdminViews/healthPackagesManagement";
+import DoctorInfo from "views/AdminViews/viewDoctorInfo";
 
 var routes = [
   //patient routes
@@ -99,6 +101,13 @@ var routes = [
     name: "My Wallet",
     icon: "ni ni-money-coins",
     component: <Wallet />,
+    layout: "/patient",
+  },
+  {
+    path: "/myMedicalHistory",
+    name: "My Medical History",
+    icon: "ni ni-money-coins",
+    component: <MedicalHistory />,
     layout: "/patient",
   },
 
@@ -188,6 +197,13 @@ var routes = [
     name: "Health Packages Management",
     icon: "ni ni-box-2",
     component: <ManageHealthPackages />,
+    layout: "/admin",
+  },
+  {
+    path: "/viewDoctorInfo",
+    name: "Doctor Information",
+    icon: "ni ni-circle-08 text-pink",
+    component: <DoctorInfo />,
     layout: "/admin",
   },
 

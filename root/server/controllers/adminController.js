@@ -86,7 +86,7 @@ const deleteDoctor = async (req, res) => {
 // View all the doctors that are not registered (only requets)
 const viewUnregisteredDoctors = async (req, res) => {
   try {
-    const doctorId = req.params.id;
+    const adminId = req.params.id;
     const doctors = await Doctor.find({
       isRegistered: false,
     });
@@ -100,10 +100,25 @@ const viewUnregisteredDoctors = async (req, res) => {
   }
 };
 
+const getEducationalBackground = async (req, res) => {
+  const adminId = req.params.id;
+  const doctorUsername = req.query.username;
+  try {
+    const doctor = await Doctor.findOne({ username: doctorUsername });
+    
+    // Assuming doctor.educationalBackground is an array of file paths
+    res.status(200).json(doctor.educationalBackground);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 
 export {
   deleteAdmin,
   deletePatient,
   deleteDoctor,
-  viewUnregisteredDoctors
+  viewUnregisteredDoctors,
+  getEducationalBackground
 };

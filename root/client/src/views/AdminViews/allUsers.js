@@ -1,5 +1,6 @@
 // reactstrap components
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useContext, useEffect } from "react";
 import ReactDatetime from "react-datetime";
 import {
   Button,
@@ -21,9 +22,123 @@ import {
 } from "reactstrap";
 // core components
 
+import { UserContext } from "../../contexts/UserContext";
+
 const AllUsers = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggle = () => setDropdownOpen((prevState) => !prevState);
+
+  const [patientUsers, setPatientUsers] = useState([]);
+  const [adminUsers, setAdminUsers] = useState([]);
+  const [doctorUsers, setDoctortUsers] = useState([]);
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { user } = useContext(UserContext);
+
+  useEffect(() => {
+    const fetchPatientUsers = async () => {
+      try {
+        const response = await fetch(`/admins/allPatients/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setPatientUsers(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    fetchPatientUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchAdminUsers = async () => {
+      try {
+        const response = await fetch(`/admins/allAdmins/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setAdminUsers(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    fetchAdminUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchDoctorUsers = async () => {
+      try {
+        const response = await fetch(`/admins/allDoctors/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setDoctortUsers(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    fetchDoctorUsers();
+  }, []);
+
+  const addAdmin = async () => {
+    try {
+      const response = await axios.post(`/admins/addAdmin/${user._id}`, {
+        username: username,
+        password: password,
+      });
+      alert(response.data.message);
+      setPassword("");
+      setUsername("");
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(error.response.data.message);
+      alert("Please make sure to fill in the blanks");
+    }
+  };
+
+  const removeAdmin = async (userName) => {
+    try {
+      const response = await axios.delete(
+        `/admins/deleteAdmin/${user._id}/${userName}`
+      );
+      alert(response.data.message);
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(error.response.data.message);
+      alert(error.response.data.message);
+    }
+  };
+
+  const removePatient = async (userName) => {
+    try {
+      const response = await axios.delete(
+        `/admins/deletePatient/${user._id}/${userName}`
+      );
+      alert(response.data.message);
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(error.response.data.message);
+      alert(error.response.data.message);
+    }
+  };
+
+  const removeDoctor = async (userName) => {
+    try {
+      const response = await axios.delete(
+        `/admins/deleteDoctor/${user._id}/${userName}`
+      );
+      alert(response.data.message);
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(error.response.data.message);
+      alert(error.response.data.message);
+    }
+  };
 
   return (
     <>
@@ -52,6 +167,10 @@ const AllUsers = () => {
                           <Input
                             className="form-control-alternative"
                             type="text"
+                            value={username}
+                            onChange={(e) => {
+                              setUsername(e.target.value);
+                            }}
                           />
                         </FormGroup>
                       </Col>
@@ -62,7 +181,11 @@ const AllUsers = () => {
                           <label className="form-control-label">Password</label>
                           <Input
                             className="form-control-alternative"
-                            type="text"
+                            type="password"
+                            value={password}
+                            onChange={(e) => {
+                              setPassword(e.target.value);
+                            }}
                           />
                         </FormGroup>
                       </Col>
@@ -72,7 +195,7 @@ const AllUsers = () => {
                         <Button
                           color="primary"
                           href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={addAdmin}
                           size="sm"
                         >
                           Add Admin
@@ -101,28 +224,81 @@ const AllUsers = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <th scope="row">
-                              <Media className="align-items-center">
-                                <Media>
-                                  <span className="mb-0 text-sm">
-                                    shahdamer
-                                  </span>
+                          {/* Map over patientUsers */}
+                          {patientUsers.map((user) => (
+                            <tr key={user._id}>
+                              <th scope="row">
+                                <Media className="align-items-center">
+                                  <Media>
+                                    <span className="mb-0 text-sm">
+                                      {user.username}
+                                    </span>
+                                  </Media>
                                 </Media>
-                              </Media>
-                            </th>
-                            <td>patient</td>
-                            <td>
-                              <Button
-                                color="primary"
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                                size="sm"
-                              >
-                                Remove User
-                              </Button>
-                            </td>
-                          </tr>
+                              </th>
+                              <td>patient</td>
+                              <td>
+                                <Button
+                                  color="primary"
+                                  href="#pablo"
+                                  onClick={() => removePatient(user.username)}
+                                  size="sm"
+                                >
+                                  Remove User
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                          {/* Map over adminUsers */}
+                          {adminUsers.map((user) => (
+                            <tr key={user._id}>
+                              <th scope="row">
+                                <Media className="align-items-center">
+                                  <Media>
+                                    <span className="mb-0 text-sm">
+                                      {user.username}
+                                    </span>
+                                  </Media>
+                                </Media>
+                              </th>
+                              <td>admin</td>
+                              <td>
+                                <Button
+                                  color="primary"
+                                  href="#pablo"
+                                  onClick={() => removeAdmin(user.username)}
+                                  size="sm"
+                                >
+                                  Remove User
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                          {/* Map over doctorUsers */}
+                          {doctorUsers.map((user) => (
+                            <tr key={user._id}>
+                              <th scope="row">
+                                <Media className="align-items-center">
+                                  <Media>
+                                    <span className="mb-0 text-sm">
+                                      {user.username}
+                                    </span>
+                                  </Media>
+                                </Media>
+                              </th>
+                              <td>doctor</td>
+                              <td>
+                                <Button
+                                  color="primary"
+                                  href="#pablo"
+                                  size="sm"
+                                  onClick={() => removeDoctor(user.username)}
+                                >
+                                  Remove User
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </Table>
                     </Card>
