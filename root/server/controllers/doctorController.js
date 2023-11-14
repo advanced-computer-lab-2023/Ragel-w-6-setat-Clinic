@@ -110,6 +110,35 @@ const getWalletAmount = async (req, res) => {
   }
 };
 
+const uploadDocumentForPatient = async (req, res) => {
+  const doctorId = req.params.doctorid;
+  const patientId = req.params.patientid;
+  try {
+    const patient = await Patient.findById(patientId);
+    patient.medicalHistory.push(req.file.filename);
+    await patient.save();
+    res.status(200).json({
+      status: "success",
+      message: "Document uploaded successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const getMedicalHistoryForPatient = async (req, res) => {
+  const doctorId = req.params.doctorid;
+  const patientId = req.params.patientid;
+  try {
+    const patient = await Patient.findById(patientId);
+    res.status(200).json(patient.medicalHistory);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 // MARIAMS REQS
 
 const searchForPatient = async (req, res) => {
@@ -377,4 +406,6 @@ export {
   viewUpcomingAppointments,
   viewPastAppointments,
   addAvailableAppointments,
+  uploadDocumentForPatient,
+  getMedicalHistoryForPatient,
 };
