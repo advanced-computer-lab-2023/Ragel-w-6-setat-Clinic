@@ -3,7 +3,10 @@ import Prescription from "../models/Prescription.js";
 import Doctor from "../models/Doctor.js";
 import Appointments from "../models/Appointments.js";
 import Package from "../models/Package.js";
+import stripe from "stripe";
 
+// Set your Stripe secret key
+const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
 // HABIBAS REQS
 
 const getAllPatients = async (req, res) => {
@@ -283,6 +286,105 @@ const removeDocument = async (req, res) => {
   }
 };
 
+// Process payment
+const processCreditCardPayment = async (res, items) => {
+  try {
+    const forAppointments = items[0].forAppointments;
+    stripeInstance._api.auth =
+      "Bearer sk_test_51OAZpWFzdF5dnLz8738y3YYDrj7WJHFDHzeufGEePpK4jOIOyG67Bv1bPOQZw1CBXbVGb53GWjXMDAPWi4iqhrfL00TmkTdtf6";
+    const session = await stripeInstance.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: items.map((item) => ({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.name, // Adjust this based on your item data
+          },
+          unit_amount: Math.round(item.price * 100), // Stripe requires amount in cents
+        },
+        quantity: 1,
+      })),
+      mode: "payment",
+      success_url: forAppointments
+        ? `${process.env.CLIENT_URL}/patient/filterAppointments`
+        : `${process.env.CLIENT_URL}/patient/mySubscribedPackage`,
+      cancel_url: forAppointments
+        ? `${process.env.CLIENT_URL}/patient/filterAppointments`
+        : `${process.env.CLIENT_URL}/patient/healthPackagesOptions`,
+    });
+
+    res.json({ url: session.url });
+  } catch (error) {
+    console.error("Stripe payment error:", error);
+    res.status(400).json({
+      error:
+        "Credit card payment failed. Please check your card details and try again.",
+      details: error.message,
+    });
+  }
+};
+
+const processPayment = async (req, res) => {
+  const { id } = req.params;
+  const { paymentType, item, paymentMethodId } = req.body.paymentData;
+  try {
+    const patient = await Patient.findById(id);
+
+    if (req.body.paymentData.familyMemberEmail) {
+      const familyPatient = await Patient.findOne({
+        email: req.body.paymentData.familyMemberEmail,
+      });
+
+      if (!familyPatient) {
+        return res
+          .status(404)
+          .json({ message: "Family member as patient not found" });
+      }
+
+      // Check if the family member is linked to patient
+      const linkedFamilyMember = patient.familyMembers.find(
+        (member) => member.email === familyPatient.email
+      );
+
+      if (!linkedFamilyMember) {
+        return res
+          .status(400)
+          .json({ message: "Family member is not linked to this patient" });
+      }
+
+      if (familyPatient.subscribedPackage) {
+        return res.status(500).json({
+          message: "Family Member is already subscribed to a health package",
+        });
+      }
+    }
+    switch (paymentType) {
+      case "wallet":
+        if (patient.wallet >= item.price) {
+          patient.wallet -= item.price;
+          await patient.save();
+          res
+            .status(200)
+            .json({ message: "Payment with wallet balance successful" });
+        } else {
+          res.status(400).json({
+            message:
+              "Insufficient funds in wallet. Please add funds or choose a different payment method.",
+          });
+        }
+        break;
+      case "creditCard":
+        await processCreditCardPayment(res, item);
+        break;
+      default:
+        res.status(400).json({ message: "Invalid payment type" });
+    }
+  } catch (error) {
+    console.error("Process payment error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 // LOJAINS REQS
 
 const addFamilyMember = async (req, res) => {
@@ -321,7 +423,6 @@ const addFamilyMember = async (req, res) => {
       message: "Family Member added successfully!",
     });
   } catch (err) {
-    console.log(err.message);
     res.status(500).json({
       status: "error",
       message: "Make sure all fields are filled",
@@ -1015,4 +1116,5 @@ export {
   uploadDocument,
   getMedicalHistory,
   removeDocument,
+  processPayment,
 };

@@ -54,13 +54,93 @@ const HealthPackages = () => {
     fetchHealthPackages();
   }, [healthPackages]);
 
-  const subscribeToPackage = async (packageId) => {
+  const subscribeToPackageCreditCard = async (packageId) => {
     try {
-      const response = await axios.patch(
+      // extracting relevant information
+      const selectedPackage = healthPackages.find(
+        (packageInfo) => packageInfo._id === packageId
+      );
+      const { name, price } = selectedPackage;
+
+      const items = [
+        {
+          name: name,
+          price: price,
+          quantity: 1,
+          forAppointments: false,
+        },
+      ];
+
+      const paymentData = {
+        paymentType: "creditCard",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        forAppointments: false,
+      };
+      const response2 = await axios.patch(
         `/patients/subscribeHealthPackage/${user._id}/${packageId}`
       );
-      // If the subscription was successful, you may want to update the UI or take additional actions.
-      console.log("Subscription successful:", response.data.message);
+      console.log("Subscription successful:", response2.data.message);
+
+      const response = await axios.post(
+        `/patients/processPayment/${user._id}`,
+        {
+          paymentData,
+        }
+      );
+      if (response.data) {
+        window.location.href = response.data.url;
+      } else {
+        const error = await response.json();
+        console.log(error);
+        alert("Error processing payment: " + error.message);
+      }
+
+      // alert("Subscription successful: " + response.data.message);
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(
+        "Error subscribing to the package:",
+        error.response.data.message
+      );
+      alert("Error subscribing to the package: " + error.response.data.message);
+    }
+  };
+
+  const subscribeToPackageWallet = async (packageId) => {
+    try {
+      // extracting relevant information
+      const selectedPackage = healthPackages.find(
+        (packageInfo) => packageInfo._id === packageId
+      );
+      const { name, price } = selectedPackage;
+
+      const items = {
+        name: name,
+        price: price,
+        quantity: 1,
+        forAppointments: false,
+      };
+
+      const paymentData = {
+        paymentType: "wallet",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        forAppointments: false,
+      };
+
+      const response = await axios.post(
+        `/patients/processPayment/${user._id}`,
+        {
+          paymentData,
+        }
+      );
+
+      const response2 = await axios.patch(
+        `/patients/subscribeHealthPackage/${user._id}/${packageId}`
+      );
+      console.log("Subscription successful:", response2.data.message);
+
       alert("Subscription successful: " + response.data.message);
     } catch (error) {
       // If there was an error in the subscription process, you can handle it accordingly.
@@ -72,16 +152,44 @@ const HealthPackages = () => {
     }
   };
 
-  const subscribeToFamilyMember = async (packageId, index) => {
+  const subscribeToFamilyMemberWallet = async (packageId, index) => {
     try {
-      const response = await axios.patch(
+      // extracting relevant information
+      const selectedPackage = healthPackages.find(
+        (packageInfo) => packageInfo._id === packageId
+      );
+      const { name, price } = selectedPackage;
+
+      const items = {
+        name: name,
+        price: price,
+        quantity: 1,
+        forAppointments: false,
+      };
+
+      const paymentData = {
+        paymentType: "wallet",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        familyMemberEmail: familyMemberEmails[index],
+        forAppointments: false,
+      };
+
+      const response = await axios.post(
+        `/patients/processPayment/${user._id}`,
+        {
+          paymentData,
+        }
+      );
+
+      const response2 = await axios.patch(
         `/patients/subscribeHealthPackageForFamilyMember/${user._id}/${packageId}`,
         {
           email: familyMemberEmails[index],
         }
       );
-      // If the subscription was successful, you may want to update the UI or take additional actions.
-      console.log("Subscription successful:", response.data.message);
+      console.log("Subscription successful:", response2.data.message);
+
       alert("Subscription successful: " + response.data.message);
     } catch (error) {
       // If there was an error in the subscription process, you can handle it accordingly.
@@ -93,9 +201,71 @@ const HealthPackages = () => {
     }
   };
 
-  const handleSubscribeFamilyMember = (packageId, index) => {
+  const subscribeToFamilyMemberCreditCard = async (packageId, index) => {
+    try {
+      // extracting relevant information
+      const selectedPackage = healthPackages.find(
+        (packageInfo) => packageInfo._id === packageId
+      );
+      const { name, price } = selectedPackage;
+
+      const items = [
+        {
+          name: name,
+          price: price,
+          quantity: 1,
+          forAppointments: false,
+        },
+      ];
+
+      const paymentData = {
+        paymentType: "creditCard",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        familyMemberEmail: familyMemberEmails[index],
+        forAppointments: false,
+      };
+      const response2 = await axios.patch(
+        `/patients/subscribeHealthPackageForFamilyMember/${user._id}/${packageId}`,
+        {
+          email: familyMemberEmails[index],
+        }
+      );
+      console.log("Subscription successful:", response2.data.message);
+      const response = await axios.post(
+        `/patients/processPayment/${user._id}`,
+        {
+          paymentData,
+        }
+      );
+      if (response.data) {
+        window.location.href = response.data.url;
+      } else {
+        const error = await response.json();
+        console.log(error);
+        alert("Error processing payment: " + error.message);
+      }
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(
+        "Error subscribing to the package:",
+        error.response.data.message
+      );
+      alert("Error subscribing to the package: " + error.response.data.message);
+    }
+  };
+
+  const handleSubscribeFamilyMemberCreditCard = (packageId, index) => {
     if (familyMemberEmails[index]) {
-      subscribeToFamilyMember(packageId, index);
+      subscribeToFamilyMemberCreditCard(packageId, index);
+    } else {
+      alert("Please provide the family member's email.");
+    }
+  };
+
+  const handleSubscribeFamilyMemberWallet = (packageId, index) => {
+    if (familyMemberEmails[index]) {
+      subscribeToFamilyMemberWallet(packageId, index);
     } else {
       alert("Please provide the family member's email.");
     }
@@ -143,10 +313,19 @@ const HealthPackages = () => {
                   family members in any package`}
                   </CardText>
                   <Button
-                    onClick={() => subscribeToPackage(packageInfo._id)}
+                    onClick={() => subscribeToPackageWallet(packageInfo._id)}
                     style={{ backgroundColor: "#F8F6F4" }}
                   >
-                    Subscribe
+                    Subscribe With Wallet
+                  </Button>
+                  <Button
+                    className="mt-2"
+                    onClick={() =>
+                      subscribeToPackageCreditCard(packageInfo._id)
+                    }
+                    style={{ backgroundColor: "#F8F6F4" }}
+                  >
+                    Subscribe With Credit Card
                   </Button>
                   <Card
                     style={{ marginTop: "20px", backgroundColor: "#F8F6F4" }}
@@ -169,17 +348,37 @@ const HealthPackages = () => {
                         />
                         <Button
                           style={{
-                            marginTop: "10px",
+                            marginTop: "5px",
                             backgroundColor: "#435585",
                           }}
                           color="primary"
                           href="#pablo"
                           onClick={() =>
-                            handleSubscribeFamilyMember(packageInfo._id, index)
+                            handleSubscribeFamilyMemberWallet(
+                              packageInfo._id,
+                              index
+                            )
                           }
                           size="sm"
                         >
-                          Subscribe
+                          Subscribe With Wallet
+                        </Button>
+                        <Button
+                          style={{
+                            marginTop: "5px",
+                            backgroundColor: "#435585",
+                          }}
+                          color="primary"
+                          href="#pablo"
+                          onClick={() =>
+                            handleSubscribeFamilyMemberCreditCard(
+                              packageInfo._id,
+                              index
+                            )
+                          }
+                          size="sm"
+                        >
+                          Subscribe With Credit Card
                         </Button>
                       </FormGroup>
                     </CardBody>

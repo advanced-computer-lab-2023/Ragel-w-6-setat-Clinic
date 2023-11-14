@@ -57,7 +57,7 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/mySubscribedPackage/",
+    path: "/mySubscribedPackage",
     name: "Subscribed Package",
     icon: "ni ni-basket",
     component: <SubscribedPackage />,

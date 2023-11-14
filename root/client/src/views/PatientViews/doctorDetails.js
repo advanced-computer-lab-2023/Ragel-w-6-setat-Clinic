@@ -107,12 +107,129 @@ const DoctorDetails = () => {
     fetchAvailableAppointments();
   }, []);
 
-  const scheduleAppointmentMyself = async (appointmentId) => {
+  const scheduleAppointmentMyselfCreditCard = async (appointmentId) => {
     try {
-      const response = await axios.patch(
+      // extracting relevant information
+
+      const { username, sessionPrice } = doctorDetails;
+
+      const items = [
+        {
+          name: username,
+          price: sessionPrice,
+          quantity: 1,
+          forAppointments: true,
+        },
+      ];
+
+      const paymentData = {
+        paymentType: "creditCard",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        forAppointments: true,
+      };
+
+      const response2 = await axios.patch(
         `/patients/registerForAnAppointmentPatient/${user._id}/${appointmentId}`
       );
-      alert("Scheduling Appointment successful: " + response.data.message);
+      // alert("Scheduling Appointment successful: " + response2.data.message);
+
+      const response = await axios.post(
+        `/patients/processPayment/${user._id}`,
+        {
+          paymentData,
+        }
+      );
+      if (response.data) {
+        window.location.href = response.data.url;
+      } else {
+        const error = await response.json();
+        console.log(error);
+        alert("Error processing payment: " + error.message);
+      }
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(
+        "Error subscribing to the package:",
+        error.response.data.message
+      );
+      alert("Error Scheduling Appointment: " + error.response.data.message);
+    }
+  };
+
+  const scheduleAppointmentWallet = async (appointmentId) => {
+    try {
+      // extracting relevant information
+
+      const { username, sessionPrice } = doctorDetails;
+
+      const items = {
+        name: username,
+        price: sessionPrice,
+        quantity: 1,
+        forAppointments: true,
+      };
+
+      const paymentData = {
+        paymentType: "wallet",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        forAppointments: true,
+      };
+
+      const response = await axios.post(
+        `/patients/processPayment/${user._id}`,
+        {
+          paymentData,
+        }
+      );
+      const response2 = await axios.patch(
+        `/patients/registerForAnAppointmentPatient/${user._id}/${appointmentId}`
+      );
+      alert("Scheduling Appointment successful: " + response2.data.message);
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(
+        "Error subscribing to the package:",
+        error.response.data.message
+      );
+      alert("Error Scheduling Appointment: " + error.response.data.message);
+    }
+  };
+
+  const scheduleAppointmentFamilyWallet = async (appointmentId) => {
+    try {
+      const { username, sessionPrice } = doctorDetails;
+      const items = {
+        name: username,
+        price: sessionPrice,
+        quantity: 1,
+        forAppointments: true,
+      };
+
+      const paymentData = {
+        paymentType: "wallet",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        familyMemberEmail: familyEmail,
+        forAppointments: true,
+      };
+
+      const response = await axios.post(
+        `/patients/processPayment/${user._id}`,
+        {
+          paymentData,
+        }
+      );
+      const response2 = await axios.patch(
+        `/patients/registerForAnAppointmentFamilyMember/${user._id}/${appointmentId}`,
+        {
+          familymemberEmail: familyEmail,
+        }
+      );
+
+      console.log("Subscription successful:", response2.data.message);
+      alert("Subscription successful: " + response.data.message);
     } catch (error) {
       // If there was an error in the subscription process, you can handle it accordingly.
 
@@ -120,19 +237,52 @@ const DoctorDetails = () => {
     }
   };
 
-  const scheduleAppointmentFamily = async (appointmentId) => {
+  const scheduleAppointmentFamilyCreditCard = async (appointmentId) => {
     try {
-      const response = await axios.patch(
+      const { username, sessionPrice } = doctorDetails;
+      const items = [
+        {
+          name: username,
+          price: sessionPrice,
+          quantity: 1,
+          forAppointments: true,
+        },
+      ];
+
+      const paymentData = {
+        paymentType: "creditCard",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        familyMemberEmail: familyEmail,
+        forAppointments: true,
+      };
+      const response2 = await axios.patch(
         `/patients/registerForAnAppointmentFamilyMember/${user._id}/${appointmentId}`,
         {
           familymemberEmail: familyEmail,
         }
       );
-      alert("Scheduling Appointment successful: " + response.data.message);
+      console.log("Subscription successful:", response2.data.message);
+      const response = await axios.post(
+        `/patients/processPayment/${user._id}`,
+        {
+          paymentData,
+        }
+      );
+      if (response.data) {
+        window.location.href = response.data.url;
+      } else {
+        const error = await response.json();
+        console.log(error);
+        alert("Error processing payment: " + error.message);
+      }
     } catch (error) {
       // If there was an error in the subscription process, you can handle it accordingly.
-
-      alert("Error Scheduling Appointment: " + error.response.data.message);
+      console.error(
+        "Error subscribing to the package:",
+        error.response.data.message
+      );
+      alert("Error subscribing to the package: " + error.response.data.message);
     }
   };
 
@@ -334,10 +484,23 @@ const DoctorDetails = () => {
                                   color="primary"
                                   size="sm"
                                   onClick={() =>
-                                    scheduleAppointmentMyself(appointment._id)
+                                    scheduleAppointmentWallet(appointment._id)
                                   }
                                 >
-                                  Schedule For Me
+                                  Schedule With Wallet
+                                </Button>
+                              </td>
+                              <td>
+                                <Button
+                                  color="primary"
+                                  size="sm"
+                                  onClick={() =>
+                                    scheduleAppointmentMyselfCreditCard(
+                                      appointment._id
+                                    )
+                                  }
+                                >
+                                  Schedule With Credit Card
                                 </Button>
                               </td>
                               <td>
@@ -375,12 +538,22 @@ const DoctorDetails = () => {
                                     <Button
                                       color="primary"
                                       onClick={() =>
-                                        scheduleAppointmentFamily(
+                                        scheduleAppointmentFamilyWallet(
                                           appointment._id
                                         )
                                       }
                                     >
-                                      Schedule
+                                      Pay With Wallet
+                                    </Button>
+                                    <Button
+                                      color="primary"
+                                      onClick={() =>
+                                        scheduleAppointmentFamilyCreditCard(
+                                          appointment._id
+                                        )
+                                      }
+                                    >
+                                      Pay With Credit Card
                                     </Button>
                                     <Button
                                       color="secondary"

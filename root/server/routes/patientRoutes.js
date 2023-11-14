@@ -32,6 +32,7 @@ import {
   uploadDocument,
   getMedicalHistory,
   removeDocument,
+  processPayment,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -77,6 +78,8 @@ router.get("/myWalletAmount/:id", getWalletAmount);
 router.post("/uploadDocument/:id", upload.single("file"), uploadDocument);
 router.get("/myMedicalHistory/:id", getMedicalHistory);
 router.patch("/removeDocument/:patientid/:documentid", removeDocument);
+// Pay with wallet/credit card
+router.post("/processPayment/:id", processPayment);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);
