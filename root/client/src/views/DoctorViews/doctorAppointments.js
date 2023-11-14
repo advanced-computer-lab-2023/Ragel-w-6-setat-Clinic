@@ -112,12 +112,15 @@ const DoctorAppointments = () => {
         `/doctors/filterAppointments/${user._id}?status=${statusFilter}&date=${fromDate}`
       );
       const json = await response.json();
+      console.log("BOSI HNA BTA3 FILTER " + json.appointments);
 
       if (response.ok) {
         if (selectedOption === "upcoming") {
           setupcomingAppointments(json.appointments);
         } else if (selectedOption === "past") {
           setpastAppointments(json.appointments);
+        } else if (selectedOption === "all") {
+          setallAppointments(json.appointments);
         }
       } else {
         console.error("Error fetching data:", response.statusText);
@@ -375,7 +378,7 @@ const DoctorAppointments = () => {
                                     <Media className="align-items-center">
                                       <Media>
                                       <span className="mb-0 text-sm">
-  {appointment.patient?.fName || 'No Doctor'}
+  {appointment.patient?.fName || 'No Patient'}
 </span>
                                       </Media>
                                     </Media>
@@ -406,7 +409,7 @@ const DoctorAppointments = () => {
                                       <Media className="align-items-center">
                                         <Media>
                                         <span className="mb-0 text-sm">
-  {appointment.patient?.fName || 'No Doctor'}
+  {appointment.patient?.fName || 'No Patient'}
 </span>
                                         </Media>
                                       </Media>
@@ -437,7 +440,7 @@ const DoctorAppointments = () => {
                                       <Media className="align-items-center">
                                         <Media>
                                         <span className="mb-0 text-sm">
-    {appointment.patient?.fName || 'No Doctor'}
+    {appointment.patient?.fName || 'No Patient'}
   </span>
                                         </Media>
                                       </Media>

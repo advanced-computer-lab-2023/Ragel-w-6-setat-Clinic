@@ -39,9 +39,8 @@ const FilterAppointments = () => {
     try {
       const response = await fetch(`/patients/viewAppointments/${user._id}`);
       const json = await response.json();
-  
+
       if (response.ok) {
-        console.log(json.appointments);
         setallAppointments(json.appointments);
       } else {
         console.error("Error fetching data:", response.statusText);
@@ -50,54 +49,11 @@ const FilterAppointments = () => {
       console.error("An error occurred:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchAllAppointments();
-  }, [user._id, selectedOption]);
-  
-  useEffect(() => {
-    const fetchAppointmentDetailsUp = async () => {
-      try {
-        const response = await fetch(
-          `/patients/viewUpcomingAppointments/${user._id}`
-        );
-        const json = await response.json();
+  }, [user._id]);
 
-        if (response.ok) {
-          setupcomingAppointments(json.appointments);
-        } else {
-          console.error("Error fetching data:", response.statusText);
-        }
-      } catch (error) {
-        console.error("An error occurred:", error);
-      }
-    };
-
-    const fetchAppointmentDetailsPast = async () => {
-      try {
-        const response = await fetch(
-          `/patients/viewPastAppointments/${user._id}`
-        );
-        const json = await response.json();
-
-        if (response.ok) {
-          setpastAppointments(json.appointments);
-        } else {
-          console.error("Error fetching data:", response.statusText);
-        }
-      } catch (error) {
-        console.error("An error occurred:", error);
-      }
-    };
-
-    if (selectedOption === "all") {
-      fetchAllAppointments();
-    } else if (selectedOption === "upcoming") {
-      fetchAppointmentDetailsUp();
-    } else if (selectedOption === "past") {
-      fetchAppointmentDetailsPast();
-    }
-  }, [user._id, selectedOption]);
   const handleFilterAppointments = async () => {
     try {
       const response = await fetch(
@@ -110,6 +66,8 @@ const FilterAppointments = () => {
           setupcomingAppointments(json.appointments);
         } else if (selectedOption === "past") {
           setpastAppointments(json.appointments);
+        } else if (selectedOption === "all") {
+          setallAppointments(json.appointments);
         }
       } else {
         console.error("Error fetching data:", response.statusText);
@@ -118,6 +76,38 @@ const FilterAppointments = () => {
       console.error("An error occurred:", error);
     }
   };
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (selectedOption === "upcoming") {
+          const response = await fetch(`/patients/viewUpcomingAppointments/${user._id}`);
+          const json = await response.json();
+
+          if (response.ok) {
+            setupcomingAppointments(json.appointments);
+          } else {
+            console.error("Error fetching data:", response.statusText);
+          }
+        } else if (selectedOption === "past") {
+          const response = await fetch(`/patients/viewPastAppointments/${user._id}`);
+          const json = await response.json();
+
+          if (response.ok) {
+            setpastAppointments(json.appointments);
+          } else {
+            console.error("Error fetching data:", response.statusText);
+          }
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    fetchData();
+  }, [user._id, selectedOption]);
+
+  
 
   return (
     <>
