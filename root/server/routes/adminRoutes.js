@@ -8,7 +8,7 @@ import {
     deleteDoctor,
     deletePatient,
     viewUnregisteredDoctors,
-    getEducationalBackground
+    getEducationalBackground,setToRegistered
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -16,8 +16,9 @@ const router = express.Router();
 
 router.delete("/deleteAdmin/:id", deleteAdmin);
 router.delete("/deletePatient/:id", deletePatient);
-router.delete("/deleteDoctor", deleteDoctor);
+router.delete("/deleteDoctor/:id", deleteDoctor);
 router.get("/viewUnregisteredDoctors/:id", viewUnregisteredDoctors);
 router.get("/getEducationalBackground/:id", getEducationalBackground);
+router.patch("/setToRegistered/:id", setToRegistered);
 
 export default router;

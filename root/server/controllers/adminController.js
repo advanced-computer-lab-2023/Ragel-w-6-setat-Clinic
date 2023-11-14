@@ -57,7 +57,7 @@ const deleteDoctor = async (req, res) => {
   try {
     const adminId = req.params.id;
     const filter = {
-      username: req.body.username,
+      username: req.query.username,
     };
     const deleteDoctorResult = await Doctor.deleteMany(filter);
     const deleteRelatedAppointments = await Appointment.deleteMany({
@@ -115,10 +115,45 @@ const getEducationalBackground = async (req, res) => {
 };
 
 
+const setToRegistered = async (req, res) => {
+  try {
+
+    const adminId = req.params.id;
+    const doctorUsername = req.query.username; // Extract doctor ID from request params
+
+    // Find the contract by doctor ID and update the isApproved field to true
+    const updatedDoctor = await Doctor.findOneAndUpdate(
+      { username: doctorUsername },
+      { isRegistered: true },
+      { new: true } // Return the updated contract
+    );
+
+    if (!updatedDoctor) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Doctor not found for the specified username",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Doctor registered successfully",
+      contract: updatedDoctor,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+
 export {
   deleteAdmin,
   deletePatient,
   deleteDoctor,
   viewUnregisteredDoctors,
-  getEducationalBackground
+  getEducationalBackground,
+  setToRegistered
 };
