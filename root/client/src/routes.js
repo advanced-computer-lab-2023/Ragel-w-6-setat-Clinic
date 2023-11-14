@@ -18,7 +18,8 @@
 import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Maps from "views/examples/Maps.js";
-import Register from "views/examples/Register.js";
+import RegisterDoctor from "views/examples/RegisterDoctor.js";
+import RegisterPatient from "views/examples/RegisterPatient.js";
 import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
@@ -198,10 +199,17 @@ var routes = [
     layout: "/auth",
   },
   {
-    path: "/register",
+    path: "/registerDoctor",
     name: "Register",
     icon: "ni ni-circle-08 text-pink",
-    component: <Register />,
+    component: <RegisterDoctor />,
+    layout: "/auth",
+  },
+  {
+    path: "/registerPatient",
+    name: "Register",
+    icon: "ni ni-circle-08 text-pink",
+    component: <RegisterPatient />,
     layout: "/auth",
   },
 ];
