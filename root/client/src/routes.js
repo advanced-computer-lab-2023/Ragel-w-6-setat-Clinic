@@ -46,6 +46,7 @@ import PatientDetails from "views/DoctorViews/patientDetails";
 
 import AllUsers from "views/AdminViews/allUsers";
 import ManageHealthPackages from "views/AdminViews/healthPackagesManagement";
+import UnregisteredDoctors from "views/AdminViews/unregisteredDoctorsInfo";
 
 var routes = [
   //patient routes
@@ -187,6 +188,13 @@ var routes = [
     name: "Health Packages Management",
     icon: "ni ni-box-2",
     component: <ManageHealthPackages />,
+    layout: "/admin",
+  },
+  {
+    path: "/unregisteredDoctorsInfo",
+    name: "Unregistered Doctors",
+    icon: "ni ni-circle-08 text-pink",
+    component: <UnregisteredDoctors />,
     layout: "/admin",
   },
 
