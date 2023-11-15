@@ -62,6 +62,7 @@ const Patient = (props) => {
 
   return (
     <>
+      <AdminNavbar />
       <Sidebar
         {...props}
         routes={routes.filter(

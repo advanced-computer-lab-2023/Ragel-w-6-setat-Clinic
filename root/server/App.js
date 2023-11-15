@@ -4,6 +4,7 @@ import express from "express";
 import patientRoutes from "./routes/patientRoutes.js";
 import doctorRoutes from "./routes/doctorRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import { login } from "./controllers/userController.js";
 import multer from "multer";
 import path from "path";
 dotenv.config({ path: "./.env" });
@@ -19,9 +20,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("./public"));
 
+// routes
 app.use("/patients", patientRoutes);
 app.use("/doctors", doctorRoutes);
 app.use("/admins", adminRoutes);
+app.post("/login", login);
 
 // connect to mongodb & listen for requests
 

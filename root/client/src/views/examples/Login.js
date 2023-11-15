@@ -17,6 +17,10 @@
 */
 
 // reactstrap components
+
+import { useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Button,
   Card,
@@ -30,9 +34,61 @@ import {
   InputGroup,
   Row,
   Col,
+  Alert,
 } from "reactstrap";
 
+import { UserContext } from "contexts/UserContext";
+
 const Login = () => {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState(null);
+  const { user, setUser } = useContext(UserContext);
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Login successful, redirect or perform actions as needed
+        console.log("Login successful", data);
+        setMessage({ type: "success", text: "Login successful" });
+        setUser({ _id: data.user._id.toString() });
+        switch (data.userType) {
+          case "doctor":
+            navigate("/doctor");
+            break;
+          case "patient":
+            navigate("/patient");
+            break;
+          case "admin":
+            navigate("/admin");
+            break;
+          default:
+            // Default redirection or handle unknown user type
+            navigate("/default/dashboard");
+        }
+      } else {
+        // Login failed, handle errors
+        console.error("Login failed", data);
+        setMessage({
+          type: "danger",
+          text: "Login failed. Invalid credentials",
+        });
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      setMessage({ type: "danger", text: "Internal server error" });
+    }
+  };
   return (
     <>
       <Col lg="5" md="7">
@@ -41,6 +97,12 @@ const Login = () => {
             <div className="text-center text-muted mb-4">
               <small>Sign in with credentials</small>
             </div>
+            {/* Display messages */}
+            {message && (
+              <Alert color={message.type} className="text-center">
+                {message.text}
+              </Alert>
+            )}
             <Form role="form">
               <FormGroup className="mb-3">
                 <InputGroup className="input-group-alternative">
@@ -52,7 +114,8 @@ const Login = () => {
                   <Input
                     placeholder="Username"
                     type="text"
-                    // autoComplete="new-email"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                   />
                 </InputGroup>
               </FormGroup>
@@ -66,7 +129,8 @@ const Login = () => {
                   <Input
                     placeholder="Password"
                     type="password"
-                    autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </InputGroup>
               </FormGroup>
@@ -84,7 +148,12 @@ const Login = () => {
                 </label>
               </div>
               <div className="text-center">
-                <Button className="my-4" color="primary" type="button">
+                <Button
+                  className="my-4"
+                  color="primary"
+                  type="button"
+                  onClick={handleLogin}
+                >
                   Sign in
                 </Button>
               </div>
@@ -99,15 +168,6 @@ const Login = () => {
               onClick={(e) => e.preventDefault()}
             >
               <small>Forgot password?</small>
-            </a>
-          </Col>
-          <Col className="text-right" xs="6">
-            <a
-              className="text-light"
-              href="#pablo"
-              onClick={(e) => e.preventDefault()}
-            >
-              <small>Create new account</small>
             </a>
           </Col>
         </Row>
