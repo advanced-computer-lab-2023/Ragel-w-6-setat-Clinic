@@ -16,6 +16,7 @@
 
 */
 import { useState } from "react";
+import axios from "axios";
 // reactstrap components
 import {
   Button,
@@ -30,6 +31,7 @@ import {
   InputGroup,
   Row,
   Col,
+  Label,
 } from "reactstrap";
 
 const RegisterDoctor = () => {
@@ -40,6 +42,93 @@ const RegisterDoctor = () => {
       "https://napr.memberclicks.net/assets/docs/OldSite/PhysicianHospitalContract3.pdf"
     );
   };
+
+  const [doctorFields, setDoctorFields] = useState({
+    username: "",
+    fName: "",
+    lName: "",
+    email: "",
+    dateOfBirth: "",
+    sessionPrice: "",
+    specialty: "",
+    affiliation: "",
+    hourlyRate: "",
+    educationalBackground: "",
+    password: "",
+  });
+
+  const [fileID, setFileID] = useState();
+  const [fileMedicalDegree, setFileMedicalDegree] = useState();
+  const [fileMedicalLicense, setFileMedicalLicense] = useState();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setDoctorFields((prevFields) => ({
+      ...prevFields,
+      [name]: value,
+    }));
+  };
+
+  const handleDoctorReister = async () => {
+    try {
+      // Validate all fields
+      for (const key in doctorFields) {
+        if (!doctorFields[key]) {
+          alert(`Please complete all the form`);
+          return;
+        }
+      }
+      if (!fileID) {
+        alert(`Please complete all the form`);
+        return;
+      }
+      if (!fileMedicalDegree) {
+        alert(`Please complete all the form`);
+        return;
+      }
+      if (!fileMedicalLicense) {
+        alert(`Please complete all the form`);
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(doctorFields.email)) {
+        alert("Please enter a valid email address");
+        return;
+      }
+      if (!agree) {
+        alert(
+          "Please view the employment contract and accept to be able to register in the system"
+        );
+        return;
+      }
+      const formData = new FormData();
+      formData.append("fileID", fileID);
+      formData.append("fileMedicalLicense", fileMedicalLicense);
+      formData.append("fileMedicalDegree", fileMedicalDegree);
+
+      const requestData = {
+        doctorFields: { ...doctorFields },
+      };
+
+      formData.append("requestData", JSON.stringify(requestData));
+
+      const response = await axios.post("/doctors/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(response.data);
+      window.location.href = "`http://localhost:3000/auth/login`";
+      alert(response.data.message);
+    } catch (error) {
+      // Handle errors
+      console.error("Error registering doctor:", error);
+      alert(error.response.data.message);
+    }
+  };
+
   return (
     <>
       <Col lg="6" md="8">
@@ -49,8 +138,6 @@ const RegisterDoctor = () => {
               <small>Sign up with credentials</small>
             </div>
             <Form role="form">
-              {/* complete the form in the same style with username, educational Background, specialty, aaffiliation, and hourly rate, session price, and date of birth fields */}
-
               <Row>
                 <Col md="6">
                   <FormGroup>
@@ -60,7 +147,13 @@ const RegisterDoctor = () => {
                           <i className="ni ni-single-02" />
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input placeholder="Username" type="text" />
+                      <Input
+                        placeholder="Username"
+                        type="text"
+                        name="username"
+                        value={doctorFields.username}
+                        onChange={handleChange}
+                      />
                     </InputGroup>
                   </FormGroup>
                 </Col>
@@ -72,7 +165,13 @@ const RegisterDoctor = () => {
                           <i className="ni ni-single-02" />
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input placeholder="First Name" type="text" />
+                      <Input
+                        placeholder="First Name"
+                        type="text"
+                        name="fName"
+                        value={doctorFields.fName}
+                        onChange={handleChange}
+                      />
                     </InputGroup>
                   </FormGroup>
                 </Col>{" "}
@@ -88,7 +187,13 @@ const RegisterDoctor = () => {
                           <i className="ni ni-single-02" />
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input placeholder="Last Name" type="text" />
+                      <Input
+                        placeholder="Last Name"
+                        type="text"
+                        name="lName"
+                        value={doctorFields.lName}
+                        onChange={handleChange}
+                      />
                     </InputGroup>
                   </FormGroup>
                 </Col>
@@ -103,7 +208,9 @@ const RegisterDoctor = () => {
                       <Input
                         placeholder="Email"
                         type="email"
-                        autoComplete="new-email"
+                        name="email"
+                        value={doctorFields.email}
+                        onChange={handleChange}
                       />
                     </InputGroup>
                   </FormGroup>
@@ -112,16 +219,18 @@ const RegisterDoctor = () => {
               <Row>
                 <Col md="6">
                   <FormGroup>
-                    <InputGroup className="input-group-alternative">
+                    <InputGroup className="input-group-alternative mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="ni ni-mobile-button" />
+                          <i className="ni ni-single-02" />
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input
-                        placeholder="Mobile Number"
-                        type="text"
-                        autoComplete="new-mobile-number"
+                        placeholder="Hourly Rate EGP"
+                        type="number"
+                        name="hourlyRate"
+                        value={doctorFields.hourlyRate}
+                        onChange={handleChange}
                       />
                     </InputGroup>
                   </FormGroup>
@@ -134,7 +243,13 @@ const RegisterDoctor = () => {
                           <i className="ni ni-single-02" />
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input placeholder="Date of Birth" type="date" />
+                      <Input
+                        placeholder="Date of Birth"
+                        type="date"
+                        name="dateOfBirth"
+                        value={doctorFields.dateOfBirth}
+                        onChange={handleChange}
+                      />
                     </InputGroup>
                   </FormGroup>
                 </Col>
@@ -148,7 +263,13 @@ const RegisterDoctor = () => {
                           <i className="ni ni-single-02" />
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input placeholder="Session Price" type="number" />
+                      <Input
+                        placeholder="Session Price"
+                        type="number"
+                        name="sessionPrice"
+                        value={doctorFields.sessionPrice}
+                        onChange={handleChange}
+                      />
                     </InputGroup>
                   </FormGroup>
                 </Col>
@@ -160,7 +281,13 @@ const RegisterDoctor = () => {
                           <i className="ni ni-single-02" />
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input placeholder="Specialty" type="text" />
+                      <Input
+                        placeholder="Specialty"
+                        type="text"
+                        name="specialty"
+                        value={doctorFields.specialty}
+                        onChange={handleChange}
+                      />
                     </InputGroup>
                   </FormGroup>
                 </Col>
@@ -175,19 +302,13 @@ const RegisterDoctor = () => {
                           <i className="ni ni-single-02" />
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input placeholder="Affiliation" type="text" />
-                    </InputGroup>
-                  </FormGroup>
-                </Col>
-                <Col md="6">
-                  <FormGroup>
-                    <InputGroup className="input-group-alternative mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-single-02" />
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input placeholder="Hourly Rate EGP" type="number" />
+                      <Input
+                        placeholder="Affiliation"
+                        type="text"
+                        name="affiliation"
+                        value={doctorFields.affiliation}
+                        onChange={handleChange}
+                      />
                     </InputGroup>
                   </FormGroup>
                 </Col>
@@ -201,7 +322,13 @@ const RegisterDoctor = () => {
                           <i className="ni ni-hat-3" />
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input placeholder="Educational Background" type="text" />
+                      <Input
+                        placeholder="Educational Background"
+                        type="text"
+                        name="educationalBackground"
+                        value={doctorFields.educationalBackground}
+                        onChange={handleChange}
+                      />
                     </InputGroup>
                   </FormGroup>
                 </Col>
@@ -218,7 +345,9 @@ const RegisterDoctor = () => {
                       <Input
                         placeholder="Password"
                         type="password"
-                        autoComplete="new-password"
+                        name="password"
+                        value={doctorFields.password}
+                        onChange={handleChange}
                       />
                     </InputGroup>
                   </FormGroup>
@@ -235,16 +364,12 @@ const RegisterDoctor = () => {
                 <Col md="12">
                   <small>Upload Personal ID</small>
                   <div class="input-group mb-3">
-                    <label
-                      class="input-group-text mr-1"
-                      for="inputGroupFile01"
-                      // onClick={handleUpload}
-                    >
+                    <label class="input-group-text mr-1" for="inputGroupFile01">
                       Upload
                     </label>
                     <input
                       type="file"
-                      // onChange={(e) => setFile(e.target.files[0])}
+                      onChange={(e) => setFileID(e.target.files[0])}
                       class="form-control"
                     />
                   </div>
@@ -254,16 +379,12 @@ const RegisterDoctor = () => {
                 <Col md="12">
                   <small>Upload Meidcal License</small>
                   <div class="input-group mb-3">
-                    <label
-                      class="input-group-text mr-1"
-                      for="inputGroupFile01"
-                      // onClick={handleUpload}
-                    >
+                    <label class="input-group-text mr-1" for="inputGroupFile01">
                       Upload
                     </label>
                     <input
                       type="file"
-                      // onChange={(e) => setFile(e.target.files[0])}
+                      onChange={(e) => setFileMedicalLicense(e.target.files[0])}
                       class="form-control"
                     />
                   </div>
@@ -273,16 +394,12 @@ const RegisterDoctor = () => {
                 <Col md="12">
                   <small>Upload Medical Degree</small>
                   <div class="input-group mb-3">
-                    <label
-                      class="input-group-text mr-1"
-                      for="inputGroupFile01"
-                      // onClick={handleUpload}
-                    >
+                    <label class="input-group-text mr-1" for="inputGroupFile01">
                       Upload
                     </label>
                     <input
                       type="file"
-                      // onChange={(e) => setFile(e.target.files[0])}
+                      onChange={(e) => setFileMedicalDegree(e.target.files[0])}
                       class="form-control"
                     />
                   </div>
@@ -299,22 +416,19 @@ const RegisterDoctor = () => {
                           id="customCheckRegister"
                           type="checkbox"
                         />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customCheckRegister"
-                        >
-                          <span className="text-muted">
-                            I agree with the{" "}
-                            <a
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setAgree(!agree);
-                              }}
-                            >
-                              Employment Contract
-                            </a>
-                          </span>
-                        </label>{" "}
+                        <FormGroup check>
+                          <Input
+                            type="checkbox"
+                            onClick={(e) => {
+                              setAgree(!agree);
+                            }}
+                          />{" "}
+                          <Label check>
+                            <span className="text-muted">
+                              I agree with the Employment Contract
+                            </span>
+                          </Label>
+                        </FormGroup>
                       </Col>
                       <Col xs="6">
                         <Button
@@ -331,7 +445,12 @@ const RegisterDoctor = () => {
                 </Col>
               </Row>
               <div className="text-center">
-                <Button className="mt-4" color="primary" type="button">
+                <Button
+                  className="mt-4"
+                  color="primary"
+                  type="button"
+                  onClick={handleDoctorReister}
+                >
                   Create account
                 </Button>
               </div>

@@ -4,6 +4,52 @@ import Appointments from "../models/Appointments.js";
 
 // HABIBAS REQS
 
+const registerDoctor = async (req, res) => {
+  try {
+    const {
+      username,
+      password,
+      email,
+      fName,
+      lName,
+      dateOfBirth,
+      educationalBackground,
+      hourlyRate,
+      sessionPrice,
+      affiliation,
+      specialty,
+    } = JSON.parse(req.body.requestData).doctorFields;
+    // Access file buffers from req.files
+    const documentID = req.files.fileID[0].filename;
+    const medicalLicense = req.files.fileMedicalLicense[0].filename;
+    const medicalDegree = req.files.fileMedicalDegree[0].filename;
+
+    const newDoctor = new Doctor({
+      username,
+      password,
+      email,
+      fName,
+      lName,
+      dateOfBirth,
+      educationalBackground,
+      hourlyRate,
+      sessionPrice,
+      affiliation,
+      specialty,
+      documentID,
+      medicalLicense,
+      medicalDegree,
+    });
+
+    await newDoctor.save();
+
+    res.status(201).json({ message: "Doctor registered successfully" });
+  } catch (error) {
+    console.error("Doctor registration error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 const getAllDoctors = async (req, res) => {
   async (req, res) => {
     try {
@@ -408,4 +454,5 @@ export {
   addAvailableAppointments,
   uploadDocumentForPatient,
   getMedicalHistoryForPatient,
+  registerDoctor,
 };

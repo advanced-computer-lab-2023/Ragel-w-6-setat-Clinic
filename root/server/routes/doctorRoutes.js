@@ -19,6 +19,7 @@ import {
   addAvailableAppointments,
   uploadDocumentForPatient,
   getMedicalHistoryForPatient,
+  registerDoctor,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 // multer
@@ -41,6 +42,15 @@ const router = express.Router();
 // HABIBAS ROUTES
 
 router.post("/registeration", createDoctor);
+router.post(
+  "/register",
+  upload.fields([
+    { name: "fileID", maxCount: 1 },
+    { name: "fileMedicalLicense", maxCount: 1 },
+    { name: "fileMedicalDegree", maxCount: 1 },
+  ]),
+  registerDoctor
+);
 router.patch("/updateProfile/:id", updateDoctorProfile);
 router.get("/allDoctors", getAllDoctors);
 router.get("/doctorProfile/:id", doctorDetails);
