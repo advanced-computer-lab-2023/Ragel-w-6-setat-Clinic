@@ -69,7 +69,7 @@ const RegisterDoctor = () => {
     }));
   };
 
-  const handleDoctorReister = async () => {
+  const handleDoctorRegister = async () => {
     try {
       // Validate all fields
       for (const key in doctorFields) {
@@ -449,7 +449,7 @@ const RegisterDoctor = () => {
                   className="mt-4"
                   color="primary"
                   type="button"
-                  onClick={handleDoctorReister}
+                  onClick={handleDoctorRegister}
                 >
                   Create account
                 </Button>

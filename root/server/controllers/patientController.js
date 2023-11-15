@@ -70,21 +70,12 @@ async function doctorDisplay(patientID, doctor) {
   return doctorToDisplay;
 }
 
-const createPatient = async (req, res) => {
+const registerPatient = async (req, res) => {
   try {
     const patient = await Patient.create({
-      username: req.body.username,
-      password: req.body.password,
-      fName: req.body.fName,
-      lName: req.body.lName,
-      email: req.body.email,
-      dateOfBirth: req.body.dateOfBirth,
-      gender: req.body.gender,
-      phoneNum: req.body.phoneNum,
+      ...req.body.patientFields,
       emergencyContact: {
-        phoneNum: req.body.emergencyMobile,
-        fName: req.body.emergencyFName,
-        lName: req.body.emergencyLName,
+        ...req.body.emergencyContact,
       },
     });
     res.status(201).json({
@@ -109,7 +100,9 @@ const getAllPackages = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 // sprint 2
+
 const cancelHealthPackageSubscription = async (req, res) => {
   const patientId = req.params.patientid;
   try {
@@ -1086,7 +1079,7 @@ const subscribeHealthPackageForFamilyMember = async (req, res) => {
 };
 
 export {
-  createPatient,
+  registerPatient,
   viewPrescription,
   getAllPatients,
   addFamilyMember,

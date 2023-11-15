@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import {
-  createPatient,
+  registerPatient,
   viewPrescription,
   getAllPatients,
   addFamilyMember,
@@ -55,7 +55,7 @@ const router = express.Router();
 
 // HABIBAS ROUTES
 
-router.post("/registeration", createPatient);
+router.post("/register", registerPatient);
 router.get("/allPatients", getAllPatients);
 router.get("/allHealthPackages/:id", getAllPackages);
 router.patch(
