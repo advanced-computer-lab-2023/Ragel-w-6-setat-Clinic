@@ -225,19 +225,21 @@ const HealthPackages = () => {
         familyMemberEmail: familyMemberEmails[index],
         forAppointments: false,
       };
-      const response2 = await axios.patch(
-        `/patients/subscribeHealthPackageForFamilyMember/${user._id}/${packageId}`,
-        {
-          email: familyMemberEmails[index],
-        }
-      );
-      console.log("Subscription successful:", response2.data.message);
+
       const response = await axios.post(
         `/patients/processPayment/${user._id}`,
         {
           paymentData,
         }
       );
+      const response2 = await axios.patch(
+        `/patients/subscribeHealthPackageForFamilyMember/${user._id}/${packageId}`,
+        {
+          email: familyMemberEmails[index],
+        }
+      );
+
+      console.log("Subscription successful:", response2.data.message);
       if (response.data) {
         window.location.href = response.data.url;
       } else {

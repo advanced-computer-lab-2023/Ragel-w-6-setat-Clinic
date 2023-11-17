@@ -345,7 +345,10 @@ const processPayment = async (req, res) => {
           .json({ message: "Family member is not linked to this patient" });
       }
 
-      if (familyPatient.subscribedPackage) {
+      if (
+        familyPatient.subscribedPackage &&
+        !req.body.paymentData.forAppointments
+      ) {
         return res.status(500).json({
           message: "Family Member is already subscribed to a health package",
         });
@@ -416,6 +419,7 @@ const addFamilyMember = async (req, res) => {
       message: "Family Member added successfully!",
     });
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({
       status: "error",
       message: "Make sure all fields are filled",

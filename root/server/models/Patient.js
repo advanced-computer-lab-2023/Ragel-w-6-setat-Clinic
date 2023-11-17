@@ -16,7 +16,6 @@ const familyMemberSchema = new Schema({
   },
   nationalID: {
     type: String,
-    unique: true,
     required: true,
   },
   gender: {

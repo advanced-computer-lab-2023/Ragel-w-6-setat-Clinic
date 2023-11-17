@@ -256,17 +256,20 @@ const DoctorDetails = () => {
         familyMemberEmail: familyEmail,
         forAppointments: true,
       };
-      const response2 = await axios.patch(
-        `/patients/registerForAnAppointmentFamilyMember/${user._id}/${appointmentId}`,
-        {
-          familymemberEmail: familyEmail,
-        }
-      );
-      console.log("Subscription successful:", response2.data.message);
+
       const response = await axios.post(
         `/patients/processPayment/${user._id}`,
         {
           paymentData,
+        }
+      );
+
+      console.log("hereee");
+
+      const response2 = await axios.patch(
+        `/patients/registerForAnAppointmentFamilyMember/${user._id}/${appointmentId}`,
+        {
+          familymemberEmail: familyEmail,
         }
       );
       if (response.data) {
@@ -282,7 +285,9 @@ const DoctorDetails = () => {
         "Error subscribing to the package:",
         error.response.data.message
       );
-      alert("Error subscribing to the package: " + error.response.data.message);
+      alert(
+        "Error registering for an appointment: " + error.response.data.message
+      );
     }
   };
 
