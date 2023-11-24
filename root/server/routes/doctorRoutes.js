@@ -20,7 +20,11 @@ import {
   uploadDocumentForPatient,
   getMedicalHistoryForPatient,
   registerDoctor,
-  getDoctorNotifications,getAppNotifications
+  getDoctorNotifications,
+  getAppNotifications,
+  createPrescription,
+  updatePrescription,
+  downloadPrescriptionPDF
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 // multer
@@ -84,9 +88,12 @@ router.get("/viewMyPatients/:id", getMyPatients);
 router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
 router.get("/viewPastAppointments/:id", viewPastAppointments);
 router.post("/addAvailableAppointments/:id", addAvailableAppointments);
+router.get("/downloadPrescriptionPDF/:id", downloadPrescriptionPDF);
 
 //sprint 3
 router.get("/getDoctorNotifications/:id", getDoctorNotifications);
 router.get("/getAppNotifications/:id", getAppNotifications);
+router.post("/createPrescription/:id", createPrescription);
+router.patch("/updatePrescription/:id", updatePrescription);
 
 export default router;

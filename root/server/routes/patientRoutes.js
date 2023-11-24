@@ -34,7 +34,8 @@ import {
   removeDocument,
   processPayment,
   getPatientNotifications,
-  getAppNotifications
+  getAppNotifications,
+  downloadPrescriptionPDF
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -100,6 +101,7 @@ router.get("/viewAppointments/:id", viewAppointments);
 // sprint 3
 router.get("/getPatientNotifications/:id", getPatientNotifications);
 router.get("/getAppNotifications/:id", getAppNotifications);
+router.get("/downloadPrescriptionPDF/:id", downloadPrescriptionPDF);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);

@@ -1,8 +1,11 @@
 import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
 import Appointments from "../models/Appointments.js";
+import Prescription from "../models/Prescription.js";
 import Notification from '../models/Notifications.js'; 
 import nodemailer from 'nodemailer'; // Import Nodemailer sprint 3
+import PDFDocument from 'pdfkit';
+import fs from 'fs';
 
 // HABIBAS REQS
 
@@ -555,6 +558,108 @@ const formatNotifications = (notifications) => {
   return notifications.map((notification) => `${notification.title}: ${notification.message}`).join('\n');
 };
 
+
+const createPrescription = async (req, res) => {
+  try {
+    const { patientId, medication, dosage, notes } = req.body;
+    const doctorId = req.params.id;  // Assuming you have a user object in the request with the doctor's ID
+
+    // Check if the patient and doctor exist
+    const patient = await Patient.findById(patientId);
+    const doctor = await Doctor.findById(doctorId);
+
+    if (!patient || !doctor) {
+      return res.status(404).json({ message: 'Patient or Doctor not found' });
+    }
+
+    // Create a new prescription
+    const prescription = new Prescription({
+      patient: patientId,
+      doctor: doctorId,
+      medication,
+      dosage,
+      date: new Date(),
+      notes,
+    });
+
+    // Save the prescription
+    await prescription.save();
+
+    res.status(201).json({ status: 'success', prescription });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const updatePrescription = async (req, res) => {
+  try {
+    const  prescriptionId  = req.params.id;
+    const { medication, dosage, notes, isFilled } = req.body;
+
+    // Check if the prescription exists
+    const prescription = await Prescription.findById(prescriptionId);
+
+    if (!prescription) {
+      return res.status(404).json({ message: 'Prescription not found' });
+    }
+
+    // Update prescription fields
+    prescription.medication = medication || prescription.medication;
+    prescription.dosage = dosage || prescription.dosage;
+    prescription.notes = notes || prescription.notes;
+    prescription.isFilled = isFilled !== undefined ? isFilled : prescription.isFilled;
+
+    // Save the updated prescription
+    const updatedPrescription = await prescription.save();
+
+    res.status(200).json({ status: 'success', prescription: updatedPrescription });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const downloadPrescriptionPDF = async (req, res) => {
+  try {
+    const  prescriptionId  = req.params.id;
+
+    // Check if the prescription exists
+    const prescription = await Prescription.findById(prescriptionId);
+
+    if (!prescription) {
+      return res.status(404).json({ message: 'Prescription not found' });
+    }
+
+    // Create a new PDF document
+    const doc = new PDFDocument();
+
+    // Set response headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=Prescription_${prescriptionId}.pdf`);
+
+    // Pipe the PDF to the response stream
+    doc.pipe(res);
+
+    // Add prescription data to the PDF
+    doc.fontSize(12).text(`Medication: ${prescription.medication}`);
+    doc.fontSize(12).text(`Dosage: ${prescription.dosage}`);
+    doc.fontSize(12).text(`Notes: ${prescription.notes}`);
+    doc.fontSize(12).text(`Date: ${prescription.date}`);
+    doc.fontSize(12).text(`Is Filled: ${prescription.isFilled ? 'Yes' : 'No'}`);
+
+    // End the PDF creation
+    doc.end();
+
+    // You can save the PDF to a file if needed
+    // doc.pipe(fs.createWriteStream(`Prescription_${prescriptionId}.pdf`));
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 export {
   createDoctor,
   updateDoctorProfile,
@@ -575,5 +680,8 @@ export {
   getMedicalHistoryForPatient,
   registerDoctor,
   getDoctorNotifications,
-  getAppNotifications
+  getAppNotifications,
+  createPrescription,
+  updatePrescription,
+  downloadPrescriptionPDF
 };

@@ -7,6 +7,8 @@ import Notification from '../models/Notifications.js';
 import stripe from "stripe";
 import nodemailer from 'nodemailer'; // Import Nodemailer sprint 3
 import Appointment from "../models/Appointments.js";
+import PDFDocument from 'pdfkit';
+import fs from 'fs';
 
 // Set your Stripe secret key
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
@@ -687,7 +689,45 @@ const formatNotifications = (notifications) => {
   return notifications.map((notification) => `${notification.title}: ${notification.message}`).join('\n');
 };
 
+const downloadPrescriptionPDF = async (req, res) => {
+  try {
+    const  prescriptionId  = req.params.id;
 
+    // Check if the prescription exists
+    const prescription = await Prescription.findById(prescriptionId);
+
+    if (!prescription) {
+      return res.status(404).json({ message: 'Prescription not found' });
+    }
+
+    // Create a new PDF document
+    const doc = new PDFDocument();
+
+    // Set response headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=Prescription_${prescriptionId}.pdf`);
+
+    // Pipe the PDF to the response stream
+    doc.pipe(res);
+
+    // Add prescription data to the PDF
+    doc.fontSize(12).text(`Medication: ${prescription.medication}`);
+    doc.fontSize(12).text(`Dosage: ${prescription.dosage}`);
+    doc.fontSize(12).text(`Notes: ${prescription.notes}`);
+    doc.fontSize(12).text(`Date: ${prescription.date}`);
+    doc.fontSize(12).text(`Is Filled: ${prescription.isFilled ? 'Yes' : 'No'}`);
+
+    // End the PDF creation
+    doc.end();
+
+    // You can save the PDF to a file if needed
+    // doc.pipe(fs.createWriteStream(`Prescription_${prescriptionId}.pdf`));
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 
 
@@ -1251,5 +1291,6 @@ export {
   removeDocument,
   processPayment,
   getPatientNotifications,
-  getAppNotifications
+  getAppNotifications,
+  downloadPrescriptionPDF
 };
