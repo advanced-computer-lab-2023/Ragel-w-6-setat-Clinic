@@ -1,6 +1,61 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
+const familyMemberSchema = new Schema({
+  email: {
+    type: String,
+    unique: true,
+  },
+  fName: {
+    type: String,
+    required: true,
+  },
+  lName: {
+    type: String,
+    required: true,
+  },
+  nationalID: {
+    type: String,
+    required: true,
+  },
+  gender: {
+    type: String,
+    required: true,
+    enum: ["male", "female"],
+  },
+  dateOfBirth: {
+    type: Date,
+    required: true,
+  },
+  relationship: {
+    type: String,
+    required: true,
+  },
+});
+
+const subscribedPackageSchema = new Schema({
+  packageId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Package",
+  },
+  packageName: {
+    type: String,
+    required: true,
+  },
+  subscriptionStatus: {
+    type: String,
+    enum: ["subscribed", "unsubscribed", "cancelled"],
+  },
+  renewalDate: {
+    type: Date,
+    required: false,
+  },
+  cancellationDate: {
+    type: Date,
+    required: false,
+  },
+});
+
 const patientSchema = new Schema({
   username: {
     type: String,
@@ -23,6 +78,11 @@ const patientSchema = new Schema({
   lName: {
     type: String,
     required: true,
+  },
+  nationalID: {
+    type: String,
+    required: true,
+    unique: true,
   },
   dateOfBirth: {
     type: Date,
@@ -52,42 +112,7 @@ const patientSchema = new Schema({
     },
   },
   familyMembers: {
-    type: [
-      {
-        email: {
-          type: String,
-          required: false,
-          unique: true,
-        },
-        fName: {
-          type: String,
-          required: false,
-        },
-        lName: {
-          type: String,
-          required: false,
-        },
-        nationalID: {
-          type: String,
-          required: false,
-          unique: true,
-        },
-        gender: {
-          type: String,
-          required: false,
-          enum: ["male", "female"],
-        },
-        dateOfBirth: {
-          type: Date,
-          required: false,
-        },
-        relationship: {
-          type: String,
-          required: false,
-          enum: ["father", "mother", "brother", "sister", "son", "daughter","wife","husband"],
-        },
-      },
-    ],
+    type: [familyMemberSchema],
     default: [],
   },
   medicalHistory: {
@@ -97,6 +122,9 @@ const patientSchema = new Schema({
   wallet: {
     type: Number,
     default: 0,
+  },
+  subscribedPackage: {
+    type: subscribedPackageSchema,
   },
 });
 

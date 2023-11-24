@@ -4,11 +4,11 @@ export const UserContext = createContext();
 
 const UserContextProvider = (props) => {
   const [user, setUser] = useState({
-    _id: "65496709ad8c85e54e348c51",
+    _id: "6554f917ea98034d26193495",
   });
 
   return (
-    <UserContext.Provider value={{ user }}>
+    <UserContext.Provider value={{ user, setUser }}>
       {props.children}
     </UserContext.Provider>
   );

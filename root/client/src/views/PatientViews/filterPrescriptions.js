@@ -37,16 +37,12 @@ const FilterPrescriptions = () => {
   useEffect(() => {
     const fetchDoctorOptions = async () => {
       try {
-        const response = await fetch(`/patients/getAllDoctors/${user._id}`);
+        const response = await fetch(`/patients/viewDoctors/${user._id}`);
         const json = await response.json();
-
-        console.log("Doctor Options Response:", json);  // ana ba debug
 
         if (response.ok) {
           // Assuming the response includes an array of doctors
           setDoctorOptions(json.doctors);
-        } else {
-          console.error("Error fetching doctor options:", response.statusText);
         }
       } catch (error) {
         console.error("An error occurred:", error);
@@ -54,7 +50,7 @@ const FilterPrescriptions = () => {
     };
 
     fetchDoctorOptions();
-  }, [user._id]);
+  }, []);
 
   useEffect(() => {
     const fetchPrescriptionDetails = async () => {
@@ -74,7 +70,7 @@ const FilterPrescriptions = () => {
     };
 
     fetchPrescriptionDetails();
-  }, [user._id]);
+  }, []);
 
   const handleFilterPrescriptions = async () => {
     try {
@@ -85,9 +81,10 @@ const FilterPrescriptions = () => {
 
       if (response.ok) {
         setPrescriptionDetails(json.prescriptions);
-      } else {
-        console.error("Error fetching data:", response);
       }
+      setSelectedDoctor("");
+      setSelectedDate("");
+      setSelectedFilledStatus("");
     } catch (error) {
       console.error("An error occurred:", error);
     }
@@ -129,14 +126,15 @@ const FilterPrescriptions = () => {
                           <label className="form-control-label">Doctor:</label>
                           <br />
                           <select
-id="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ownDoctor"
+                            id="dropdown"
                             className="form-control-alternative"
+                            value={selectedDoctor}
                             onChange={(e) => setSelectedDoctor(e.target.value)}
                           >
                             <option value="">All</option>
                             {doctorOptions.map((doctor, index) => (
-                              <option key={index} value={doctor.username}>
-                                {doctor.username}
+                              <option key={index} value={doctor._id}>
+                                {doctor.name}
                               </option>
                             ))}
                           </select>
@@ -155,13 +153,13 @@ id="                                                                            
                               </InputGroupText>
                             </InputGroupAddon>
                             <ReactDatetime
+                              key={selectedDate}
                               inputProps={{
                                 placeholder: "Date",
                               }}
                               timeFormat={false}
-                              onChange={(date) =>
-                                setSelectedDate(date.format("YYYY-MM-DD"))
-                              }
+                              value={selectedDate}
+                              onChange={(date) => setSelectedDate(date)}
                             />
                           </InputGroup>
                         </FormGroup>
@@ -177,6 +175,7 @@ id="                                                                            
                           <select
                             id="dropdownFilledStatus"
                             className="form-control-alternative"
+                            value={selectedFilledStatus}
                             onChange={(e) =>
                               setSelectedFilledStatus(e.target.value)
                             }

@@ -17,6 +17,8 @@
 */
 
 // reactstrap components
+import axios from "axios";
+import { useContext, useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -31,7 +33,81 @@ import {
 } from "reactstrap";
 // core components
 
+import { UserContext } from "contexts/UserContext";
+
 const DoctorProfile = () => {
+  const { user } = useContext(UserContext);
+
+  const [doctorDetails, setDoctorDetails] = useState({
+    username: "",
+    email: "",
+    fName: "",
+    lName: "",
+    educationalBackground: "",
+    hourlyRate: "",
+    affiliation: "",
+    specialty: "",
+  });
+
+  const [editMode, setEditMode] = useState(false);
+  const [editedValues, setEditedValues] = useState({
+    affiliation: "",
+    hourlyRate: "",
+    email: "",
+  });
+
+  useEffect(() => {
+    const fetchDoctorDetails = async () => {
+      try {
+        const response = await fetch(`/doctors/doctorProfile/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setDoctorDetails(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+
+    fetchDoctorDetails();
+  }, [user._id]);
+
+  const handleEditProfile = () => {
+    setEditMode(true);
+    setEditedValues({
+      affiliation: doctorDetails.affiliation,
+      hourlyRate: doctorDetails.hourlyRate,
+      email: doctorDetails.email,
+    });
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      await axios.patch(`/doctors/updateProfile/${user._id}`, editedValues);
+      setEditMode(false);
+      setDoctorDetails((prevDetails) => ({
+        ...prevDetails,
+        affiliation: editedValues.affiliation,
+        hourlyRate: editedValues.hourlyRate,
+        email: editedValues.email,
+      }));
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(false);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
   return (
     <>
       <div
@@ -46,15 +122,35 @@ const DoctorProfile = () => {
         <Container className="d-flex align-items-center" fluid>
           <Row>
             <Col lg="7" md="10">
-              <h1 className="display-2 text-white">Hello Jesse!</h1>
-
-              <Button
-                color="primary"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                Edit profile
-              </Button>
+              <h1 className="display-2 text-white">
+                {doctorDetails ? `Hello Dr. ${doctorDetails.fName}!` : ""}
+              </h1>
+              {editMode ? (
+                <>
+                  <Button
+                    color="primary"
+                    onClick={handleSaveChanges}
+                    className="ml-2"
+                  >
+                    Done
+                  </Button>
+                  <Button
+                    color="secondary"
+                    onClick={handleCancelEdit}
+                    className="ml-2 mt-2"
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  color="primary"
+                  onClick={handleEditProfile}
+                  className="ml-2"
+                >
+                  Edit Profile
+                </Button>
+              )}
             </Col>
           </Row>
         </Container>
@@ -89,10 +185,9 @@ const DoctorProfile = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="lucky.jesse"
                             id="input-username"
-                            placeholder="Username"
                             type="text"
+                            value={doctorDetails.username}
                             readOnly={true}
                           />
                         </FormGroup>
@@ -107,10 +202,15 @@ const DoctorProfile = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            id="input-email"
-                            placeholder="jesse@example.com"
                             type="email"
-                            readOnly={true}
+                            name="email"
+                            value={
+                              editMode
+                                ? editedValues.email
+                                : doctorDetails.email
+                            }
+                            readOnly={!editMode} // Updated this line
+                            onChange={handleChange}
                           />
                         </FormGroup>
                       </Col>
@@ -126,10 +226,8 @@ const DoctorProfile = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Lucky"
-                            id="input-first-name"
-                            placeholder="First name"
                             type="text"
+                            value={doctorDetails.fName}
                             readOnly={true}
                           />
                         </FormGroup>
@@ -144,10 +242,8 @@ const DoctorProfile = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Jesse"
-                            id="input-last-name"
-                            placeholder="Last name"
                             type="text"
+                            value={doctorDetails.lName}
                             readOnly={true}
                           />
                         </FormGroup>
@@ -164,10 +260,8 @@ const DoctorProfile = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Cairo University"
-                            id="input-last-name"
-                            placeholder="Last name"
                             type="text"
+                            value={doctorDetails.educationalBackground}
                             readOnly={true}
                           />
                         </FormGroup>
@@ -182,11 +276,15 @@ const DoctorProfile = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue={"800" + " EGP"}
-                            id="input-last-name"
-                            placeholder="Last name"
                             type="text"
-                            readOnly={true}
+                            name="hourlyRate"
+                            value={
+                              editMode
+                                ? editedValues.hourlyRate
+                                : doctorDetails.hourlyRate
+                            }
+                            readOnly={!editMode}
+                            onChange={handleChange}
                           />
                         </FormGroup>
                       </Col>
@@ -202,10 +300,8 @@ const DoctorProfile = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Cardiologist"
-                            id="input-last-name"
-                            placeholder="Last name"
                             type="text"
+                            value={doctorDetails.specialty}
                             readOnly={true}
                           />
                         </FormGroup>
@@ -220,11 +316,15 @@ const DoctorProfile = () => {
                           </label>
                           <Input
                             className="form-control-alternative"
-                            defaultValue="Cairo Hospital"
-                            id="input-last-name"
-                            placeholder="Last name"
                             type="text"
-                            readOnly={true}
+                            name="affiliation"
+                            value={
+                              editMode
+                                ? editedValues.affiliation
+                                : doctorDetails.affiliation
+                            }
+                            readOnly={!editMode}
+                            onChange={handleChange}
                           />
                         </FormGroup>
                       </Col>

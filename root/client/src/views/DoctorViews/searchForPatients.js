@@ -1,5 +1,7 @@
 // reactstrap components
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useContext, useEffect } from "react";
+import { Link } from "react-router-dom";
 import ReactDatetime from "react-datetime";
 import {
   Button,
@@ -25,13 +27,97 @@ import {
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
 
+import { UserContext } from "contexts/UserContext";
+
 const SearchForPatients = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggle = () => setDropdownOpen((prevState) => !prevState);
 
   const [modal, setModal] = useState(false);
-
   const toggleModal = () => setModal(!modal);
+
+  const { user } = useContext(UserContext);
+  const [patients, setPatients] = useState([]);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [followupDate, setFollowupDate] = useState("");
+  const [followupPrice, setFollowupPrice] = useState("");
+
+  useEffect(() => {
+    const fetchDoctorsPatients = async () => {
+      try {
+        const response = await fetch(`/doctors/viewMyPatients/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setPatients(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+        alert(error.response.data.message);
+      }
+    };
+
+    fetchDoctorsPatients();
+  }, []);
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(
+        `/doctors/searchForPatients/${user._id}`,
+        {
+          params: {
+            fName: firstName,
+            lName: lastName,
+          },
+        }
+      );
+      if (response.data && response.data.length > 0) {
+        setPatients(response.data);
+      } else {
+        setPatients([]);
+      }
+      setFirstName("");
+      setLastName("");
+    } catch (err) {
+      alert("Internal Server Error: " + err.response.data.message);
+    }
+  };
+
+  const filterUpcomingAppointments = async () => {
+    try {
+      const response = await axios.get(
+        `/doctors/upcomingAppointments/${user._id}`
+      );
+      if (response.data && response.data.length > 0) {
+        setPatients(response.data);
+      } else {
+        setPatients([]);
+      }
+      setFirstName("");
+      setLastName("");
+    } catch (err) {
+      alert("Internal Server Error: " + err.response.data.message);
+    }
+  };
+
+  const scheduleFollowUp = async (patientId) => {
+    try {
+      const response = await axios.post(
+        `/doctors/scheduleFollowUp/${user._id}/${patientId}`,
+        {
+          date: followupDate,
+          price: followupPrice,
+        }
+      );
+      alert(response.data.message);
+      setFollowupDate("");
+      setFollowupPrice("");
+    } catch (error) {
+      // If there was an error in the subscription process, you can handle it accordingly.
+      console.error(error.response.data.message);
+      alert(error.response.data.message);
+    }
+  };
 
   return (
     <>
@@ -64,6 +150,8 @@ const SearchForPatients = () => {
                           <Input
                             className="form-control-alternative"
                             type="text"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -77,6 +165,8 @@ const SearchForPatients = () => {
                           <Input
                             className="form-control-alternative"
                             type="text"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
                           />
                         </FormGroup>
                       </Col>
@@ -85,8 +175,7 @@ const SearchForPatients = () => {
                       <Col lg="6">
                         <Button
                           color="primary"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={handleSearch}
                           size="sm"
                         >
                           Search Patients
@@ -95,8 +184,7 @@ const SearchForPatients = () => {
                       <Col lg="6">
                         <Button
                           color="primary"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
+                          onClick={filterUpcomingAppointments}
                           size="sm"
                         >
                           Get Patients with Upcoming Appointments
@@ -126,85 +214,101 @@ const SearchForPatients = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <th scope="row">
-                              <Media className="align-items-center">
-                                <Media>
-                                  <span className="mb-0 text-sm">
-                                    Hana Younis
-                                  </span>
+                          {patients.map((patient) => (
+                            <tr key={patient._id}>
+                              <th scope="row">
+                                <Media className="align-items-center">
+                                  <Media>
+                                    <Link
+                                      to={`/doctor/patientDetails/${patient._id}`}
+                                    >
+                                      <span className="mb-0 text-sm">
+                                        {`${patient.fName} ${patient.lName}`}
+                                      </span>
+                                    </Link>
+                                  </Media>
                                 </Media>
-                              </Media>
-                            </th>
-                            <td>Female</td>
-                            <td>
-                              <i className="bg-warning" />
-                              01018668669
-                            </td>
-                            <td>
-                              <Button
-                                color="primary"
-                                size="sm"
-                                onClick={toggleModal}
-                              >
-                                Schedule Follow Up
-                              </Button>
-                              <Modal isOpen={modal} toggle={toggleModal}>
-                                <ModalHeader toggle={toggleModal}>
-                                  Schedule follow-up appointment for Hana
-                                </ModalHeader>
-                                <ModalBody>
-                                  <Row>
-                                    <Col lg="6">
-                                      <FormGroup>
-                                        <label className="form-control-label">
-                                          Follow-up Appointment Date:
-                                        </label>
-                                        <br />
-                                        <InputGroup className="input-group-alternative">
-                                          <InputGroupAddon addonType="prepend">
-                                            <InputGroupText>
-                                              <i className="ni ni-calendar-grid-58" />
-                                            </InputGroupText>
-                                          </InputGroupAddon>
-                                          <ReactDatetime
-                                            inputProps={{
-                                              placeholder: "From Date",
-                                            }}
-                                            timeFormat={true}
+                              </th>
+                              <td>{patient.gender}</td>
+                              <td>{patient.phoneNum}</td>
+                              <td>
+                                <Button
+                                  color="primary"
+                                  size="sm"
+                                  onClick={toggleModal}
+                                >
+                                  Schedule Follow Up
+                                </Button>
+                                <Modal isOpen={modal} toggle={toggleModal}>
+                                  <ModalHeader toggle={toggleModal}>
+                                    Schedule follow-up appointment for Hana
+                                  </ModalHeader>
+                                  <ModalBody>
+                                    <Row>
+                                      <Col lg="6">
+                                        <FormGroup>
+                                          <label className="form-control-label">
+                                            Follow-up Appointment Date:
+                                          </label>
+                                          <br />
+                                          <InputGroup className="input-group-alternative">
+                                            <InputGroupAddon addonType="prepend">
+                                              <InputGroupText>
+                                                <i className="ni ni-calendar-grid-58" />
+                                              </InputGroupText>
+                                            </InputGroupAddon>
+                                            <ReactDatetime
+                                              inputProps={{
+                                                placeholder: "From Date",
+                                              }}
+                                              timeFormat={true}
+                                              value={followupDate}
+                                              onChange={(value) =>
+                                                setFollowupDate(value)
+                                              }
+                                            />
+                                          </InputGroup>
+                                        </FormGroup>
+                                      </Col>
+                                    </Row>
+                                    <Row>
+                                      <Col lg="6">
+                                        <FormGroup>
+                                          <label className="form-control-label">
+                                            Price of Appointment
+                                          </label>
+                                          <Input
+                                            className="form-control-alternative"
+                                            type="number"
+                                            value={followupPrice}
+                                            onChange={(e) =>
+                                              setFollowupPrice(e.target.value)
+                                            }
                                           />
-                                        </InputGroup>
-                                      </FormGroup>
-                                    </Col>
-                                  </Row>
-                                  <Row>
-                                    <Col lg="6">
-                                      <FormGroup>
-                                        <label className="form-control-label">
-                                          Price of Appointment
-                                        </label>
-                                        <Input
-                                          className="form-control-alternative"
-                                          type="number"
-                                        />
-                                      </FormGroup>
-                                    </Col>
-                                  </Row>
-                                </ModalBody>
-                                <ModalFooter>
-                                  <Button color="primary" onClick={toggleModal}>
-                                    Schedule
-                                  </Button>{" "}
-                                  <Button
-                                    color="secondary"
-                                    onClick={toggleModal}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </ModalFooter>
-                              </Modal>
-                            </td>
-                          </tr>
+                                        </FormGroup>
+                                      </Col>
+                                    </Row>
+                                  </ModalBody>
+                                  <ModalFooter>
+                                    <Button
+                                      color="primary"
+                                      onClick={() =>
+                                        scheduleFollowUp(patient._id)
+                                      }
+                                    >
+                                      Schedule
+                                    </Button>{" "}
+                                    <Button
+                                      color="secondary"
+                                      onClick={toggleModal}
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </ModalFooter>
+                                </Modal>
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </Table>
                     </Card>

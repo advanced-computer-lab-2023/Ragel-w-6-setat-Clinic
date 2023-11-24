@@ -15,7 +15,8 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import { useState } from "react";
+import axios from "axios";
+import { useState, useContext, useEffect } from "react";
 // node.js library that concatenates classes (strings)
 // javascipt plugin for creating charts
 import Chart from "chart.js";
@@ -25,10 +26,33 @@ import { Card, CardTitle, CardBody, Container, Row, Col } from "reactstrap";
 // core components
 import { chartOptions, parseOptions } from "variables/charts.js";
 
+import { UserContext } from "../../contexts/UserContext";
+
 const Wallet = (props) => {
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
   }
+
+  const { user } = useContext(UserContext);
+
+  const [walletAmount, setWalletAmount] = useState(0);
+
+  useEffect(() => {
+    const fetchWallet = async () => {
+      try {
+        const response = await fetch(`/patients/myWalletAmount/${user._id}`);
+        const json = await response.json();
+        if (response.ok) {
+          setWalletAmount(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+        alert("Server Error");
+      }
+    };
+
+    fetchWallet();
+  }, []);
 
   return (
     <>
@@ -54,7 +78,9 @@ const Wallet = (props) => {
                     >
                       Wallet Amount
                     </CardTitle>
-                    <span className="h2 font-weight-bold mb-0">924</span>
+                    <span className="h2 font-weight-bold mb-0">
+                      {walletAmount}
+                    </span>
                   </div>
                   <Col className="col-auto">
                     <div className="icon icon-shape bg-blue text-white rounded-circle shadow">

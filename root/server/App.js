@@ -4,17 +4,10 @@ import express from "express";
 import patientRoutes from "./routes/patientRoutes.js";
 import doctorRoutes from "./routes/doctorRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import Patient from "./models/Patient.js";
-import Doctor from "./models/Doctor.js";
-import Admin from "./models/Admin.js";
-import { fileURLToPath } from "url";
-import path from "path";
-import { deleteAdmin } from "./controllers/adminController.js";
+import { login } from "./controllers/userController.js";
 import multer from "multer";
+import path from "path";
 dotenv.config({ path: "./.env" });
-import cors from 'cors';
-
-
 
 let uri = process.env.MONGODB_URI;
 let port = process.env.PORT;
@@ -26,11 +19,12 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("./public"));
-app.use(cors());
 
+// routes
 app.use("/patients", patientRoutes);
 app.use("/doctors", doctorRoutes);
 app.use("/admins", adminRoutes);
+app.post("/login", login);
 
 // connect to mongodb & listen for requests
 
@@ -47,9 +41,3 @@ mongoose
   .catch((err) => {
     console.error("Error connecting to MongoDB:", err);
   });
-
-
-
-
- 
-

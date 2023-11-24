@@ -62,9 +62,12 @@ const Doctor = (props) => {
 
   return (
     <>
+      <AdminNavbar />
       <Sidebar
         {...props}
-        routes={routes.filter((route) => route.layout === "/doctor")}
+        routes={routes.filter(
+          (route) => route.layout === "/doctor" && !route.excludeFromSidebar
+        )}
         logo={{
           innerLink: "/doctor/index",
           imgSrc: require("../assets/img/brand/argon-react.png"),

@@ -21,7 +21,7 @@ const prescriptionSchema = new Schema({
   },
   isFilled: {
     type: Boolean,
-    default: false
+    default: false,
   },
   date: {
     type: Date,

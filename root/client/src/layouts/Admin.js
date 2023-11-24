@@ -62,6 +62,7 @@ const Admin = (props) => {
 
   return (
     <>
+      <AdminNavbar />
       <Sidebar
         {...props}
         routes={routes.filter((route) => route.layout === "/admin")}

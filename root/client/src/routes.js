@@ -18,7 +18,8 @@
 import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Maps from "views/examples/Maps.js";
-import Register from "views/examples/Register.js";
+import RegisterDoctor from "views/examples/RegisterDoctor.js";
+import RegisterPatient from "views/examples/RegisterPatient.js";
 import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
@@ -31,19 +32,21 @@ import HealthPackages from "views/PatientViews/healthPackages";
 import SearchForDoctors from "views/PatientViews/searchForDoctors";
 import FilterPrescriptions from "views/PatientViews/filterPrescriptions";
 import Wallet from "views/PatientViews/wallet";
+import DoctorDetails from "views/PatientViews/doctorDetails";
 import MedicalHistory from "views/PatientViews/viewMedicalHistory";
 
 // doctor views
 import DoctorProfile from "views/DoctorViews/doctorProfile";
 import SearchForPatients from "views/DoctorViews/searchForPatients";
 import DoctorAppointments from "views/DoctorViews/doctorAppointments";
-import DoctorContracts from "views/DoctorViews/employmentContract";
+import WalletDoctor from "views/DoctorViews/wallet";
+import PatientDetails from "views/DoctorViews/patientDetails";
 
 // admin views
 
 import AllUsers from "views/AdminViews/allUsers";
 import ManageHealthPackages from "views/AdminViews/healthPackagesManagement";
-import DoctorInfo from "views/AdminViews/viewDoctorInfo";
+import UnregisteredDoctors from "views/AdminViews/unregisteredDoctorsInfo";
 
 var routes = [
   //patient routes
@@ -55,7 +58,7 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/mySubscribedPackage/",
+    path: "/mySubscribedPackage",
     name: "Subscribed Package",
     icon: "ni ni-basket",
     component: <SubscribedPackage />,
@@ -104,6 +107,14 @@ var routes = [
     layout: "/patient",
   },
   {
+    path: "/doctorProfile/:doctorid",
+    name: "Doctor Profile",
+    icon: "ni ni-money-coins",
+    component: <DoctorDetails />,
+    layout: "/patient",
+    excludeFromSidebar: true,
+  },
+  {
     path: "/myMedicalHistory",
     name: "My Medical History",
     icon: "ni ni-money-coins",
@@ -142,11 +153,19 @@ var routes = [
     layout: "/doctor",
   },
   {
-    path: "/myContract",
-    name: "My Contract",
-    icon: "ni ni-fat-add",
-    component: <DoctorContracts />,
+    path: "/wallet",
+    name: "My Wallet",
+    icon: "ni ni-money-coins",
+    component: <WalletDoctor />,
     layout: "/doctor",
+  },
+  {
+    path: "/patientDetails/:patientid",
+    name: "Patient Profile",
+    icon: "ni ni-money-coins",
+    component: <PatientDetails />,
+    layout: "/doctor",
+    excludeFromSidebar: true,
   },
 
   //admin routes
@@ -155,34 +174,6 @@ var routes = [
     name: "Dashboard",
     icon: "ni ni-tv-2 text-primary",
     component: <Index />,
-    layout: "/admin",
-  },
-  {
-    path: "/icons",
-    name: "Icons",
-    icon: "ni ni-planet text-blue",
-    component: <Icons />,
-    layout: "/admin",
-  },
-  {
-    path: "/maps",
-    name: "Maps",
-    icon: "ni ni-pin-3 text-orange",
-    component: <Maps />,
-    layout: "/admin",
-  },
-  {
-    path: "/user-profile",
-    name: "User Profile",
-    icon: "ni ni-single-02 text-yellow",
-    component: <Profile />,
-    layout: "/admin",
-  },
-  {
-    path: "/tables",
-    name: "Tables",
-    icon: "ni ni-bullet-list-67 text-red",
-    component: <Tables />,
     layout: "/admin",
   },
   {
@@ -200,10 +191,10 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/viewDoctorInfo",
-    name: "Doctor Information",
+    path: "/unregisteredDoctorsInfo",
+    name: "Unregistered Doctors",
     icon: "ni ni-circle-08 text-pink",
-    component: <DoctorInfo />,
+    component: <UnregisteredDoctors />,
     layout: "/admin",
   },
 
@@ -216,10 +207,17 @@ var routes = [
     layout: "/auth",
   },
   {
-    path: "/register",
+    path: "/registerDoctor",
     name: "Register",
     icon: "ni ni-circle-08 text-pink",
-    component: <Register />,
+    component: <RegisterDoctor />,
+    layout: "/auth",
+  },
+  {
+    path: "/registerPatient",
+    name: "Register",
+    icon: "ni ni-circle-08 text-pink",
+    component: <RegisterPatient />,
     layout: "/auth",
   },
 ];
