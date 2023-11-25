@@ -1,29 +1,30 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Maps from "views/examples/Maps.js";
 import Register from "views/examples/Register.js";
-import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
 
+// guest users
+
+import Login from "views/GuestViews/Login.js";
+import RegisterDoctor from "views/GuestViews/RegisterDoctor.js";
+import RegisterPatient from "views/GuestViews/RegisterPatient.js";
+
+// patient users
+
+import HomePatient from "views/PatientViews/HomePatient.js";
+
 var routes = [
+  // patient routes
+  {
+    path: "/home",
+    name: "Home",
+    icon: "ni ni-circle-08 text-pink",
+    component: <HomePatient />,
+    layout: "/patient",
+  },
+
   {
     path: "/index",
     name: "Dashboard",
@@ -60,6 +61,15 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/register",
+    name: "Register",
+    icon: "ni ni-circle-08 text-pink",
+    component: <Register />,
+    layout: "/auth",
+  },
+
+  // auth routes
+  {
     path: "/login",
     name: "Login",
     icon: "ni ni-key-25 text-info",
@@ -67,11 +77,19 @@ var routes = [
     layout: "/auth",
   },
   {
-    path: "/register",
+    path: "/registerDoctor",
     name: "Register",
     icon: "ni ni-circle-08 text-pink",
-    component: <Register />,
+    component: <RegisterDoctor />,
+    layout: "/auth",
+  },
+  {
+    path: "/registerPatient",
+    name: "Register",
+    icon: "ni ni-circle-08 text-pink",
+    component: <RegisterPatient />,
     layout: "/auth",
   },
 ];
+
 export default routes;
