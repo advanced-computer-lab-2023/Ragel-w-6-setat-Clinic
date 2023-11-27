@@ -1,3 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
+//components
+
 import {
   Button,
   Card,
@@ -17,6 +21,12 @@ import {
 } from "reactstrap";
 
 const HomePatient = () => {
+  const navigate = useNavigate();
+
+  const handleMedicalHistoryClick = () => {
+    navigate("/patient/medicalHistory");
+  };
+
   return (
     <>
       <div
@@ -91,8 +101,9 @@ const HomePatient = () => {
                       color="default"
                       size="lg"
                       type="button"
+                      onClick={handleMedicalHistoryClick}
                     >
-                      Medical Records
+                      Medical History
                     </Button>
                   </div>
 
@@ -220,7 +231,7 @@ const HomePatient = () => {
                     color: "#ffffff",
                   }}
                 >
-                  <i class="fa-solid fa-circle-info mr-2"></i>
+                  <i className="fa-solid fa-circle-info mr-2"></i>
                   Appointment rescheduled
                 </ListGroupItem>
                 <ListGroupItem
@@ -252,7 +263,7 @@ const HomePatient = () => {
                 </ListGroupItem>
               </ListGroup>
               <div className="d-flex justify-content-center mt-3">
-                <nav st aria-label="...">
+                <nav aria-label="...">
                   <Pagination
                     className="pagination pagination-lg"
                     listClassName="pagination-lg"

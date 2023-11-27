@@ -14,6 +14,7 @@ import RegisterPatient from "views/GuestViews/RegisterPatient.js";
 // patient users
 
 import HomePatient from "views/PatientViews/HomePatient.js";
+import MedicalHistory from "views/PatientViews/MedicalHistory.js";
 
 var routes = [
   // patient routes
@@ -22,6 +23,13 @@ var routes = [
     name: "Home",
     icon: "ni ni-circle-08 text-pink",
     component: <HomePatient />,
+    layout: "/patient",
+  },
+  {
+    path: "/medicalHistory",
+    name: "Medical History",
+    icon: "ni ni-circle-08 text-pink",
+    component: <MedicalHistory />,
     layout: "/patient",
   },
 
