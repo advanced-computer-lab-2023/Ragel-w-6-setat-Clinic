@@ -1138,6 +1138,91 @@ const cancelAppointmentForSelf = async (req, res) => {
   }
 }
 
+const cancelAppointmentForFamilyMember = async (req, res) => {
+  const appointmentId = req.params.id;
+  const Email = req.body.email;
+  
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Appointment not found",
+      });
+    }
+  
+    if (appointment.status === "completed" || appointment.status === "cancelled") { 
+      return res.status(400).json({
+        status: "fail",
+        message: "Appointment is not available for cancellation",
+      });
+    }
+
+    // Find the family member by email
+    const familyMember = await Patient.findOne({ email: Email });
+    if (!familyMember) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Family member not found",
+      });
+    }
+
+    // Check if the family member is associated with the appointment
+    console.log(familyMember._id);
+    console.log(appointment.patient);
+
+
+    const familyMemberId = (familyMember._id);
+    const appointmentPatientId = (appointment.patient);
+
+    if (!familyMemberId === (appointmentPatientId)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "The appointment does not belong to the specified family member",
+      });
+    }
+
+    const appointmentTime = appointment.date.getTime();
+    const currentTime = Date.now();
+    const timeDiffInHours = Math.abs(appointmentTime - currentTime) / 36e5; // Calculate time difference in hours
+
+    let refundAmount = 0;
+
+    if (timeDiffInHours < 24) {
+      // Within 24 hours, no refund
+      appointment.status = "cancelled (within 24 hours)";
+    } else {
+      // More than 24 hours, refund the appointment price
+      refundAmount = appointment.price;
+      appointment.status = "cancelled";
+      familyMember.wallet += refundAmount;
+    }
+
+    // Update family member's wallet
+    await Patient.findOneAndUpdate(
+      { email: Email },
+      { $inc: { wallet: refundAmount } }
+    );
+
+    appointment.isAvailable = false;
+
+    // Save the changes 
+    await appointment.save(); 
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment cancelled for family member.",
+      refundAmount,
+      updatedAppointment: appointment,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
 
 export {
   createPatient,
@@ -1170,4 +1255,5 @@ export {
   rescheduleAppointmentforPatient,
   rescheduleAppointmentforFamilyMember,
   cancelAppointmentForSelf,
+  cancelAppointmentForFamilyMember,
 };
