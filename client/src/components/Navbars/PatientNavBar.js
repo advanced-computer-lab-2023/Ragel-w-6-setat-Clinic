@@ -54,7 +54,7 @@ const PatientNavBar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/components/" className="mb-sm-1 mb-md-0">
+                <NavLink href="/patient/allDoctors" className="mb-sm-1 mb-md-0">
                   <i className="fa-solid fa-user-doctor"></i>
                   Doctors
                 </NavLink>

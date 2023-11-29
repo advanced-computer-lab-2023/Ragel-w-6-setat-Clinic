@@ -15,6 +15,8 @@ import RegisterPatient from "views/GuestViews/RegisterPatient.js";
 
 import HomePatient from "views/PatientViews/HomePatient.js";
 import MedicalHistory from "views/PatientViews/MedicalHistory.js";
+import FamilyMemberList from "views/PatientViews/FamilyMemberList";
+import AllDoctors from "views/PatientViews/AllDoctors";
 
 var routes = [
   // patient routes
@@ -30,6 +32,20 @@ var routes = [
     name: "Medical History",
     icon: "ni ni-circle-08 text-pink",
     component: <MedicalHistory />,
+    layout: "/patient",
+  },
+  {
+    path: "/familyMembers",
+    name: "Family Members",
+    icon: "ni ni-circle-08 text-pink",
+    component: <FamilyMemberList />,
+    layout: "/patient",
+  },
+  {
+    path: "/allDoctors",
+    name: "Doctors",
+    icon: "ni ni-circle-08 text-pink",
+    component: <AllDoctors />,
     layout: "/patient",
   },
 

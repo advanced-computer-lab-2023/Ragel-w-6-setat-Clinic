@@ -27,6 +27,10 @@ const HomePatient = () => {
     navigate("/patient/medicalHistory");
   };
 
+  const handleFamilyMembersClick = () => {
+    navigate("/patient/familyMembers");
+  };
+
   return (
     <>
       <div
@@ -66,7 +70,7 @@ const HomePatient = () => {
                 style={{ backgroundColor: "#EEF5FF" }}
               ></CardHeader>
               <CardBody className="pt-0 pt-md-4">
-                <div className="card-profile-stats d-flex justify-content-center mt-md-5"></div>
+                <div className="card-profile-stats d-flex justify-content-center mt-md-4"></div>
                 <div className="text-center">
                   <h3>
                     Jessica Jones
@@ -114,6 +118,7 @@ const HomePatient = () => {
                       color="default"
                       size="lg"
                       type="button"
+                      onClick={handleFamilyMembersClick}
                     >
                       Family Members
                     </Button>
