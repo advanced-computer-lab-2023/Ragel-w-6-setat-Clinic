@@ -1223,6 +1223,48 @@ const cancelAppointmentForFamilyMember = async (req, res) => {
   }
 }
 
+const requestFollowUpAppointment = async (req, res) => {
+  const patientId = req.params.patientid;
+  const previousAppointmentId = req.params.id;
+  const followUpDate = req.body.followUpDate;
+
+  try {
+    // Check if the previous appointment exists
+    const previousAppointment = await Appointments.findById(previousAppointmentId);
+    if (!previousAppointment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Previous appointment not found",
+      });
+    }
+
+    // Create a new follow-up appointment
+    const followUpAppointment = new Appointments({
+      patient: patientId,
+      doctor: previousAppointment.doctor, // Use the same doctor for the follow-up
+      date: followUpDate,
+      isAvailable: false,
+      type: "follow-up",
+      status: "upcoming", // Set as available by default
+      price: previousAppointment.price, // Set the price as needed for the follow-up appointment
+      acceptance: "pending", // Set the acceptance status as pending
+    });
+
+    // Save the follow-up appointment
+    await followUpAppointment.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Follow-up appointment requested successfully.",
+      followUpAppointment,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
 
 export {
   createPatient,
@@ -1256,4 +1298,5 @@ export {
   rescheduleAppointmentforFamilyMember,
   cancelAppointmentForSelf,
   cancelAppointmentForFamilyMember,
+  requestFollowUpAppointment,
 };

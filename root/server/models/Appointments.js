@@ -33,6 +33,13 @@ const appointmentSchema = new Schema({
     type: Number,
     required: true,
   },
+  acceptance: {
+    type: String,
+    required: true,
+    default: "pending",
+    enum: ["pending", "accepted", "rejected"],
+  },
+  
 });
 
 const Appointment = mongoose.model("Appointment", appointmentSchema);

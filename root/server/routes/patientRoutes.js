@@ -31,6 +31,7 @@ import {
   rescheduleAppointmentforFamilyMember,
   cancelAppointmentForSelf,
   cancelAppointmentForFamilyMember,
+  requestFollowUpAppointment,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -115,5 +116,6 @@ router.patch("/rescheduleAppointmentforFamilyMember/:patientid/:appointmentid",
 
  router.patch("/cancelAppointmentForSelf/:id",cancelAppointmentForSelf);
  router.patch("/cancelAppointmentForFamilyMember/:id",cancelAppointmentForFamilyMember);
+ router.post("/followUp/:patientid/:id", requestFollowUpAppointment);
  
 export default router;
