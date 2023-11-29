@@ -1004,6 +1004,70 @@ const rescheduleAppointmentforPatient = async (req, res) => {
 };
 
 
+const rescheduleAppointmentforFamilyMember = async (req, res) => {
+  const patientId = req.params.patientid;
+  const appointmentId = req.params.appointmentid;
+  const familyMemberEmail = req.body.familymemberEmail;
+  const date = req.body.date;
+
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Appointment not found",
+      });
+    }
+
+    if (!(appointment.isAvailable && appointment.status === "upcoming")) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Appointment is not available for rescheduling",
+      });
+    }
+
+    const patient = await Patient.findById(patientId);
+
+    const familyMember = patient.familyMembers.find(member => member.email === familyMemberEmail);
+
+    if (!familyMember) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Family member not found with the specified email",
+      });
+    }
+
+    const familyMemberId = (familyMember._id);
+    const appointmentPatientId = (appointment.patient);
+
+    if (!familyMemberId === (appointmentPatientId)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "The appointment does not belong to the specified family member",
+      });
+    }
+
+    appointment.date = date;
+    appointment.status = "rescheduled";
+
+    // Save the changes
+    await appointment.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment rescheduled successfully.",
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+
+
 export {
   createPatient,
   viewPrescription,
@@ -1033,4 +1097,5 @@ export {
   viewPastAppointments,
   getWalletAmount,
   rescheduleAppointmentforPatient,
+  rescheduleAppointmentforFamilyMember,
 };

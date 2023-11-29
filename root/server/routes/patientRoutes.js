@@ -28,6 +28,7 @@ import {
   viewPastAppointments,
   getWalletAmount,
   rescheduleAppointmentforPatient,
+  rescheduleAppointmentforFamilyMember,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 
@@ -104,4 +105,9 @@ router.patch(
   "/rescheduleAppointmentforPatient/:patientid/:appointmentid",
   rescheduleAppointmentforPatient
 );
+
+router.patch("/rescheduleAppointmentforFamilyMember/:patientid/:appointmentid",
+ rescheduleAppointmentforFamilyMember);
+
+ 
 export default router;
