@@ -284,6 +284,8 @@ const getSinglePatient = async (req, res) => {
   }
 };
 
+
+// req 48
 const rescheduleAppointment = async (req, res) => {
   const appointmentId = req.params.appointmentid;
   const date = req.body.date;
@@ -328,6 +330,62 @@ const rescheduleAppointment = async (req, res) => {
   }
 };
 
+
+//req 49  
+const cancelAppointmentforPatient = async (req, res) => {
+  const appointmentId = req.params.id;
+
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Appointment not found",
+      });
+    }
+  
+    if (appointment.status === "completed" || appointment.status === "cancelled") { 
+      return res.status(400).json({
+        status: "fail",
+        message: "Appointment is not available for cancellation",
+      });
+    }
+
+    const patientId = appointment.patient;
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Patient not found",
+      });
+    }
+
+    // Update patient's wallet
+    await Patient.findOneAndUpdate(
+      { _id: patientId },
+      { $inc: { wallet: appointment.price } }
+    );
+
+    appointment.isAvailable = false;
+    appointment.status = "cancelled";
+
+    // Save the changes 
+    await appointment.save(); 
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment cancelled.",
+      updatedAppointment: appointment,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
+
+
 export {
   createDoctor,
   updateDoctorProfile,
@@ -342,4 +400,5 @@ export {
   scheduleFollowUp,
   getWalletAmount,
   rescheduleAppointment,
+  cancelAppointmentforPatient,
 };

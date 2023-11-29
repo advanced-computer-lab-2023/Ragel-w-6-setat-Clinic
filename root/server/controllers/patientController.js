@@ -986,6 +986,7 @@ const rescheduleAppointmentforPatient = async (req, res) => {
     // Perform rescheduling logic here (e.g., updating appointment time)
     appointment.date = date;
     appointment.status = "rescheduled";
+    appointment.isAvailable = false;  
 
 
     // Save the changes
@@ -1050,6 +1051,7 @@ const rescheduleAppointmentforFamilyMember = async (req, res) => {
 
     appointment.date = date;
     appointment.status = "rescheduled";
+    appointment.isAvailable = false;  
 
     // Save the changes
     await appointment.save();
