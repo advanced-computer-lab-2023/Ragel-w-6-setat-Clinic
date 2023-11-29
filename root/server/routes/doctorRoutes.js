@@ -14,6 +14,7 @@ import {
   getWalletAmount,
   rescheduleAppointment,
   cancelAppointmentforPatient,
+  acceptOrRejectFollowUp,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 
@@ -41,6 +42,6 @@ router.get("/selectedPatient/:doctorid/:patientid", getSinglePatient);
 router.get("/viewMyPatients/:id", getMyPatients);
 router.patch("/rescheduleAppointment/:appointmentid", rescheduleAppointment);
 router.patch("/cancelApp/:id",cancelAppointmentforPatient);
-
+router.patch("/accOrRej/:id",acceptOrRejectFollowUp);
 
 export default router;

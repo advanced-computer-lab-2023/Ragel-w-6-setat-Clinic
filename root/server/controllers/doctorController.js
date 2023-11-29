@@ -385,6 +385,55 @@ const cancelAppointmentforPatient = async (req, res) => {
   }
 }
 
+//req 65
+
+const acceptOrRejectFollowUp = async (req, res) => {
+  const appointmentId = req.params.id;
+  const { acceptance } = req.body;
+
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Appointment not found",
+      });
+    }
+
+    if (appointment.status !== "upcoming" || appointment.type !== "follow-up") {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid appointment type or status",
+      });
+    }
+
+    if (appointment.acceptance !== "pending") {
+      return res.status(400).json({
+        status: "fail",
+        message: "Appointment is not pending for acceptance/rejection",
+      });
+    }
+if(appointment.type === "follow-up"){
+    appointment.acceptance = acceptance;
+    await appointment.save();
+    res.status(200).json({
+      status: "success",
+      message: "Appointment acceptance/rejection updated",
+      updatedAppointment: appointment,
+    });
+
+}
+  }
+    
+    
+   catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 
 export {
   createDoctor,
@@ -401,4 +450,5 @@ export {
   getWalletAmount,
   rescheduleAppointment,
   cancelAppointmentforPatient,
+  acceptOrRejectFollowUp,
 };

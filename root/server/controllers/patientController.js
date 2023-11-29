@@ -1137,7 +1137,7 @@ const cancelAppointmentForSelf = async (req, res) => {
     });
   }
 }
-
+//req 49 for family member
 const cancelAppointmentForFamilyMember = async (req, res) => {
   const appointmentId = req.params.id;
   const Email = req.body.email;
@@ -1222,7 +1222,7 @@ const cancelAppointmentForFamilyMember = async (req, res) => {
     });
   }
 }
-
+//req 64 
 const requestFollowUpAppointment = async (req, res) => {
   const patientId = req.params.patientid;
   const previousAppointmentId = req.params.id;
