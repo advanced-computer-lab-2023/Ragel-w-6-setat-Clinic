@@ -1068,6 +1068,75 @@ const rescheduleAppointmentforFamilyMember = async (req, res) => {
   }
 };
 
+//req 49 for myself
+const cancelAppointmentForSelf = async (req, res) => {
+  const appointmentId = req.params.id;
+  
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Appointment not found",
+      });
+    }
+  
+    if (appointment.status === "completed" || appointment.status === "cancelled") { 
+      return res.status(400).json({
+        status: "fail",
+        message: "Appointment is not available for cancellation",
+      });
+    }
+
+    const patientId = appointment.patient;
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Patient not found",
+      });
+    }
+
+    const appointmentTime = appointment.date.getTime();
+    const currentTime = Date.now();
+    const timeDiffInHours = Math.abs(appointmentTime - currentTime) / 36e5; // Calculate time difference in hours
+
+    let refundAmount = 0;
+
+    if (timeDiffInHours < 24) {
+      // Within 24 hours, no refund
+      appointment.status = "cancelled (within 24 hours)";
+    } else {
+      // More than 24 hours, refund the appointment price
+      refundAmount = appointment.price;
+      appointment.status = "cancelled";
+      patient.wallet += refundAmount;
+    }
+
+    // Update patient's wallet
+    await Patient.findOneAndUpdate(
+      { _id: patientId },
+      { $inc: { wallet: refundAmount } }
+    );
+
+    appointment.isAvailable = false;
+
+    // Save the changes 
+    await appointment.save(); 
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment cancelled.",
+      refundAmount,
+      updatedAppointment: appointment,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+}
 
 
 export {
@@ -1100,4 +1169,5 @@ export {
   getWalletAmount,
   rescheduleAppointmentforPatient,
   rescheduleAppointmentforFamilyMember,
+  cancelAppointmentForSelf,
 };
