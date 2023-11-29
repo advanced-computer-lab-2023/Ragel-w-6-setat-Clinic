@@ -960,7 +960,7 @@ const subscribeHealthPackageForFamilyMember = async (req, res) => {
 
 
 //sprint 3
-
+// req 47
 const rescheduleAppointmentforPatient = async (req, res) => {
   const patientId = req.params.patientid;
   const appointmentId = req.params.appointmentid;
@@ -1003,7 +1003,7 @@ const rescheduleAppointmentforPatient = async (req, res) => {
   }
 };
 
-
+//req 47
 const rescheduleAppointmentforFamilyMember = async (req, res) => {
   const patientId = req.params.patientid;
   const appointmentId = req.params.appointmentid;

@@ -284,6 +284,50 @@ const getSinglePatient = async (req, res) => {
   }
 };
 
+const rescheduleAppointment = async (req, res) => {
+  const appointmentId = req.params.appointmentid;
+  const date = req.body.date;
+  
+  try {
+
+    const appointment = await Appointments.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Appointment not found",
+      });
+    }
+
+
+    if (!(appointment.isAvailable && appointment.status === "upcoming")) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Appointment is not available for rescheduling",
+      });
+    }
+
+   
+    appointment.date = date;
+    appointment.status = "rescheduled";
+
+    // Save the changes
+    await appointment.save();
+
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment rescheduled successfully.",
+      updatedAppointment: appointment,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 export {
   createDoctor,
   updateDoctorProfile,
@@ -297,4 +341,5 @@ export {
   getMyAppointments,
   scheduleFollowUp,
   getWalletAmount,
+  rescheduleAppointment,
 };
