@@ -30,6 +30,9 @@ const HomePatient = () => {
   const handleFamilyMembersClick = () => {
     navigate("/patient/familyMembers");
   };
+  const handleAppointmentsClick = () => {
+    navigate("/patient/myAppointments");
+  };
 
   return (
     <>
@@ -83,6 +86,7 @@ const HomePatient = () => {
                       color="default"
                       size="lg"
                       type="button"
+                      onClick={handleAppointmentsClick}
                     >
                       Appointments
                     </Button>
