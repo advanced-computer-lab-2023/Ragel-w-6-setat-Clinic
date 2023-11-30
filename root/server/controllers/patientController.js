@@ -141,13 +141,11 @@ try {
 const selectDoctor = async (req, res) => {
   const doctorUsername = req.query.username;
   try {
-    
     const doctor = await Doctor.find({username : doctorUsername});
     if(!doctor){
       return res.status(404).json({message: "Doctor not found"});
     }
     res.json(doctor);
-   //res.render('selectDoctor', { doctor, userID: patientID });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
@@ -274,6 +272,7 @@ const payAppointmentWallet = async (req, res) => {
     if (!appointment) {
       return res.status(400).json({ error: 'No pending appointment for this patient' });
     }
+
     const paymentAmount = appointment.price; 
       if (patient.wallet >= paymentAmount) {
         patient.wallet -= paymentAmount;
@@ -288,22 +287,6 @@ const payAppointmentWallet = async (req, res) => {
       console.error(error);
       return res.status(500).json({ error: 'An error occurred while processing the payment' });
     }
-   /* } else if (paymentMethod === 'creditCard') {
-      // Check if the patient has a credit card
-      const creditCard = await CreditCard.findOne({ patient: patientId });
-
-      if (!creditCard) {
-        return res.status(400).json({ error: 'No credit card on file' });
-      }
-
-      // Process the payment with the credit card (you may need to integrate a payment gateway)
-      // If the payment is successful, update the appointment status
-      // You would typically use a payment gateway library to handle credit card payments
-
-      return res.status(200).json({ message: 'Payment successful with credit card' });
-    } else {
-      return res.status(400).json({ error: 'Invalid payment method' });
-    }*/
   };
 
 //stripe payment still not complete 
@@ -326,6 +309,49 @@ const payAppointmentWallet = async (req, res) => {
   }
  }
   
+ //----------------------------------------------sprint 3--------------------------------------------------------------//
+
+ const selectPrescription = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    const prescriptionsForPatient = await Prescription.find({ patient: patientId });
+    if (!prescriptionsForPatient || prescriptionsForPatient.length === 0) {
+      return res.status(404).json({ error: 'Prescriptions not found for the specified patient' });
+    }
+    res.json(prescriptionsForPatient);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+const viewAllPrescription = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    const allPrescriptions = await Prescription.find({ patient: patientId });
+    if (!allPrescriptions || allPrescriptions.length === 0) {
+      return res.status(404).json({ error: 'No prescriptions found for the specified patient' });
+    }
+    const prescriptionsWithStatus = allPrescriptions.map((prescription) => {
+      return {
+        medicines: prescription.medicines.map((medicine) => {
+          return {
+            name: medicine.name,
+            dosage: medicine.dosage,
+          };
+        }),
+        isFilled: prescription.isFilled,
+        date: prescription.date,
+        notes: prescription.notes,
+      };
+    });
+    res.json(prescriptionsWithStatus);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 export { 
   createPatient, 
   searchForDoctor,
@@ -338,5 +364,7 @@ export {
   viwHealthPackages,
   linkFamilyMember,
   payAppointmentWallet,
-  payAppointmentCreditCard
+  payAppointmentCreditCard,
+  selectPrescription,
+  viewAllPrescription
  };

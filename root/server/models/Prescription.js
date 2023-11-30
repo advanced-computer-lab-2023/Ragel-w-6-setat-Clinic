@@ -2,6 +2,17 @@ import mongoose from "mongoose";
 import { boolean } from "webidl-conversions";
 const Schema = mongoose.Schema;
 
+const medicineSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  dosage: {
+    type: String,
+    required: true,
+  },
+}, { _id: false });
+
 const prescriptionSchema = new Schema({
   patient: {
     type: mongoose.Schema.Types.ObjectId,
@@ -11,17 +22,13 @@ const prescriptionSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Doctor",
   },
-  medication: {
-    type: String,
-    required: true,
-  },
-  dosage: {
-    type: String,
-    required: true,
-  },
+  medicines: {
+    type: [medicineSchema],
+    default: [],
+  }, 
   isFilled: {
     type: Boolean,
-    default: false
+    default: false,
   },
   date: {
     type: Date,

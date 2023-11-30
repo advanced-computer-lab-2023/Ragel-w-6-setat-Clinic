@@ -1,5 +1,5 @@
   import express from "express";
-  import {searchForPatient ,addAppointment, filterMyAppointments ,upcomingAppointments, getMyPatients} from "../controllers/doctorController.js";
+  import {searchForPatient ,addAppointment, filterMyAppointments ,upcomingAppointments, getMyPatients, viewAllPrescription, addDosage , addMedicine, deleteMedicine} from "../controllers/doctorController.js";
 
   import { body, validationResult } from "express-validator";
 
@@ -18,5 +18,20 @@
   router.get("/upcomingappointments/:id", upcomingAppointments)
 
   router.get('/viewMypatients/:id', getMyPatients);
+
+//----------------------------------------------------------sprint 3--------------------------------------------------------------//
+
+
+//view all new and old prescriptions and their statuses (filled/ not filled)
+router.get("/viewAllPrescriptions/:id",viewAllPrescription);  
+
+//add/update dosage for each medicine added to the prescription
+ router.post("/addDosage/:id", addDosage);
+
+ //add medicine to/from the prescription from the pharmacy platform
+ router.post("/addMedicine/:id", addMedicine);
+
+//delete medicine to/from the prescription from the pharmacy platform
+router.delete("/deleteMedicine/:id", deleteMedicine);
 
   export default router;
