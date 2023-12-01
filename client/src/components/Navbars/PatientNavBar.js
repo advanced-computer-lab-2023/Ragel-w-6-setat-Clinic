@@ -66,7 +66,10 @@ const PatientNavBar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/components/" className="mb-sm-1 mb-md-0">
+                <NavLink
+                  href="/patient/healthPackages"
+                  className="mb-sm-1 mb-md-0"
+                >
                   <i className="fa-solid fa-box-archive"></i>
                   Health Packages
                 </NavLink>
