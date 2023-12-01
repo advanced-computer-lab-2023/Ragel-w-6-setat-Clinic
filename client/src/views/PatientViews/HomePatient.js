@@ -33,6 +33,9 @@ const HomePatient = () => {
   const handleAppointmentsClick = () => {
     navigate("/patient/myAppointments");
   };
+  const handlePrescriptionsClick = () => {
+    navigate("/patient/myPrescriptions");
+  };
 
   return (
     <>
@@ -98,6 +101,7 @@ const HomePatient = () => {
                       color="default"
                       size="lg"
                       type="button"
+                      onClick={handlePrescriptionsClick}
                     >
                       Prescriptions
                     </Button>
@@ -152,10 +156,30 @@ const HomePatient = () => {
                   Gold Package
                 </CardTitle>
                 <CardText>
-                  Patient pays 3600 LE per year and gets 40% off any doctor's
-                  session price and 20% off any medicin ordered from pharmacy
-                  platform and 10% discount on the subscribtion of any of his
-                  family members in any package
+                  <p className="mt-3 mb-0 text-muted text-sm">
+                    <span
+                      className="text-nowrap"
+                      style={{
+                        color: "white",
+                      }}
+                    >
+                      <div>
+                        Status: Canceled
+                        <br />
+                        Renewal Date: Not determined
+                        <br />
+                        Cancellation Date: 24-12-2023
+                      </div>
+                    </span>
+                  </p>
+                  <Button
+                    style={{ backgroundColor: "#F8F6F4" }}
+                    className="mt-2"
+                    type="button"
+                    size="sm"
+                  >
+                    Cancel
+                  </Button>
                 </CardText>
               </CardBody>
             </Card>
@@ -194,7 +218,7 @@ const HomePatient = () => {
           </Col>
           <Col
             className="order-xl-2 mt-5 ml-7"
-            style={{ paddingTop: 10 }}
+            style={{ paddingTop: 9 }}
             xl="4"
           >
             <Card

@@ -11,6 +11,7 @@ import {
   Form,
   FormGroup,
   Input,
+  UncontrolledTooltip,
 } from "reactstrap";
 
 const FamilyMemberList = () => {
@@ -31,6 +32,7 @@ const FamilyMemberList = () => {
                         <div className="card-profile-image">
                           <a href="#pablo" onClick={(e) => e.preventDefault()}>
                             <img
+                              id="tooltip1"
                               alt="..."
                               className="rounded-circle"
                               src={require("../../assets/img/brand/patienticonf.png")}
@@ -41,6 +43,14 @@ const FamilyMemberList = () => {
                               }}
                             />
                           </a>
+                          <UncontrolledTooltip
+                            delay={0}
+                            placement="right"
+                            target="tooltip1"
+                            style={{ backgroundColor: "#0C356A" }}
+                          >
+                            Click to view profile
+                          </UncontrolledTooltip>
                         </div>
                       </Col>
                     </Row>
@@ -76,6 +86,7 @@ const FamilyMemberList = () => {
                         <div className="card-profile-image">
                           <a href="#pablo" onClick={(e) => e.preventDefault()}>
                             <img
+                              id="tooltip2"
                               alt="..."
                               className="rounded-circle"
                               src={require("../../assets/img/brand/patienticonm.png")}
@@ -86,6 +97,14 @@ const FamilyMemberList = () => {
                               }}
                             />
                           </a>
+                          <UncontrolledTooltip
+                            delay={0}
+                            placement="right"
+                            target="tooltip2"
+                            style={{ backgroundColor: "#0C356A" }}
+                          >
+                            Click to view profile
+                          </UncontrolledTooltip>
                         </div>
                       </Col>
                     </Row>
@@ -123,6 +142,7 @@ const FamilyMemberList = () => {
                         <div className="card-profile-image">
                           <a href="#pablo" onClick={(e) => e.preventDefault()}>
                             <img
+                              id="tooltip3"
                               alt="..."
                               className="rounded-circle"
                               src={require("../../assets/img/brand/patienticonf.png")}
@@ -133,6 +153,14 @@ const FamilyMemberList = () => {
                               }}
                             />
                           </a>
+                          <UncontrolledTooltip
+                            delay={0}
+                            placement="right"
+                            target="tooltip3"
+                            style={{ backgroundColor: "#0C356A" }}
+                          >
+                            Click to view profile
+                          </UncontrolledTooltip>
                         </div>
                       </Col>
                     </Row>
@@ -168,6 +196,7 @@ const FamilyMemberList = () => {
                         <div className="card-profile-image">
                           <a href="#pablo" onClick={(e) => e.preventDefault()}>
                             <img
+                              id="tooltip4"
                               alt="..."
                               className="rounded-circle"
                               src={require("../../assets/img/brand/patienticonm.png")}
@@ -178,6 +207,14 @@ const FamilyMemberList = () => {
                               }}
                             />
                           </a>
+                          <UncontrolledTooltip
+                            delay={0}
+                            placement="right"
+                            target="tooltip4"
+                            style={{ backgroundColor: "#0C356A" }}
+                          >
+                            Click to view profile
+                          </UncontrolledTooltip>
                         </div>
                       </Col>
                     </Row>
