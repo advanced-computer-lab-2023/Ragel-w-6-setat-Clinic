@@ -21,7 +21,8 @@ import DoctorDetails from "views/PatientViews/DoctorDetails";
 import PatientAppointments from "views/PatientViews/PatientAppointments";
 import PatientPrescriptions from "views/PatientViews/PatientPrescriptions";
 import PrescriptionDetails from "views/PatientViews/PrescriptionDetails";
-import FamilyMemberDetails from "views/PatientViews/FamiltMemberDetails";
+import FamilyMemberDetails from "views/PatientViews/FamilyMemberDetails";
+import HealthPackages from "views/PatientViews/HealthPackages";
 
 var routes = [
   // patient routes
@@ -86,6 +87,13 @@ var routes = [
     name: "Family Member Details",
     icon: "ni ni-circle-08 text-pink",
     component: <FamilyMemberDetails />,
+    layout: "/patient",
+  },
+  {
+    path: "/healthPackages",
+    name: "Health Packages",
+    icon: "ni ni-circle-08 text-pink",
+    component: <HealthPackages />,
     layout: "/patient",
   },
 
