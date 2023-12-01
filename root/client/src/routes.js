@@ -1,174 +1,79 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
 import Maps from "views/examples/Maps.js";
-import RegisterDoctor from "views/examples/RegisterDoctor.js";
-import RegisterPatient from "views/examples/RegisterPatient.js";
-import Login from "views/examples/Login.js";
+import Register from "views/examples/Register.js";
 import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
 
-// patient views
-import SubscribedPackage from "views/PatientViews/viewSubscribedPackage.js";
-import AddFamilyMember from "views/PatientViews/addFamilyMember.js";
-import FilterAppointments from "views/PatientViews/filterAppointments.js";
-import HealthPackages from "views/PatientViews/healthPackages";
-import SearchForDoctors from "views/PatientViews/searchForDoctors";
-import FilterPrescriptions from "views/PatientViews/filterPrescriptions";
-import Wallet from "views/PatientViews/wallet";
-import DoctorDetails from "views/PatientViews/doctorDetails";
-import MedicalHistory from "views/PatientViews/viewMedicalHistory";
+// guest users
 
-// doctor views
-import DoctorProfile from "views/DoctorViews/doctorProfile";
-import SearchForPatients from "views/DoctorViews/searchForPatients";
-import DoctorAppointments from "views/DoctorViews/doctorAppointments";
-import WalletDoctor from "views/DoctorViews/wallet";
-import PatientDetails from "views/DoctorViews/patientDetails";
+import Login from "views/GuestViews/Login.js";
+import RegisterDoctor from "views/GuestViews/RegisterDoctor.js";
+import RegisterPatient from "views/GuestViews/RegisterPatient.js";
 
-// admin views
+// patient users
 
-import AllUsers from "views/AdminViews/allUsers";
-import ManageHealthPackages from "views/AdminViews/healthPackagesManagement";
-import UnregisteredDoctors from "views/AdminViews/unregisteredDoctorsInfo";
+import HomePatient from "views/PatientViews/HomePatient.js";
+import MedicalHistory from "views/PatientViews/MedicalHistory.js";
+import FamilyMemberList from "views/PatientViews/FamilyMemberList";
+import AllDoctors from "views/PatientViews/AllDoctors";
+import DoctorDetails from "views/PatientViews/DoctorDetails";
+import PatientAppointments from "views/PatientViews/PatientAppointments";
+import HealthPackages from "views/PatientViews/HealthPackages";
 
 var routes = [
-  //patient routes
+  // patient routes
   {
-    path: "/index",
-    name: "Dashboard",
-    icon: "ni ni-tv-2 text-primary",
-    component: <Index />,
+    path: "/home",
+    name: "Home",
+    icon: "ni ni-circle-08 text-pink",
+    component: <HomePatient />,
     layout: "/patient",
   },
   {
-    path: "/mySubscribedPackage",
-    name: "Subscribed Package",
-    icon: "ni ni-basket",
-    component: <SubscribedPackage />,
+    path: "/medicalHistory",
+    name: "Medical History",
+    icon: "ni ni-circle-08 text-pink",
+    component: <MedicalHistory />,
     layout: "/patient",
   },
   {
-    path: "/addFamilyMember",
-    name: "Add a Family Member",
-    icon: "ni ni-single-02",
-    component: <AddFamilyMember />,
-    layout: "/patient",
-  },
-  {
-    path: "/filterAppointments",
-    name: "My Appointments",
-    icon: "ni ni-fat-add",
-    component: <FilterAppointments />,
-    layout: "/patient",
-  },
-  {
-    path: "/healthPackagesOptions",
-    name: "Health Package Options",
-    icon: "ni ni-box-2",
-    component: <HealthPackages />,
+    path: "/familyMembers",
+    name: "Family Members",
+    icon: "ni ni-circle-08 text-pink",
+    component: <FamilyMemberList />,
     layout: "/patient",
   },
   {
     path: "/allDoctors",
-    name: "Search for Doctors",
-    icon: "ni ni-single-02",
-    component: <SearchForDoctors />,
+    name: "Doctors",
+    icon: "ni ni-circle-08 text-pink",
+    component: <AllDoctors />,
+    layout: "/patient",
+  },
+  //bta3et el healthpackages sprint 3
+  {
+    path: "/healthpackages",
+    name: "Health Packages",
+    icon: "ni ni-circle-08 text-pink",
+    component: <HealthPackages />,
     layout: "/patient",
   },
   {
-    path: "/filterPrescriptions",
-    name: "My Prescriptions",
-    icon: "ni ni-collection",
-    component: <FilterPrescriptions />,
-    layout: "/patient",
-  },
-  {
-    path: "/wallet",
-    name: "My Wallet",
-    icon: "ni ni-money-coins",
-    component: <Wallet />,
-    layout: "/patient",
-  },
-  {
-    path: "/doctorProfile/:doctorid",
-    name: "Doctor Profile",
-    icon: "ni ni-money-coins",
+    path: "/doctorDetails",
+    name: "Doctor Details",
+    icon: "ni ni-circle-08 text-pink",
     component: <DoctorDetails />,
     layout: "/patient",
-    excludeFromSidebar: true,
-  },
-  {
-    path: "/myMedicalHistory",
-    name: "My Medical History",
-    icon: "ni ni-money-coins",
-    component: <MedicalHistory />,
-    layout: "/patient",
-  },
-
-  //doctor routes
-
-  {
-    path: "/index",
-    name: "Dashboard",
-    icon: "ni ni-tv-2 text-primary",
-    component: <Index />,
-    layout: "/doctor",
-  },
-  {
-    path: "/myProfile",
-    name: "My Profile",
-    icon: "ni ni-circle-08",
-    component: <DoctorProfile />,
-    layout: "/doctor",
-  },
-  {
-    path: "/myPatients",
-    name: "My Patients",
-    icon: "ni ni-single-02",
-    component: <SearchForPatients />,
-    layout: "/doctor",
   },
   {
     path: "/myAppointments",
     name: "My Appointments",
-    icon: "ni ni-fat-add",
-    component: <DoctorAppointments />,
-    layout: "/doctor",
-  },
-  {
-    path: "/wallet",
-    name: "My Wallet",
-    icon: "ni ni-money-coins",
-    component: <WalletDoctor />,
-    layout: "/doctor",
-  },
-  {
-    path: "/patientDetails/:patientid",
-    name: "Patient Profile",
-    icon: "ni ni-money-coins",
-    component: <PatientDetails />,
-    layout: "/doctor",
-    excludeFromSidebar: true,
+    icon: "ni ni-circle-08 text-pink",
+    component: <PatientAppointments />,
+    layout: "/patient",
   },
 
-  //admin routes
   {
     path: "/index",
     name: "Dashboard",
@@ -177,25 +82,39 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/allUsers",
-    name: "System Users",
-    icon: "ni ni-circle-08 text-pink",
-    component: <AllUsers />,
+    path: "/icons",
+    name: "Icons",
+    icon: "ni ni-planet text-blue",
+    component: <Icons />,
     layout: "/admin",
   },
   {
-    path: "/healthPackagesManagement",
-    name: "Health Packages Management",
-    icon: "ni ni-box-2",
-    component: <ManageHealthPackages />,
+    path: "/maps",
+    name: "Maps",
+    icon: "ni ni-pin-3 text-orange",
+    component: <Maps />,
     layout: "/admin",
   },
   {
-    path: "/unregisteredDoctorsInfo",
-    name: "Unregistered Doctors",
-    icon: "ni ni-circle-08 text-pink",
-    component: <UnregisteredDoctors />,
+    path: "/user-profile",
+    name: "User Profile",
+    icon: "ni ni-single-02 text-yellow",
+    component: <Profile />,
     layout: "/admin",
+  },
+  {
+    path: "/tables",
+    name: "Tables",
+    icon: "ni ni-bullet-list-67 text-red",
+    component: <Tables />,
+    layout: "/admin",
+  },
+  {
+    path: "/register",
+    name: "Register",
+    icon: "ni ni-circle-08 text-pink",
+    component: <Register />,
+    layout: "/auth",
   },
 
   // auth routes
@@ -221,4 +140,5 @@ var routes = [
     layout: "/auth",
   },
 ];
+
 export default routes;

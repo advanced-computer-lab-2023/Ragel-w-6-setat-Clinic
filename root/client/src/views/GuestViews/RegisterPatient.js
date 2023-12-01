@@ -1,27 +1,8 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import { useState } from "react";
-import axios from "axios";
 // reactstrap components
 import {
   Button,
   Card,
-  CardHeader,
   CardBody,
   FormGroup,
   Form,
@@ -66,45 +47,6 @@ const RegisterPatient = () => {
       ...prevFields,
       [name]: value,
     }));
-  };
-
-  const handlePatientRegister = async () => {
-    try {
-      // Validate all fields
-      for (const key in patientFields) {
-        if (!patientFields[key]) {
-          alert(`Please complete all the form ${key}`);
-          return;
-        }
-      }
-
-      for (const key in emergencyContact) {
-        if (!emergencyContact[key]) {
-          alert(`Please complete all the form`);
-          return;
-        }
-      }
-
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(patientFields.email)) {
-        alert("Please enter a valid email address");
-        return;
-      }
-
-      const response = await axios.post("/patients/register", {
-        patientFields,
-        emergencyContact,
-      });
-
-      console.log(response.data);
-      window.location.href = "`http://localhost:3000/auth/login`";
-      alert(response.data.message);
-    } catch (error) {
-      // Handle errors
-      console.error("Error registering doctor:", error);
-      alert(error.response.data.message);
-    }
   };
 
   return (
@@ -339,12 +281,7 @@ const RegisterPatient = () => {
               </Row>
 
               <div className="text-center">
-                <Button
-                  className="mt-4"
-                  color="primary"
-                  type="button"
-                  onClick={handlePatientRegister}
-                >
+                <Button className="mt-4" color="primary" type="button">
                   Create account
                 </Button>
               </div>

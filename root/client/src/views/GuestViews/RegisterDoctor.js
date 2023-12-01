@@ -1,27 +1,8 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import { useState } from "react";
-import axios from "axios";
 // reactstrap components
 import {
   Button,
   Card,
-  CardHeader,
   CardBody,
   FormGroup,
   Form,
@@ -57,8 +38,11 @@ const RegisterDoctor = () => {
     password: "",
   });
 
+  // eslint-disable-next-line
   const [fileID, setFileID] = useState();
+  // eslint-disable-next-line
   const [fileMedicalDegree, setFileMedicalDegree] = useState();
+  // eslint-disable-next-line
   const [fileMedicalLicense, setFileMedicalLicense] = useState();
 
   const handleChange = (e) => {
@@ -67,66 +51,6 @@ const RegisterDoctor = () => {
       ...prevFields,
       [name]: value,
     }));
-  };
-
-  const handleDoctorRegister = async () => {
-    try {
-      // Validate all fields
-      for (const key in doctorFields) {
-        if (!doctorFields[key]) {
-          alert(`Please complete all the form`);
-          return;
-        }
-      }
-      if (!fileID) {
-        alert(`Please complete all the form`);
-        return;
-      }
-      if (!fileMedicalDegree) {
-        alert(`Please complete all the form`);
-        return;
-      }
-      if (!fileMedicalLicense) {
-        alert(`Please complete all the form`);
-        return;
-      }
-
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(doctorFields.email)) {
-        alert("Please enter a valid email address");
-        return;
-      }
-      if (!agree) {
-        alert(
-          "Please view the employment contract and accept to be able to register in the system"
-        );
-        return;
-      }
-      const formData = new FormData();
-      formData.append("fileID", fileID);
-      formData.append("fileMedicalLicense", fileMedicalLicense);
-      formData.append("fileMedicalDegree", fileMedicalDegree);
-
-      const requestData = {
-        doctorFields: { ...doctorFields },
-      };
-
-      formData.append("requestData", JSON.stringify(requestData));
-
-      const response = await axios.post("/doctors/register", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log(response.data);
-      window.location.href = "`http://localhost:3000/auth/login`";
-      alert(response.data.message);
-    } catch (error) {
-      // Handle errors
-      console.error("Error registering doctor:", error);
-      alert(error.response.data.message);
-    }
   };
 
   return (
@@ -445,12 +369,7 @@ const RegisterDoctor = () => {
                 </Col>
               </Row>
               <div className="text-center">
-                <Button
-                  className="mt-4"
-                  color="primary"
-                  type="button"
-                  onClick={handleDoctorRegister}
-                >
+                <Button className="mt-4" color="primary" type="button">
                   Create account
                 </Button>
               </div>
