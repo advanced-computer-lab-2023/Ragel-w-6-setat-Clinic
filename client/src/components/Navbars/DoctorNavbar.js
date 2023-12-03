@@ -54,7 +54,7 @@ const DoctorNavBar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/patient/allDoctors" className="mb-sm-1 mb-md-0">
+                <NavLink href="/doctor/myPatients" className="mb-sm-1 mb-md-0">
                   <i className="fa-solid fa-user-doctor"></i>
                   My Patients
                 </NavLink>
@@ -69,7 +69,10 @@ const DoctorNavBar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/components/" className="mb-sm-1 mb-md-0">
+                <NavLink
+                  href="/doctor/appointmentRequests"
+                  className="mb-sm-1 mb-md-0"
+                >
                   <i class="fa-solid fa-person-circle-question"></i>
                   Appointments Requests
                 </NavLink>

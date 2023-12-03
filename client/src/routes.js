@@ -27,6 +27,8 @@ import UnregisteredDoctors from "views/AdminViews/UnregisteredDoctors";
 
 import HomeDoctor from "views/DoctorViews/HomeDoctor";
 import DoctorAppointments from "views/DoctorViews/DoctorAppointments";
+import AppointmentRequests from "views/DoctorViews/AppointmentRequests";
+import DoctorPatients from "views/DoctorViews/DoctorPatients";
 
 var routes = [
   // patient routes
@@ -116,7 +118,20 @@ var routes = [
     component: <DoctorAppointments />,
     layout: "/doctor",
   },
-
+  {
+    path: "/appointmentRequests",
+    name: "Appointment Requests",
+    icon: "ni ni-single-02 text-yellow",
+    component: <AppointmentRequests />,
+    layout: "/doctor",
+  },
+  {
+    path: "/myPatients",
+    name: "My Patients",
+    icon: "ni ni-single-02 text-yellow",
+    component: <DoctorPatients />,
+    layout: "/doctor",
+  },
   // admin routes
   {
     path: "/home",
