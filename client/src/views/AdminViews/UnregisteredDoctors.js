@@ -8,6 +8,7 @@ import {
   Col,
   Table,
 } from "reactstrap";
+
 const UnregisteredDoctors = () => {
   return (
     <>

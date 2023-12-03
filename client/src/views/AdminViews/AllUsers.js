@@ -28,7 +28,7 @@ const AllUsers = () => {
               </h6>
               <div className="pl-lg-4">
                 <Row>
-                  <Col lg="6">
+                  <Col lg="10">
                     <FormGroup>
                       <label
                         className="form-control-label"
@@ -41,7 +41,7 @@ const AllUsers = () => {
                   </Col>
                 </Row>
                 <Row>
-                  <Col lg="6">
+                  <Col lg="10">
                     <FormGroup>
                       <label
                         className="form-control-label"

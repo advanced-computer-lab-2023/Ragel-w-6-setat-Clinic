@@ -23,6 +23,11 @@ import HomeAdmin from "views/AdminViews/HomeAdmin";
 import AllUsers from "views/AdminViews/AllUsers";
 import UnregisteredDoctors from "views/AdminViews/UnregisteredDoctors";
 
+//doctor users
+
+import HomeDoctor from "views/DoctorViews/HomeDoctor";
+import DoctorAppointments from "views/DoctorViews/DoctorAppointments";
+
 var routes = [
   // patient routes
   {
@@ -94,6 +99,22 @@ var routes = [
     icon: "ni ni-circle-08 text-pink",
     component: <HealthPackages />,
     layout: "/patient",
+  },
+
+  // doctor routes
+  {
+    path: "/home",
+    name: "Home",
+    icon: "ni ni-single-02 text-yellow",
+    component: <HomeDoctor />,
+    layout: "/doctor",
+  },
+  {
+    path: "/myAppointments",
+    name: "My Appointments",
+    icon: "ni ni-single-02 text-yellow",
+    component: <DoctorAppointments />,
+    layout: "/doctor",
   },
 
   // admin routes
