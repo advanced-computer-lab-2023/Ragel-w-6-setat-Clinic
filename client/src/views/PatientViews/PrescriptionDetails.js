@@ -21,17 +21,17 @@ const PrescriptionDetails = () => {
               style={{ backgroundColor: "#EEF5FF" }}
             >
               <Row>
-                <Col className="ml-3 mr-9 mt-3" xl="3">
+                <Col className="ml-3 mr-6 mt-3" xl="3">
                   <Button color="secondary" size="sm">
                     Download as PDF
                   </Button>
                 </Col>
-                <Col className="mt-3" xl="3">
+                <Col className="mt-3 ml-5 mr--5" xl="4">
                   <Button color="secondary" size="sm">
                     Pay with Credit Card
                   </Button>
                 </Col>
-                <Col className=" mt-3" xl="3">
+                <Col className="mt-3" xl="3">
                   <Button color="secondary" size="sm">
                     Pay with Wallet
                   </Button>

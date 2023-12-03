@@ -1,10 +1,3 @@
-import Index from "views/Index.js";
-import Profile from "views/examples/Profile.js";
-import Maps from "views/examples/Maps.js";
-import Register from "views/examples/Register.js";
-import Tables from "views/examples/Tables.js";
-import Icons from "views/examples/Icons.js";
-
 // guest users
 
 import Login from "views/GuestViews/Login.js";
@@ -23,6 +16,12 @@ import PatientPrescriptions from "views/PatientViews/PatientPrescriptions";
 import PrescriptionDetails from "views/PatientViews/PrescriptionDetails";
 import FamilyMemberDetails from "views/PatientViews/FamilyMemberDetails";
 import HealthPackages from "views/PatientViews/HealthPackages";
+
+// admin users
+
+import HomeAdmin from "views/AdminViews/HomeAdmin";
+import AllUsers from "views/AdminViews/AllUsers";
+import UnregisteredDoctors from "views/AdminViews/UnregisteredDoctors";
 
 var routes = [
   // patient routes
@@ -97,47 +96,27 @@ var routes = [
     layout: "/patient",
   },
 
+  // admin routes
   {
-    path: "/index",
-    name: "Dashboard",
-    icon: "ni ni-tv-2 text-primary",
-    component: <Index />,
-    layout: "/admin",
-  },
-  {
-    path: "/icons",
-    name: "Icons",
-    icon: "ni ni-planet text-blue",
-    component: <Icons />,
-    layout: "/admin",
-  },
-  {
-    path: "/maps",
-    name: "Maps",
-    icon: "ni ni-pin-3 text-orange",
-    component: <Maps />,
-    layout: "/admin",
-  },
-  {
-    path: "/user-profile",
-    name: "User Profile",
+    path: "/home",
+    name: "Home",
     icon: "ni ni-single-02 text-yellow",
-    component: <Profile />,
+    component: <HomeAdmin />,
     layout: "/admin",
   },
   {
-    path: "/tables",
-    name: "Tables",
-    icon: "ni ni-bullet-list-67 text-red",
-    component: <Tables />,
+    path: "/allUsers",
+    name: "All System Users",
+    icon: "ni ni-single-02 text-yellow",
+    component: <AllUsers />,
     layout: "/admin",
   },
   {
-    path: "/register",
-    name: "Register",
-    icon: "ni ni-circle-08 text-pink",
-    component: <Register />,
-    layout: "/auth",
+    path: "/unregisteredDoctors",
+    name: "Unregistered Doctors",
+    icon: "ni ni-single-02 text-yellow",
+    component: <UnregisteredDoctors />,
+    layout: "/admin",
   },
 
   // auth routes
