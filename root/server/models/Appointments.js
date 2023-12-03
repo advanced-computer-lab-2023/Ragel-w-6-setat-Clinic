@@ -5,12 +5,10 @@ const appointmentSchema = new Schema({
   patient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Patient",
-    default: null,
   },
   doctor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Doctor",
-    required: true,
   },
   date: {
     type: Date,
@@ -18,18 +16,18 @@ const appointmentSchema = new Schema({
   },
   isAvailable: {
     type: Boolean,
-    default: true,
+    required: true,
   },
   type: {
     type: String,
     required: true,
-    default: "general", 
+    default: "general",
   },
   status: {
     type: String,
     required: true,
     default: "available",
-    enum: ["available","upcoming", "completed", "cancelled", "rescheduled"],
+    enum: ["available", "upcoming", "completed", "cancelled", "rescheduled"],
   },
   price: {
     type: Number,

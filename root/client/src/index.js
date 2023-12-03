@@ -25,15 +25,21 @@ import "assets/scss/argon-dashboard-react.scss";
 
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
+import PatientLayout from "layouts/Patient.js";
+
+import UserContextProvider from "contexts/UserContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
+   <UserContextProvider>
     <Routes>
+      <Route path="/patient/*" element={<PatientLayout />} />
       <Route path="/admin/*" element={<AdminLayout />} />
       <Route path="/auth/*" element={<AuthLayout />} />
-      <Route path="*" element={<Navigate to="/admin/index" replace />} />
+      <Route path="*" element={<Navigate to="auth/login" replace />} />
     </Routes>
+    </UserContextProvider>
   </BrowserRouter>
 );

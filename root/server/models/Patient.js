@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const familyMemberSchema = new Schema({
   email: {
     type: String,
+    unique: true,
   },
   fName: {
     type: String,
@@ -32,6 +33,29 @@ const familyMemberSchema = new Schema({
   },
 });
 
+const subscribedPackageSchema = new Schema({
+  packageId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Package",
+  },
+  packageName: {
+    type: String,
+    required: true,
+  },
+  subscriptionStatus: {
+    type: String,
+    enum: ["subscribed", "unsubscribed", "cancelled"],
+  },
+  renewalDate: {
+    type: Date,
+    required: false,
+  },
+  cancellationDate: {
+    type: Date,
+    required: false,
+  },
+});
+
 const patientSchema = new Schema({
   username: {
     type: String,
@@ -55,6 +79,11 @@ const patientSchema = new Schema({
     type: String,
     required: true,
   },
+  nationalID: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   dateOfBirth: {
     type: Date,
     required: true,
@@ -63,10 +92,6 @@ const patientSchema = new Schema({
     type: String,
     required: true,
     enum: ["male", "female"],
-  },
-  nationalID: {
-    type: String,
-    required: true,
   },
   phoneNum: {
     type: String,
@@ -92,18 +117,14 @@ const patientSchema = new Schema({
   },
   medicalHistory: {
     type: Array,
-    default: [
-      "https://assets-global.website-files.com/651a053c342015fefc668f61/651a053d342015fefc66e09a_Personal%20Health%20Record%20Example%20(Sample).png",
-    ],
+    default: [],
   },
   wallet: {
     type: Number,
     default: 0,
   },
   subscribedPackage: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Package",
-    default: null,
+    type: subscribedPackageSchema,
   },
 });
 

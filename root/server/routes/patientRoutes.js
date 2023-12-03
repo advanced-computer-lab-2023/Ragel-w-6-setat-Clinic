@@ -1,51 +1,135 @@
 import express from "express";
-import { createPatient,  searchForDoctor, filterAvailableAppointments ,filtermyAppointments, filterDoctors ,selectDoctor,getAllDoctors,viwHealthPackages, linkFamilyMember,payAppointmentWallet , viewPrescription ,payAppointmentCreditCard, selectPrescription ,viewAllPrescription} from "../controllers/patientController.js";
+import multer from "multer";
+import path from "path";
+import {
+  registerPatient,
+  viewPrescription,
+  getAllPatients,
+  addFamilyMember,
+  filterThePrescription,
+  selectPrescription,
+  filterDoctors,
+  searchForDoctor,
+  filterMyAppointments,
+  filterAvailableAppointments,
+  doctorDetails,
+  getFamilyMembers,
+  getAllDoctors,
+  cancelHealthPackageSubscription,
+  viewSelectedDoctorAvailableAppointments,
+  registerForAnAppointmentPatient,
+  registerForAnAppointmentFamilyMember,
+  getMyHealthPackages,
+  getAllPackages,
+  subscribeToHealthPackage,
+  subscribeHealthPackageForFamilyMember,
+  getFamilyHealthPackages,
+  linkFamilyMember,
+  viewUpcomingAppointments,
+  viewPastAppointments,
+  getWalletAmount,
+  viewAppointments,
+  uploadDocument,
+  getMedicalHistory,
+  removeDocument,
+  processPayment,
+  selectPrescription2,
+  viewAllPrescription,
+} from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
+
+// multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./public/uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    ); //Appending extension
+  },
+});
+
+const upload = multer({ storage: storage });
 
 const router = express.Router();
 
-// post request to create a patient
-router.post("/registeration", createPatient);
+// HABIBAS ROUTES
 
-// Search for a doctor by name/specialty
-router.get("/searchForDoctors" , searchForDoctor);
+router.post("/register", registerPatient);
+router.get("/allPatients", getAllPatients);
+router.get("/allHealthPackages/:id", getAllPackages);
+router.patch(
+  "/cancelHealthPackage/:patientid",
+  cancelHealthPackageSubscription
+);
+router.get(
+  "/doctorDetails/availableAppointment/:patientid/:doctorid",
+  viewSelectedDoctorAvailableAppointments
+);
+router.patch(
+  "/registerForAnAppointmentPatient/:patientid/:appointmentid",
+  registerForAnAppointmentPatient
+);
+router.patch(
+  "/registerForAnAppointmentFamilyMember/:patientid/:appointmentid",
+  registerForAnAppointmentFamilyMember
+);
+router.get("/myWalletAmount/:id", getWalletAmount);
+router.post("/uploadDocument/:id", upload.single("file"), uploadDocument);
+router.get("/myMedicalHistory/:id", getMedicalHistory);
+router.patch("/removeDocument/:patientid/:documentid", removeDocument);
+// Pay with wallet/credit card
+router.post("/processPayment/:id", processPayment);
 
-// Filter available appointments by date and status
-router.get("/filterAvailableAppointments", filterAvailableAppointments);
-
-// Filter my appointments by date and status
-router.get("/filtermyAppointments/:id", filtermyAppointments);
-
-//filter  a doctor by speciality and/or availability on a certain date and at a specific time
-router.get("/filterDoctors",filterDoctors);
-
-//select a doctor from the search/filter results 
-router.get("/selectDoctor",selectDoctor);
-
-router.get("/viewDoctors", getAllDoctors);
-
+// LOJAINS ROUTES
+router.post("/addFamilyMember/:id", addFamilyMember);
 router.get("/viewPrescription/:id", viewPrescription);
+router.get("/filterThePrescription/:id", filterThePrescription);
+router.get(
+  "/selectPrescription/:patientid/:prescriptionid",
+  selectPrescription
+);
 
-//----------------------------------------------------------sprint 2--------------------------------------------------------------//
- 
-//view health packages options and details 
-router.get("/viewHealthPackages",viwHealthPackages);
+//sprint 2
+router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
+router.get("/viewPastAppointments/:id", viewPastAppointments);
+router.get("/viewAppointments/:id", viewAppointments);
 
-//link another patient's account as a family member using email or phone number stating relation to the patient
-router.post("/linkFamilyMember/:id",linkFamilyMember);
+// MARIAMS ROUTES
+router.get("/searchForDoctors/:id", searchForDoctor);
+router.get("/filterAvailableAppointments", filterAvailableAppointments);
+router.get("/filterMyAppointments/:id", filterMyAppointments);
+router.get("/filterDoctors/:id", filterDoctors);
+router.get("/doctorDetails/:patientid/:doctorid", doctorDetails);
 
-//choose to pay for my appointment using my wallet or credit card
-router.post("/payAppointmentWallet/:id",payAppointmentWallet);
+// sprint 2
 
-//enter credit card details and pay for an appointment using Stripe
-router.post("/payAppointmentCreditCard/:id",payAppointmentCreditCard);
+router.post("/linkFamilyMember/:id", linkFamilyMember);
 
-//----------------------------------------------------------sprint 3--------------------------------------------------------------//
+//sprint 3
 
-//view the details of my selected prescription
-router.get("/selectPrescription/:id",selectPrescription);
-
-//view all new and old prescriptions and their statuses (filled/ not filled)
+router.get("/selectPrescription/:id",selectPrescription2);
 router.get("/viewAllPrescriptions/:id",viewAllPrescription);
+
+// SARA ROUTES
+
+router.get("/familyMembers/:id", getFamilyMembers);
+router.get("/viewDoctors/:id", getAllDoctors);
+// router.get("/selectDoctor/:id", getSingleDoctor);
+
+// sprint 2
+
+router.get("/healthPackages/:id", getMyHealthPackages);
+router.get("/familyMembersHealthPackages/:id", getFamilyHealthPackages);
+router.patch(
+  "/subscribeHealthPackage/:patientId/:packageId",
+  subscribeToHealthPackage
+);
+router.patch(
+  "/subscribeHealthPackageForFamilyMember/:patientId/:packageId",
+  subscribeHealthPackageForFamilyMember
+);
 
 export default router;

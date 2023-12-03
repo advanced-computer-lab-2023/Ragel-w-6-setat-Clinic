@@ -1,37 +1,98 @@
-  import express from "express";
-  import {searchForPatient ,addAppointment, filterMyAppointments ,upcomingAppointments, getMyPatients, viewAllPrescription, addDosage , addMedicine, deleteMedicine} from "../controllers/doctorController.js";
+import express from "express";
+import multer from "multer";
+import path from "path";
+import {
+  createDoctor,
+  updateDoctorProfile,
+  getAllDoctors,
+  doctorDetails,
+  searchForPatient,
+  filterMyAppointments,
+  upcomingAppointments,
+  getMyPatients,
+  getSinglePatient,
+  getMyAppointments,
+  scheduleFollowUp,
+  getWalletAmount,
+  viewUpcomingAppointments,
+  viewPastAppointments,
+  addAvailableAppointments,
+  uploadDocumentForPatient,
+  getMedicalHistoryForPatient,
+  registerDoctor,
+  viewAllPrescription,
+  addDosage,
+  addMedicine,
+  deleteMedicine,
+} from "../controllers/doctorController.js";
+import { body, validationResult } from "express-validator";
+// multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./public/uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    ); //Appending extension
+  },
+});
 
-  import { body, validationResult } from "express-validator";
+const upload = multer({ storage: storage });
 
-  const router = express.Router();
+const router = express.Router();
 
-  // Search for a patient by name
-  router.get('/searchForPatients', searchForPatient)
+// HABIBAS ROUTES
 
-  // post request to add an appointment
-  router.post("/addAppointment", addAppointment);
+router.post("/registeration", createDoctor);
+router.post(
+  "/register",
+  upload.fields([
+    { name: "fileID", maxCount: 1 },
+    { name: "fileMedicalLicense", maxCount: 1 },
+    { name: "fileMedicalDegree", maxCount: 1 },
+  ]),
+  registerDoctor
+);
+router.patch("/updateProfile/:id", updateDoctorProfile);
+router.get("/allDoctors", getAllDoctors);
+router.get("/doctorProfile/:id", doctorDetails);
+router.post("/scheduleFollowUp/:doctorid/:patientid", scheduleFollowUp);
+router.get("/myWalletAmount/:id", getWalletAmount);
+router.post(
+  "/uploadDocumentForPatient/:doctorid/:patientid",
+  upload.single("file"),
+  uploadDocumentForPatient
+);
+router.get(
+  "/patientMedicalHistory/:doctorid/:patientid",
+  getMedicalHistoryForPatient
+);
 
-  //Filter my appointments by date and status
-  router.get("/filterMyAppointments/:id", filterMyAppointments);
+// MARIAMS ROUTES
 
-  // Filter patients based on upcoming appointments with the doctor
-  router.get("/upcomingappointments/:id", upcomingAppointments)
+//sprint 1 
+router.get("/searchForPatients/:id", searchForPatient);
+router.get("/filterMyAppointments/:id", filterMyAppointments);
+router.get("/upcomingAppointments/:id", upcomingAppointments);
+router.get("/getMyAppointments/:id", getMyAppointments);
 
-  router.get('/viewMypatients/:id', getMyPatients);
-
-//----------------------------------------------------------sprint 3--------------------------------------------------------------//
-
-
-//view all new and old prescriptions and their statuses (filled/ not filled)
-router.get("/viewAllPrescriptions/:id",viewAllPrescription);  
-
-//add/update dosage for each medicine added to the prescription
- router.post("/addDosage/:id", addDosage);
-
- //add medicine to/from the prescription from the pharmacy platform
- router.post("/addMedicine/:id", addMedicine);
-
-//delete medicine to/from the prescription from the pharmacy platform
+//sprint 3
+router.get("/viewAllPrescriptions/:id",viewAllPrescription); 
+router.post("/addDosage/:id", addDosage);
+router.post("/addMedicine/:id", addMedicine);
 router.delete("/deleteMedicine/:id", deleteMedicine);
 
-  export default router;
+//SARAS ROUTES
+
+router.get("/selectedPatient/:doctorid/:patientid", getSinglePatient);
+router.get("/viewMyPatients/:id", getMyPatients);
+
+//LOJAINS ROUTES
+
+router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
+router.get("/viewPastAppointments/:id", viewPastAppointments);
+router.post("/addAvailableAppointments/:id", addAvailableAppointments);
+
+export default router;

@@ -1,72 +1,125 @@
-/*!
+// guest users
 
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
+import Login from "views/GuestViews/Login.js";
+import RegisterDoctor from "views/GuestViews/RegisterDoctor.js";
+import RegisterPatient from "views/GuestViews/RegisterPatient.js";
 
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
+// patient users
 
-* Coded by Creative Tim
+import HomePatient from "views/PatientViews/HomePatient.js";
+import MedicalHistory from "views/PatientViews/MedicalHistory.js";
+import FamilyMemberList from "views/PatientViews/FamilyMemberList";
+import AllDoctors from "views/PatientViews/AllDoctors";
+import DoctorDetails from "views/PatientViews/DoctorDetails";
+import PatientAppointments from "views/PatientViews/PatientAppointments";
+import PatientPrescriptions from "views/PatientViews/PatientPrescriptions";
+import PrescriptionDetails from "views/PatientViews/PrescriptionDetails";
+import FamilyMemberDetails from "views/PatientViews/FamilyMemberDetails";
+import HealthPackages from "views/PatientViews/HealthPackages";
 
-=========================================================
+// admin users
 
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-import Index from "views/Index.js";
-import Profile from "views/examples/Profile.js";
-import Maps from "views/examples/Maps.js";
-import Register from "views/examples/Register.js";
-import Login from "views/examples/Login.js";
-import Tables from "views/examples/Tables.js";
-import Icons from "views/examples/Icons.js";
-import HandlePharmReq from "views/AdminViews/HandlePharmReq";
-import HealthPackages from "views/AdminViews/HealthPackages";
-import Patients from "views/AdminViews/Patient";
-import PatientPrescriptions from "views/AdminViews/PatientPrescriptions";
-import ViewDoctors from "views/AdminViews/Doctors";
-import AddFamilyMember from "views/AdminViews/addFamilyMember";
-import PayWithWalletButton from "views/AdminViews/PayAppointment";
-
+import HomeAdmin from "views/AdminViews/HomeAdmin";
+import AllUsers from "views/AdminViews/AllUsers";
+import UnregisteredDoctors from "views/AdminViews/UnregisteredDoctors";
 
 var routes = [
+  // patient routes
   {
-    path: "/index",
-    name: "Dashboard",
-    icon: "ni ni-tv-2 text-primary",
-    component: <Index />,
-    layout: "/admin",
+    path: "/home",
+    name: "Home",
+    icon: "ni ni-circle-08 text-pink",
+    component: <HomePatient />,
+    layout: "/patient",
   },
   {
-    path: "/icons",
-    name: "Icons",
-    icon: "ni ni-planet text-blue",
-    component: <Icons />,
-    layout: "/admin",
+    path: "/medicalHistory",
+    name: "Medical History",
+    icon: "ni ni-circle-08 text-pink",
+    component: <MedicalHistory />,
+    layout: "/patient",
   },
   {
-    path: "/maps",
-    name: "Maps",
-    icon: "ni ni-pin-3 text-orange",
-    component: <Maps />,
-    layout: "/admin",
+    path: "/familyMembers",
+    name: "Family Members",
+    icon: "ni ni-circle-08 text-pink",
+    component: <FamilyMemberList />,
+    layout: "/patient",
   },
   {
-    path: "/user-profile",
-    name: "User Profile",
+    path: "/allDoctors",
+    name: "Doctors",
+    icon: "ni ni-circle-08 text-pink",
+    component: <AllDoctors />,
+    layout: "/patient",
+  },
+  {
+    path: "/doctorDetails",
+    name: "Doctor Details",
+    icon: "ni ni-circle-08 text-pink",
+    component: <DoctorDetails />,
+    layout: "/patient",
+  },
+  {
+    path: "/myAppointments",
+    name: "My Appointments",
+    icon: "ni ni-circle-08 text-pink",
+    component: <PatientAppointments />,
+    layout: "/patient",
+  },
+  {
+    path: "/myPrescriptions",
+    name: "My Prescriptions",
+    icon: "ni ni-circle-08 text-pink",
+    component: <PatientPrescriptions />,
+    layout: "/patient",
+  },
+  {
+    path: "/prescriptionDetails",
+    name: "Prescription Details",
+    icon: "ni ni-circle-08 text-pink",
+    component: <PrescriptionDetails />,
+    layout: "/patient",
+  },
+  {
+    path: "/familyMemberDetails",
+    name: "Family Member Details",
+    icon: "ni ni-circle-08 text-pink",
+    component: <FamilyMemberDetails />,
+    layout: "/patient",
+  },
+  {
+    path: "/healthPackages",
+    name: "Health Packages",
+    icon: "ni ni-circle-08 text-pink",
+    component: <HealthPackages />,
+    layout: "/patient",
+  },
+
+  // admin routes
+  {
+    path: "/home",
+    name: "Home",
     icon: "ni ni-single-02 text-yellow",
-    component: <Profile />,
+    component: <HomeAdmin />,
     layout: "/admin",
   },
   {
-    path: "/tables",
-    name: "Tables",
-    icon: "ni ni-bullet-list-67 text-red",
-    component: <Tables />,
+    path: "/allUsers",
+    name: "All System Users",
+    icon: "ni ni-single-02 text-yellow",
+    component: <AllUsers />,
     layout: "/admin",
   },
+  {
+    path: "/unregisteredDoctors",
+    name: "Unregistered Doctors",
+    icon: "ni ni-single-02 text-yellow",
+    component: <UnregisteredDoctors />,
+    layout: "/admin",
+  },
+
+  // auth routes
   {
     path: "/login",
     name: "Login",
@@ -75,55 +128,19 @@ var routes = [
     layout: "/auth",
   },
   {
-    path: "/register",
+    path: "/registerDoctor",
     name: "Register",
     icon: "ni ni-circle-08 text-pink",
-    component: <Register />,
+    component: <RegisterDoctor />,
     layout: "/auth",
   },
   {
-    path: "/HealthPackages",
-    name: "HealthPackages",
+    path: "/registerPatient",
+    name: "Register",
     icon: "ni ni-circle-08 text-pink",
-    component: <HealthPackages />,
+    component: <RegisterPatient />,
     layout: "/auth",
   },
-  {
-    path: "/Patient/:id",
-    name: "Patient",
-    icon: "ni ni-circle-08 text-pink",
-    component: <Patients />,
-    layout: "/auth",
-  },
-  {
-    path: "/Prescriptions/:id",
-    name: "PatientPrescriptions",
-    icon: "ni ni-circle-08 text-pink",
-    component: <PatientPrescriptions />,
-    layout: "/auth",
-  },
-  {
-    path: "/Doctor",
-    name: "Doctor",
-    icon: "ni ni-circle-08 text-pink",
-    component: <ViewDoctors />,
-    layout: "/auth",
-  },
-  {
-    path: "/Family/:id",
-    name: "Family",
-    icon: "ni ni-circle-08 text-pink",
-    component: <AddFamilyMember />,
-    layout: "/auth",
-  },
-  {
-    path: "/PayAppointment/:id",
-    name: "PayAppointment",
-    icon: "ni ni-circle-08 text-pink",
-    component: <PayWithWalletButton />,
-    layout: "/auth",
-  },
-  
-
 ];
+
 export default routes;
