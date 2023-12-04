@@ -8,12 +8,20 @@ import {
   NavItem,
   NavLink,
   Container,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
 } from "reactstrap";
 
 const PatientNavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
+
+  const handleLogOut = async (e) => {
+    window.location.href = "http://localhost:3000/auth/login";
+  };
 
   return (
     <>
@@ -90,6 +98,21 @@ const PatientNavBar = () => {
                   <i className="fa-solid fa-video"></i>
                 </span>
               </NavLink>
+            </NavItem>
+            <NavItem>
+              <UncontrolledDropdown nav>
+                <DropdownToggle className="pr-0" nav>
+                  <span className="nav-link-icon d-block text-white">
+                    <i className="ni ni-button-power" />
+                  </span>
+                </DropdownToggle>
+                <DropdownMenu className="dropdown-menu-arrow" right>
+                  <DropdownItem href="#pablo" onClick={handleLogOut}>
+                    <i className="ni ni-user-run" />
+                    <span>Logout</span>
+                  </DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
             </NavItem>
           </Nav>
         </Collapse>

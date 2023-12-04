@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 // reactstrap components
 import {
   Button,
@@ -12,9 +13,14 @@ import {
   InputGroup,
   Row,
   Col,
+  Alert,
 } from "reactstrap";
 
 const RegisterPatient = () => {
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
   const [patientFields, setPatientFields] = useState({
     username: "",
     fName: "",
@@ -47,6 +53,47 @@ const RegisterPatient = () => {
       ...prevFields,
       [name]: value,
     }));
+  };
+
+  const handlePatientRegister = async () => {
+    try {
+      // Validate all fields
+      for (const key in patientFields) {
+        if (!patientFields[key]) {
+          setVisible(true);
+          setAlertMessage(`Please complete all the form`);
+          return;
+        }
+      }
+
+      for (const key in emergencyContact) {
+        if (!emergencyContact[key]) {
+          setVisible(true);
+          setAlertMessage(`Please complete all the form`);
+          return;
+        }
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(patientFields.email)) {
+        setVisible(true);
+        setAlertMessage("Please enter a valid email address");
+        return;
+      }
+
+      const response = await axios.post("/patients/register", {
+        patientFields,
+        emergencyContact,
+      });
+
+      window.location.href = "`http://localhost:3000/auth/login`";
+      alert(response.data.message);
+    } catch (error) {
+      // Handle errors
+      console.error("Error registering doctor:", error);
+      alert(error.response.data.message);
+    }
   };
 
   return (
@@ -228,12 +275,6 @@ const RegisterPatient = () => {
                   </FormGroup>
                 </Col>
               </Row>
-              {/* <div className="text-muted font-italic">
-                <small>
-                  password strength:{" "}
-                  <span className="text-success font-weight-700">strong</span>
-                </small>
-              </div> */}
 
               <div className="text-center text-muted mb-4">
                 <small>Emergency Contact Details</small>
@@ -281,11 +322,24 @@ const RegisterPatient = () => {
               </Row>
 
               <div className="text-center">
-                <Button className="mt-4" color="primary" type="button">
+                <Button
+                  className="mt-4"
+                  color="primary"
+                  type="button"
+                  onClick={handlePatientRegister}
+                >
                   Create account
                 </Button>
               </div>
             </Form>
+            <Alert
+              className="mt-3"
+              color="danger"
+              isOpen={visible}
+              toggle={onDismiss}
+            >
+              {alertMessage}
+            </Alert>
           </CardBody>
         </Card>
       </Col>
