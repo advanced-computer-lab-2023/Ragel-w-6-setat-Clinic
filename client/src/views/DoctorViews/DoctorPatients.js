@@ -5,12 +5,11 @@ import {
   Container,
   Row,
   Col,
-  Table,
-  Media,
   FormGroup,
   Form,
   CardBody,
   Input,
+  UncontrolledTooltip,
 } from "reactstrap";
 
 const DoctorPatients = () => {
@@ -85,85 +84,226 @@ const DoctorPatients = () => {
             </Card>
           </Col>
           <Col xl="8">
-            <Card
-              className="shadow mt-5"
-              style={{
-                backgroundColor: "#0C356A",
-              }}
-            >
-              <CardHeader
-                className="border-0"
-                style={{
-                  backgroundColor: "#0C356A",
-                }}
-              >
-                <Row>
-                  <Col lg="6">
-                    <h3 className="mb-0" style={{ color: "#f7fafc" }}>
-                      My Patients
-                    </h3>
-                  </Col>
-                </Row>
-              </CardHeader>
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    >
-                      Patient
-                    </th>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    >
-                      Gender
-                    </th>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    >
-                      Phone Number
-                    </th>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    ></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr key="1" style={{ color: "#f7fafc" }}>
-                    <th scope="row">
-                      <Media className="align-items-center">
-                        <Media>
-                          <span className="mb-0 text-sm">Sara Elshemy</span>
-                        </Media>
-                      </Media>
-                    </th>
-                    <td> female </td>
-                    <td> 01234567890</td>
-                    <td>
-                      <Button color="secondary" size="sm">
-                        View Patient Details
-                      </Button>
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-            </Card>
+            <Container fluid>
+              <Row>
+                <Col className="order-xl-6 mb-4" xl="6">
+                  <Card
+                    className="card-profile shadow"
+                    style={{ backgroundColor: "#EEF5FF" }}
+                  >
+                    <Row className="justify-content-center">
+                      <Col className="order-lg-2" lg="3">
+                        <div className="card-profile-image">
+                          <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                            <img
+                              id="tooltip1"
+                              alt="..."
+                              className="rounded-circle"
+                              src={require("../../assets/img/brand/patienticonf.png")}
+                              style={{
+                                height: "70px",
+                                width: "70px",
+                                background: "#EEF5FF",
+                              }}
+                            />
+                          </a>
+                          <UncontrolledTooltip
+                            delay={0}
+                            placement="right"
+                            target="tooltip1"
+                            style={{ backgroundColor: "#0C356A" }}
+                          >
+                            Click to view profile
+                          </UncontrolledTooltip>
+                        </div>
+                      </Col>
+                    </Row>
+                    <CardHeader
+                      className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4"
+                      style={{ backgroundColor: "#EEF5FF" }}
+                    ></CardHeader>
+                    <CardBody className="pt-0 pt-md-4">
+                      <div className="text-center">
+                        <div className="h5 font-weight-300">
+                          <i className="ni location_pin mr-2" />
+                          Female
+                        </div>
+                        <h3>
+                          Jessica Jones
+                          <span className="font-weight-light">, 27</span>
+                        </h3>
+                        <div className="h5 font-weight-300">
+                          <i className="ni location_pin mr-2" />
+                          Phone No.: 01000000000
+                        </div>
+                      </div>{" "}
+                    </CardBody>
+                  </Card>
+                </Col>
+                <Col className="order-xl-6 mb-4" xl="6">
+                  <Card
+                    className="card-profile shadow"
+                    style={{ backgroundColor: "#EEF5FF" }}
+                  >
+                    <Row className="justify-content-center">
+                      <Col className="order-lg-2" lg="3">
+                        <div className="card-profile-image">
+                          <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                            <img
+                              id="tooltip2"
+                              alt="..."
+                              className="rounded-circle"
+                              src={require("../../assets/img/brand/patienticonm.png")}
+                              style={{
+                                height: "70px",
+                                width: "70px",
+                                background: "#EEF5FF",
+                              }}
+                            />
+                          </a>
+                          <UncontrolledTooltip
+                            delay={0}
+                            placement="right"
+                            target="tooltip2"
+                            style={{ backgroundColor: "#0C356A" }}
+                          >
+                            Click to view profile
+                          </UncontrolledTooltip>
+                        </div>
+                      </Col>
+                    </Row>
+                    <CardHeader
+                      className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4"
+                      style={{ backgroundColor: "#EEF5FF" }}
+                    ></CardHeader>
+                    <CardBody className="pt-0 pt-md-4">
+                      <div className="text-center">
+                        <div className="h5 font-weight-300">
+                          <i className="ni location_pin mr-2" />
+                          Male
+                        </div>
+                        <h3>
+                          Jackson Smith
+                          <span className="font-weight-light">, 37</span>
+                        </h3>
+                        <div className="h5 font-weight-300">
+                          <i className="ni location_pin mr-2" />
+                          Phone No.: 01000000000
+                        </div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+                <Col className="order-xl-6 mb-4" xl="6">
+                  <Card
+                    className="card-profile shadow"
+                    style={{ backgroundColor: "#EEF5FF" }}
+                  >
+                    <Row className="justify-content-center">
+                      <Col className="order-lg-2" lg="3">
+                        <div className="card-profile-image">
+                          <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                            <img
+                              id="tooltip3"
+                              alt="..."
+                              className="rounded-circle"
+                              src={require("../../assets/img/brand/patienticonf.png")}
+                              style={{
+                                height: "70px",
+                                width: "70px",
+                                background: "#EEF5FF",
+                              }}
+                            />
+                          </a>
+                          <UncontrolledTooltip
+                            delay={0}
+                            placement="right"
+                            target="tooltip3"
+                            style={{ backgroundColor: "#0C356A" }}
+                          >
+                            Click to view profile
+                          </UncontrolledTooltip>
+                        </div>
+                      </Col>
+                    </Row>
+                    <CardHeader
+                      className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4"
+                      style={{ backgroundColor: "#EEF5FF" }}
+                    ></CardHeader>
+                    <CardBody className="pt-0 pt-md-4">
+                      <div className="text-center">
+                        <div className="h5 font-weight-300">
+                          <i className="ni location_pin mr-2" />
+                          Female
+                        </div>
+                        <h3>
+                          Jessica Jones
+                          <span className="font-weight-light">, 27</span>
+                        </h3>
+                        <div className="h5 font-weight-300">
+                          <i className="ni location_pin mr-2" />
+                          Phone No.: 01000000000
+                        </div>
+                      </div>{" "}
+                    </CardBody>
+                  </Card>
+                </Col>
+                <Col className="order-xl-6 mb-4" xl="6">
+                  <Card
+                    className="card-profile shadow"
+                    style={{ backgroundColor: "#EEF5FF" }}
+                  >
+                    <Row className="justify-content-center">
+                      <Col className="order-lg-2" lg="3">
+                        <div className="card-profile-image">
+                          <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                            <img
+                              id="tooltip4"
+                              alt="..."
+                              className="rounded-circle"
+                              src={require("../../assets/img/brand/patienticonm.png")}
+                              style={{
+                                height: "70px",
+                                width: "70px",
+                                background: "#EEF5FF",
+                              }}
+                            />
+                          </a>
+                          <UncontrolledTooltip
+                            delay={0}
+                            placement="right"
+                            target="tooltip4"
+                            style={{ backgroundColor: "#0C356A" }}
+                          >
+                            Click to view profile
+                          </UncontrolledTooltip>
+                        </div>
+                      </Col>
+                    </Row>
+                    <CardHeader
+                      className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4"
+                      style={{ backgroundColor: "#EEF5FF" }}
+                    ></CardHeader>
+                    <CardBody className="pt-0 pt-md-4">
+                      <div className="text-center">
+                        <div className="h5 font-weight-300">
+                          <i className="ni location_pin mr-2" />
+                          Male
+                        </div>
+                        <h3>
+                          Jackson Smith
+                          <span className="font-weight-light">, 37</span>
+                        </h3>
+                        <div className="h5 font-weight-300">
+                          <i className="ni location_pin mr-2" />
+                          Phone No.: 01000000000
+                        </div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+            </Container>
           </Col>
         </Row>
       </Container>

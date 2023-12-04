@@ -1,3 +1,7 @@
+import React, { useState } from "react";
+
+import Select from "react-select";
+
 //components
 
 import {
@@ -7,10 +11,38 @@ import {
   Container,
   Row,
   Col,
+  Input,
   CardTitle,
+  FormGroup,
+  Label,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "reactstrap";
 
-const PrescriptionDetails = () => {
+const DoctorPrescriptionDetailsForPatient = () => {
+  const [modal, setModal] = useState(false);
+  const toggleModal = () => setModal(!modal);
+  const [editMode, setEditMode] = useState(false);
+
+  const options = [
+    { value: "Medicine1", label: "Medicine1" },
+    { value: "Medicine2", label: "Medicine2" },
+  ];
+
+  const handleDone = () => {
+    setEditMode(false);
+  };
+
+  const handleCancel = () => {
+    setEditMode(false);
+  };
+
+  const handleEdit = () => {
+    setEditMode(true);
+  };
+
   return (
     <>
       <Container className="mt-5 mb-5" fluid>
@@ -21,20 +53,77 @@ const PrescriptionDetails = () => {
               style={{ backgroundColor: "#EEF5FF" }}
             >
               <Row>
-                <Col className="ml-3 mr-6 mt-3" xl="3">
-                  <Button color="secondary" size="sm">
-                    Download as PDF
-                  </Button>
-                </Col>
-                <Col className="mt-3 ml-5 mr--5" xl="4">
-                  <Button color="secondary" size="sm">
-                    Pay with Credit Card
-                  </Button>
-                </Col>
-                <Col className="mt-3" xl="3">
-                  <Button color="secondary" size="sm">
-                    Pay with Wallet
-                  </Button>
+                <Col className="ml-3 mt-3" xl="12">
+                  {editMode ? (
+                    <>
+                      <Button color="secondary" size="sm" onClick={toggleModal}>
+                        Add Medicine
+                      </Button>
+                      <Modal isOpen={modal} toggle={toggleModal}>
+                        <ModalHeader toggle={toggleModal}>
+                          Add Medicines to this Prescription
+                        </ModalHeader>
+                        <ModalBody>
+                          <Row>
+                            <Col className="mt--4" lg="12">
+                              <Label className="form-control-label">
+                                Medicines Added:
+                              </Label>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col lg="12">
+                              <FormGroup>
+                                <Label className="form-control-label">
+                                  Medicine:
+                                </Label>
+                                <Select
+                                  options={options}
+                                  isSearchable={true}
+                                  placeholder="Select Medicine"
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col lg="12">
+                              <FormGroup>
+                                <Label className="form-control-label">
+                                  Dosage:
+                                </Label>
+                                <Input type="text" placeholder="Dosage" />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col className="mb-3" lg="12">
+                              <Button color="default" size="sm">
+                                Add Medicine
+                              </Button>
+                            </Col>
+                          </Row>
+                        </ModalBody>
+                        <ModalFooter>
+                          <Button color="default">
+                            Confirm New Medicines to Prescription
+                          </Button>{" "}
+                          <Button color="secondary" onClick={toggleModal}>
+                            Cancel
+                          </Button>
+                        </ModalFooter>
+                      </Modal>
+                      <Button color="success" size="sm" onClick={handleDone}>
+                        Done
+                      </Button>{" "}
+                      <Button color="danger" size="sm" onClick={handleCancel}>
+                        Cancel
+                      </Button>{" "}
+                    </>
+                  ) : (
+                    <Button color="secondary" size="sm" onClick={handleEdit}>
+                      Edit Prescription
+                    </Button>
+                  )}
                 </Col>
               </Row>
               <CardBody className="pt-0 pt-md-4">
@@ -60,13 +149,22 @@ const PrescriptionDetails = () => {
                                   Panadol
                                 </CardTitle>
                                 <span className="h4 text-muted mb-0">
-                                  2 times a day
+                                  {editMode ? (
+                                    <Input type="text" placeholder="Dosage" />
+                                  ) : (
+                                    "2 times a day"
+                                  )}
                                 </span>
                               </div>
                             </Row>
                             <p className="mt-1 mb-0 text-muted text-sm">
                               <span className="text-nowrap">100 EGP</span>
                             </p>
+                            {editMode && (
+                              <Button color="danger" size="sm">
+                                Delete Medicine
+                              </Button>
+                            )}
                           </CardBody>
                         </Card>
                       </Col>
@@ -82,13 +180,22 @@ const PrescriptionDetails = () => {
                                   Panadol
                                 </CardTitle>
                                 <span className="h4 text-muted mb-0">
-                                  2 times a day
+                                  {editMode ? (
+                                    <Input type="text" placeholder="Dosage" />
+                                  ) : (
+                                    "2 times a day"
+                                  )}
                                 </span>
                               </div>
                             </Row>
                             <p className="mt-1 mb-0 text-muted text-sm">
                               <span className="text-nowrap">100 EGP</span>
                             </p>
+                            {editMode && (
+                              <Button color="danger" size="sm">
+                                Delete Medicine
+                              </Button>
+                            )}
                           </CardBody>
                         </Card>
                       </Col>
@@ -104,13 +211,22 @@ const PrescriptionDetails = () => {
                                   Panadol
                                 </CardTitle>
                                 <span className="h4 text-muted mb-0">
-                                  2 times a day
+                                  {editMode ? (
+                                    <Input type="text" placeholder="Dosage" />
+                                  ) : (
+                                    "2 times a day"
+                                  )}
                                 </span>
                               </div>
                             </Row>
                             <p className="mt-1 mb-0 text-muted text-sm">
                               <span className="text-nowrap">100 EGP</span>
                             </p>
+                            {editMode && (
+                              <Button color="danger" size="sm">
+                                Delete Medicine
+                              </Button>
+                            )}
                           </CardBody>
                         </Card>
                       </Col>
@@ -126,13 +242,22 @@ const PrescriptionDetails = () => {
                                   Panadol
                                 </CardTitle>
                                 <span className="h4 text-muted mb-0">
-                                  2 times a day
+                                  {editMode ? (
+                                    <Input type="text" placeholder="Dosage" />
+                                  ) : (
+                                    "2 times a day"
+                                  )}
                                 </span>
                               </div>
                             </Row>
                             <p className="mt-1 mb-0 text-muted text-sm">
                               <span className="text-nowrap">100 EGP</span>
                             </p>
+                            {editMode && (
+                              <Button color="danger" size="sm">
+                                Delete Medicine
+                              </Button>
+                            )}
                           </CardBody>
                         </Card>
                       </Col>
@@ -148,13 +273,22 @@ const PrescriptionDetails = () => {
                                   Panadol
                                 </CardTitle>
                                 <span className="h4 text-muted mb-0">
-                                  2 times a day
+                                  {editMode ? (
+                                    <Input type="text" placeholder="Dosage" />
+                                  ) : (
+                                    "2 times a day"
+                                  )}
                                 </span>
                               </div>
                             </Row>
                             <p className="mt-1 mb-0 text-muted text-sm">
                               <span className="text-nowrap">100 EGP</span>
                             </p>
+                            {editMode && (
+                              <Button color="danger" size="sm">
+                                Delete Medicine
+                              </Button>
+                            )}
                           </CardBody>
                         </Card>
                       </Col>
@@ -175,4 +309,4 @@ const PrescriptionDetails = () => {
     </>
   );
 };
-export default PrescriptionDetails;
+export default DoctorPrescriptionDetailsForPatient;

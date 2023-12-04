@@ -29,6 +29,10 @@ import HomeDoctor from "views/DoctorViews/HomeDoctor";
 import DoctorAppointments from "views/DoctorViews/DoctorAppointments";
 import AppointmentRequests from "views/DoctorViews/AppointmentRequests";
 import DoctorPatients from "views/DoctorViews/DoctorPatients";
+import PatientDetails from "views/DoctorViews/PatientDetails";
+import DoctorMedicalHistoryForPatient from "views/DoctorViews/DoctorMedicalHistoryForPatient";
+import DoctorPrescriptionsForPatient from "views/DoctorViews/DoctorPrescriptionsForPatient";
+import DoctorPrescriptionDetailsForPatient from "views/DoctorViews/DoctorPrescriptionDetailsForPatient";
 
 var routes = [
   // patient routes
@@ -132,6 +136,35 @@ var routes = [
     component: <DoctorPatients />,
     layout: "/doctor",
   },
+  {
+    path: "/patientDetails",
+    name: "Patient Details",
+    icon: "ni ni-single-02 text-yellow",
+    component: <PatientDetails />,
+    layout: "/doctor",
+  },
+  {
+    path: "/patientMedicalHistory",
+    name: "Patient Medical History",
+    icon: "ni ni-single-02 text-yellow",
+    component: <DoctorMedicalHistoryForPatient />,
+    layout: "/doctor",
+  },
+  {
+    path: "/patientPrescriptions",
+    name: "Patient Prescription",
+    icon: "ni ni-single-02 text-yellow",
+    component: <DoctorPrescriptionsForPatient />,
+    layout: "/doctor",
+  },
+  {
+    path: "/patientPrescriptionDetails",
+    name: "Patient Prescription Details",
+    icon: "ni ni-single-02 text-yellow",
+    component: <DoctorPrescriptionDetailsForPatient />,
+    layout: "/doctor",
+  },
+
   // admin routes
   {
     path: "/home",
