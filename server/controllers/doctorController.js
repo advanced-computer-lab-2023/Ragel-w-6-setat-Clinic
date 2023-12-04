@@ -1,6 +1,7 @@
 import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
 import Appointments from "../models/Appointments.js";
+import Admin from "../models/Admin.js";
 
 // HABIBAS REQS
 
@@ -24,6 +25,22 @@ const registerDoctor = async (req, res) => {
     const medicalLicense = req.files.fileMedicalLicense[0].filename;
     const medicalDegree = req.files.fileMedicalDegree[0].filename;
 
+    const patient = await Patient.findOne({ username });
+    const patient2 = await Patient.findOne({ email });
+    const admin = await Admin.findOne({ username });
+
+    if (patient || admin) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this username" });
+    }
+
+    if (patient2) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this email" });
+    }
+
     const newDoctor = new Doctor({
       username,
       password,
@@ -46,7 +63,13 @@ const registerDoctor = async (req, res) => {
     res.status(201).json({ message: "Doctor registered successfully" });
   } catch (error) {
     console.error("Doctor registration error:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      const message = `A user already exists with this ${duplicatedField}`;
+      res.status(500).json({ message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 };
 

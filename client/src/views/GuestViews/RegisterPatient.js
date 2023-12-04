@@ -27,7 +27,7 @@ const RegisterPatient = () => {
     lName: "",
     email: "",
     dateOfBirth: "",
-    gender: "",
+    gender: "female",
     nationalID: "",
     phoneNum: "",
     password: "",
@@ -82,17 +82,35 @@ const RegisterPatient = () => {
         return;
       }
 
-      const response = await axios.post("/patients/register", {
+      // Validate username format
+      const usernameRegex = /^[^\s]+$/;
+      if (!usernameRegex.test(patientFields.username)) {
+        setVisible(true);
+        setAlertMessage("Username should not contain spaces");
+        return;
+      }
+
+      // // ensure password is at least 8 characters, with one uppercase letter, and one symbol
+      // const passwordRegex =
+      //   /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+,\-./:;<=>?@[\\\]^_`{|}~])[a-zA-Z0-9!@#$%^&*()_+,\-./:;<=>?@[\\\]^_`{|}~]{8,}$/;
+      // if (!passwordRegex.test(patientFields.password)) {
+      //   setVisible(true);
+      //   setAlertMessage(
+      //     "Password should be at least 8 characters, with one uppercase letter, and one symbol"
+      //   );
+      //   return;
+      // }
+
+      await axios.post("/patients/register", {
         patientFields,
         emergencyContact,
       });
 
       window.location.href = "`http://localhost:3000/auth/login`";
-      alert(response.data.message);
     } catch (error) {
-      // Handle errors
-      console.error("Error registering doctor:", error);
-      alert(error.response.data.message);
+      console.error("Error registering patient:", error);
+      setVisible(true);
+      setAlertMessage(error.response.data.message);
     }
   };
 

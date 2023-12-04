@@ -1,6 +1,7 @@
 import Patient from "../models/Patient.js";
 import Prescription from "../models/Prescription.js";
 import Doctor from "../models/Doctor.js";
+import Admin from "../models/Admin.js";
 import Appointments from "../models/Appointments.js";
 import Package from "../models/Package.js";
 import stripe from "stripe";
@@ -72,21 +73,48 @@ async function doctorDisplay(patientID, doctor) {
 
 const registerPatient = async (req, res) => {
   try {
+    const doctor = await Doctor.findOne({
+      username: req.body.patientFields.username,
+    });
+    const doctor2 = await Doctor.findOne({
+      email: req.body.patientFields.email,
+    });
+    const admin = await Admin.findOne({
+      username: req.body.patientFields.username,
+    });
+
+    if (doctor || admin) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this username" });
+    }
+
+    if (doctor2) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this email" });
+    }
+
     const patient = await Patient.create({
       ...req.body.patientFields,
       emergencyContact: {
         ...req.body.emergencyContact,
       },
     });
+
     res.status(201).json({
       status: "success",
       message: "Patient successfully registered.",
     });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+  } catch (error) {
+    console.error("Doctor registration error:", error);
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      const message = `A user already exists with this ${duplicatedField}`;
+      res.status(500).json({ message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 };
 
