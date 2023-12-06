@@ -1,6 +1,7 @@
 // reactstrap components
 
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Button,
@@ -14,11 +15,58 @@ import {
   InputGroup,
   Row,
   Col,
+  Alert,
 } from "reactstrap";
 
+import { UserContext } from "contexts/UserContext";
+
 const Login = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  // eslint-disable-next-line
+  const { user, setUser } = useContext(UserContext);
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser({ _id: data.user._id.toString() });
+        switch (data.userType) {
+          case "doctor":
+            navigate("/doctor");
+            break;
+          case "patient":
+            navigate("/patient");
+            break;
+          case "admin":
+            navigate("/admin");
+            break;
+          default:
+            // Default redirection or handle unknown user type
+            navigate("/default/dashboard");
+        }
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error("Error during login:", error.message);
+      setVisible(true);
+      setAlertMessage(error.message);
+    }
+  };
 
   return (
     <>
@@ -73,11 +121,24 @@ const Login = () => {
                 </label>
               </div>
               <div className="text-center">
-                <Button className="my-4" color="primary" type="button">
+                <Button
+                  className="my-4"
+                  color="primary"
+                  type="button"
+                  onClick={handleLogin}
+                >
                   Sign in
                 </Button>
               </div>
             </Form>
+            <Alert
+              className="mt-3"
+              color="danger"
+              isOpen={visible}
+              toggle={onDismiss}
+            >
+              {alertMessage}
+            </Alert>
           </CardBody>
         </Card>
         <Row className="mt-3">

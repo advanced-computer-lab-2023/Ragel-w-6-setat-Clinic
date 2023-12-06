@@ -265,15 +265,24 @@ const uploadDocument = async (req, res) => {
   const patientId = req.params.id;
   try {
     const patient = await Patient.findById(patientId);
-    patient.medicalHistory.push(req.file.filename);
+    const newHealthRecord = {
+      uploadByID: patientId,
+      uploadByType: "Patient",
+      name: req.file.originalname,
+      filePath: req.file.filename,
+      forWhomID: patientId,
+      fileType: req.file.mimetype,
+    };
+
+    patient.medicalHistory.push(newHealthRecord);
+    const medicalHistory = patient.medicalHistory;
     await patient.save();
     res.status(200).json({
-      status: "success",
-      message: "Document uploaded successfully.",
+      medicalHistory: medicalHistory,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -281,29 +290,30 @@ const getMedicalHistory = async (req, res) => {
   const patientId = req.params.id;
   try {
     const patient = await Patient.findById(patientId);
-    res.status(200).json(patient.medicalHistory);
+    res.status(200).json({ medicalHistory: patient.medicalHistory });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
 const removeDocument = async (req, res) => {
   const patientId = req.params.patientid;
   const documentId = req.params.documentid;
+
   try {
     const patient = await Patient.findById(patientId);
 
     // Remove the document from the medicalHistory array
     patient.medicalHistory = patient.medicalHistory.filter(
-      (document) => document !== documentId
+      (document) => document._id.toString() !== documentId
     );
     await patient.save();
 
     res.status(200).json({ message: "Document removed successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
