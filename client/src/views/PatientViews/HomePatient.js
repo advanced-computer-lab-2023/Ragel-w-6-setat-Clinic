@@ -23,10 +23,6 @@ import {
 const HomePatient = () => {
   const navigate = useNavigate();
 
-  const handleMedicalHistoryClick = () => {
-    navigate("/patient/medicalHistory");
-  };
-
   const handleFamilyMembersClick = () => {
     navigate("/patient/familyMembers");
   };
@@ -113,7 +109,7 @@ const HomePatient = () => {
                       color="default"
                       size="lg"
                       type="button"
-                      onClick={handleMedicalHistoryClick}
+                      href="/patient/medicalHistory"
                     >
                       Medical History
                     </Button>

@@ -8,6 +8,9 @@ import {
   ListGroup,
   ListGroupItem,
   Button,
+  Pagination,
+  PaginationItem,
+  PaginationLink,
 } from "reactstrap";
 
 import { UserContext } from "../../contexts/UserContext";
@@ -16,6 +19,35 @@ const MedicalHistory = () => {
   const { user } = useContext(UserContext);
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [acceptedFiles, setAcceptedFiles] = useState([]);
+
+  // pagination patient
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 4;
+  const lastIndex = currentPage * recordsPerPage;
+  const firstIndex = lastIndex - recordsPerPage;
+  const patientMedicalHistory = medicalHistory.filter(
+    (record) => record.uploadByType === "Patient"
+  );
+  const records = patientMedicalHistory.slice(firstIndex, lastIndex);
+  const npage = Math.ceil(patientMedicalHistory.length / recordsPerPage);
+  const numbers = [...Array(npage + 1).keys()].slice(1);
+
+  // pagination doctor
+  const [currentPageDoctor, setCurrentPageDoctor] = useState(1);
+  const recordsPerPageDoctor = 4;
+  const lastIndexDoctor = currentPageDoctor * recordsPerPageDoctor;
+  const firstIndexDoctor = lastIndexDoctor - recordsPerPageDoctor;
+  const doctorMedicalHistory = medicalHistory.filter(
+    (record) => record.uploadByType === "Doctor"
+  );
+  const recordsDoctor = doctorMedicalHistory.slice(
+    firstIndexDoctor,
+    lastIndexDoctor
+  );
+  const npageDoctor = Math.ceil(
+    doctorMedicalHistory.length / recordsPerPageDoctor
+  );
+  const numbersDoctor = [...Array(npageDoctor + 1).keys()].slice(1);
 
   useEffect(() => {
     const fetchMedicalHistory = async () => {
@@ -87,6 +119,42 @@ const MedicalHistory = () => {
     maxFiles: 1,
   });
 
+  // pagination functions patient
+
+  function prevPage() {
+    if (currentPage !== 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  }
+
+  function nextPage() {
+    if (currentPage !== npage) {
+      setCurrentPage(currentPage + 1);
+    }
+  }
+
+  function changeCurrentPage(id) {
+    setCurrentPage(id);
+  }
+
+  // pagination functions doctor
+
+  function prevPageDoctor() {
+    if (currentPageDoctor !== 1) {
+      setCurrentPageDoctor(currentPageDoctor - 1);
+    }
+  }
+
+  function nextPageDoctor() {
+    if (currentPageDoctor !== npageDoctor) {
+      setCurrentPageDoctor(currentPageDoctor + 1);
+    }
+  }
+
+  function changeCurrentPageDoctor(id) {
+    setCurrentPageDoctor(id);
+  }
+
   return (
     <>
       {/* Display uploaded files and trigger upload on button click */}
@@ -132,8 +200,8 @@ const MedicalHistory = () => {
               </h4>
 
               <ListGroup flush>
-                {medicalHistory.length > 0
-                  ? medicalHistory.map(
+                {records.length > 0
+                  ? records.map(
                       (record, index) =>
                         record.uploadByType === "Patient" && (
                           <ListGroupItem
@@ -178,6 +246,43 @@ const MedicalHistory = () => {
                     )
                   : ""}
               </ListGroup>
+              <nav aria-label="...">
+                <Pagination
+                  className="pagination justify-content-center mt-2"
+                  listClassName="justify-content-center"
+                >
+                  <PaginationItem>
+                    <PaginationLink href="#" onClick={prevPage}>
+                      <i className="fa fa-angle-left" />
+                      <span className="sr-only">Previous</span>
+                    </PaginationLink>
+                  </PaginationItem>
+                  {numbers.map((n, i) => (
+                    <PaginationItem
+                      key={i}
+                      className={`${currentPage === n ? "active" : ""}`}
+                    >
+                      <PaginationLink
+                        style={{
+                          backgroundColor: currentPage === n ? "#0C356A" : "", // Apply custom color when active
+                          color: currentPage === n ? "#ffffff" : "", // Text color when active
+                        }}
+                        href="#"
+                        onClick={() => changeCurrentPage(n)}
+                      >
+                        {n}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationLink href="#" onClick={nextPage}>
+                      <i className="fa fa-angle-right" />
+                      <span className="sr-only">Next</span>
+                    </PaginationLink>
+                  </PaginationItem>
+                </Pagination>
+              </nav>
             </Container>
           </Col>
           <Col
@@ -199,8 +304,8 @@ const MedicalHistory = () => {
                 Records Uploaded by Doctors
               </h4>
               <ListGroup flush>
-                {medicalHistory.length > 0
-                  ? medicalHistory.map(
+                {recordsDoctor.length > 0
+                  ? recordsDoctor.map(
                       (record, index) =>
                         record.uploadByType === "Doctor" && (
                           <ListGroupItem
@@ -238,6 +343,44 @@ const MedicalHistory = () => {
                     )
                   : ""}
               </ListGroup>
+              <nav aria-label="...">
+                <Pagination
+                  className="pagination justify-content-center mt-2"
+                  listClassName="justify-content-center"
+                >
+                  <PaginationItem>
+                    <PaginationLink href="#" onClick={prevPageDoctor}>
+                      <i className="fa fa-angle-left" />
+                      <span className="sr-only">Previous</span>
+                    </PaginationLink>
+                  </PaginationItem>
+                  {numbersDoctor.map((n, i) => (
+                    <PaginationItem
+                      key={i}
+                      className={`${currentPageDoctor === n ? "active" : ""}`}
+                    >
+                      <PaginationLink
+                        style={{
+                          backgroundColor:
+                            currentPageDoctor === n ? "#0C356A" : "", // Apply custom color when active
+                          color: currentPageDoctor === n ? "#ffffff" : "", // Text color when active
+                        }}
+                        href="#"
+                        onClick={() => changeCurrentPageDoctor(n)}
+                      >
+                        {n}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationLink href="#" onClick={nextPageDoctor}>
+                      <i className="fa fa-angle-right" />
+                      <span className="sr-only">Next</span>
+                    </PaginationLink>
+                  </PaginationItem>
+                </Pagination>
+              </nav>
             </Container>
           </Col>
         </Row>
