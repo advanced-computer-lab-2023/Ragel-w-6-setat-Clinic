@@ -23,6 +23,17 @@ import HomeAdmin from "views/AdminViews/HomeAdmin";
 import AllUsers from "views/AdminViews/AllUsers";
 import UnregisteredDoctors from "views/AdminViews/UnregisteredDoctors";
 
+//doctor users
+
+import HomeDoctor from "views/DoctorViews/HomeDoctor";
+import DoctorAppointments from "views/DoctorViews/DoctorAppointments";
+import AppointmentRequests from "views/DoctorViews/AppointmentRequests";
+import DoctorPatients from "views/DoctorViews/DoctorPatients";
+import PatientDetails from "views/DoctorViews/PatientDetails";
+import DoctorMedicalHistoryForPatient from "views/DoctorViews/DoctorMedicalHistoryForPatient";
+//import DoctorPrescriptionsForPatient from "views/DoctorViews/DoctorPrescriptionsForPatient";
+//import DoctorPrescriptionDetailsForPatient from "views/DoctorViews/DoctorPrescriptionDetailsForPatient";
+
 var routes = [
   // patient routes
   {
@@ -118,6 +129,51 @@ var routes = [
     component: <UnregisteredDoctors />,
     layout: "/admin",
   },
+
+    // doctor routes
+    {
+      path: "/home",
+      name: "Home",
+      icon: "ni ni-single-02 text-yellow",
+      component: <HomeDoctor />,
+      layout: "/doctor",
+    },
+    {
+      path: "/myAppointments",
+      name: "My Appointments",
+      icon: "ni ni-single-02 text-yellow",
+      component: <DoctorAppointments />,
+      layout: "/doctor",
+    },
+    {
+      path: "/appointmentRequests",
+      name: "Appointment Requests",
+      icon: "ni ni-single-02 text-yellow",
+      component: <AppointmentRequests />,
+      layout: "/doctor",
+    },
+    {
+      path: "/myPatients",
+      name: "My Patients",
+      icon: "ni ni-single-02 text-yellow",
+      component: <DoctorPatients />,
+      layout: "/doctor",
+    },
+    {
+      path: "/patientDetails",
+      name: "Patient Details",
+      icon: "ni ni-single-02 text-yellow",
+      component: <PatientDetails />,
+      layout: "/doctor",
+    },
+    {
+      path: "/patientMedicalHistory",
+      name: "Patient Medical History",
+      icon: "ni ni-single-02 text-yellow",
+      component: <DoctorMedicalHistoryForPatient />,
+      layout: "/doctor",
+    },
+
 
   // auth routes
   {
