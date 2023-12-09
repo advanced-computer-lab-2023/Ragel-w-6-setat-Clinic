@@ -25,6 +25,7 @@ function App() {
           path="/doctor/*"
           element={user && user.userType === "doctor" && <DoctorLayout />}
         />
+        <Route path="/*" element={!user && <AuthLayout />} />
       </Routes>
     </BrowserRouter>
   );

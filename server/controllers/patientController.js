@@ -107,7 +107,7 @@ const registerPatient = async (req, res) => {
       message: "Patient successfully registered.",
     });
   } catch (error) {
-    console.error("Doctor registration error:", error);
+    console.error("Patient registration error:", error);
     if (error.code === 11000) {
       const duplicatedField = Object.keys(error.keyPattern)[0];
       const message = `A user already exists with this ${duplicatedField}`;

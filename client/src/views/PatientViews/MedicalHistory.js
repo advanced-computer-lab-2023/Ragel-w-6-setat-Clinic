@@ -54,7 +54,7 @@ const MedicalHistory = () => {
     const fetchMedicalHistory = async () => {
       try {
         const response = await fetch(
-          `/patients/myMedicalHistory/${user.user._id.toString()}`,
+          `/patients/myMedicalHistory/${user.user._id}`,
           {
             headers: { Authorization: `Bearer ${user.token}` },
           }
@@ -83,7 +83,13 @@ const MedicalHistory = () => {
   const removeDocument = async (documentId) => {
     try {
       const response = await axios.patch(
-        `/patients/removeDocument/${user._id}/${documentId}`
+        `/patients/removeDocument/${user.user._id}/${documentId}`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
       );
 
       if (response.status === 200) {
@@ -104,8 +110,13 @@ const MedicalHistory = () => {
       formData.append("file", acceptedFiles[0]);
       try {
         const response = await axios.post(
-          `/patients/uploadDocument/${user._id}`,
-          formData
+          `/patients/uploadDocument/${user.user._id}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
         );
         if (response.status === 200) {
           setMedicalHistory(response.data.medicalHistory);
@@ -326,7 +337,7 @@ const MedicalHistory = () => {
                           >
                             <Button
                               className="mr-5"
-                              onClick={(e) => e.preventDefault()}
+                              onClick={() => showDocument(record.filePath)}
                               size="sm"
                               style={{
                                 backgroundColor: "#f8f9fe",

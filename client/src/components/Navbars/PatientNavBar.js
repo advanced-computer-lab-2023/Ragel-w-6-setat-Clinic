@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Collapse,
   Navbar,
@@ -68,10 +69,12 @@ const PatientNavBar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/patient/allDoctors" className="mb-sm-1 mb-md-0">
-                  <i className="fa-solid fa-user-doctor"></i>
-                  Doctors
-                </NavLink>
+                <Link to="/patient/allDoctors">
+                  <NavLink className="mb-sm-1 mb-md-0">
+                    <i className="fa-solid fa-user-doctor"></i>
+                    Doctors
+                  </NavLink>
+                </Link>
               </NavItem>
               <NavItem>
                 <NavLink href="/components/" className="mb-sm-1 mb-md-0">
@@ -88,7 +91,7 @@ const PatientNavBar = () => {
                   Health Packages
                 </NavLink>
               </NavItem>
-            </Nav>{" "}
+            </Nav>
           </Container>
           <Nav className="ml-auto" style={{ marginRight: "5px" }} navbar>
             <NavItem className="ml-auto">

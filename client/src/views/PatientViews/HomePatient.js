@@ -33,6 +33,10 @@ const HomePatient = () => {
     navigate("/patient/myPrescriptions");
   };
 
+  const handleMedicalHistoryClick = () => {
+    navigate("/patient/medicalHistory");
+  };
+
   return (
     <>
       <div
@@ -109,7 +113,7 @@ const HomePatient = () => {
                       color="default"
                       size="lg"
                       type="button"
-                      href="/patient/medicalHistory"
+                      onClick={handleMedicalHistoryClick}
                     >
                       Medical History
                     </Button>

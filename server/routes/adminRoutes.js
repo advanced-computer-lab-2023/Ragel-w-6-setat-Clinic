@@ -14,6 +14,7 @@ import {
   getAllPatients,
   setToRegistered,
   rejectDoctor,
+  getAdmin,
 } from "../controllers/adminController.js";
 import { body, validationResult } from "express-validator";
 
@@ -24,6 +25,7 @@ const router = express.Router();
 //require auth
 router.use(requireAuthAdmin);
 
+router.get("/adminDetails/:id", getAdmin);
 router.post("/addAdmin/:id", createAdmin);
 router.get("/getAllPackages/:id", getAllPackages);
 router.post("/packageManagement/:id", createPackage);

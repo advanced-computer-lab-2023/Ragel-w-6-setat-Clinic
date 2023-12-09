@@ -5,6 +5,19 @@ import Package from "../models/Package.js";
 import Appointment from "../models/Appointments.js";
 import Prescription from "../models/Prescription.js";
 
+// get an admin's details
+
+const getAdmin = async (req, res) => {
+  const adminId = req.params.id;
+  try {
+    const admin = await Admin.findById(adminId).select("username");
+    res.status(200).json({ admin });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getAllAdmins = async (req, res) => {
   const adminId = req.params.id;
   try {
@@ -30,18 +43,39 @@ const getAllPackages = async (req, res) => {
 // create an admin
 const createAdmin = async (req, res) => {
   const adminId = req.params.id;
-  console.log("heree");
+
+  const doctor = await Doctor.findOne({
+    username: req.body.username,
+  });
+
+  const patient = await Patient.findOne({
+    username: req.body.username,
+  });
+
+  if (doctor || patient) {
+    return res.status(400).json({
+      status: "fail",
+      message: "username already exists",
+    });
+  }
+
   try {
     const admin = await Admin.create(req.body);
-    res.status(201).json({
+    res.status(200).json({
       status: "success",
+      admin,
       message: "Admin successfully added.",
     });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+  } catch (error) {
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      const message = `${duplicatedField} already exists`;
+      res.status(400).json({ status: "fail", message });
+    } else {
+      res
+        .status(400)
+        .json({ status: "fail", message: "Internal Server Error" });
+    }
   }
 };
 
@@ -152,7 +186,6 @@ const deleteAdmin = async (req, res) => {
     };
 
     const deleteAdminResult = await Admin.findOneAndDelete(filter);
-    console.log(deleteAdminResult);
 
     if (deleteAdminResult.length === 0) {
       res.status(404).json({
@@ -338,4 +371,5 @@ export {
   getAllPatients,
   setToRegistered,
   rejectDoctor,
+  getAdmin,
 };

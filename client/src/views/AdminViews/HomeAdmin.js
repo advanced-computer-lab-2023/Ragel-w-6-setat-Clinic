@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // node.js library that concatenates classes (strings)
 import classnames from "classnames";
 // javascipt plugin for creating charts
@@ -23,6 +23,9 @@ import {
 // core components
 import { chartOptions, parseOptions, chartExample1 } from "variables/charts.js";
 
+// context
+import { useAuthContext } from "../../hooks/useAuthContext";
+
 const Index = () => {
   const [activeNav, setActiveNav] = useState(1);
   const [chartExample1Data, setChartExample1Data] = useState("data1");
@@ -36,6 +39,33 @@ const Index = () => {
     setActiveNav(index);
     setChartExample1Data("data" + index);
   };
+
+  const { user } = useAuthContext();
+
+  const [admin, setAdmin] = useState({ username: "" });
+
+  useEffect(() => {
+    const fetchAdmin = async () => {
+      try {
+        const response = await fetch(`/admins/adminDetails/${user.user._id}`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          setAdmin(data.admin);
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error.message);
+        alert(error.message);
+      }
+    };
+    fetchAdmin();
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <>
       {/* Page content */}
@@ -66,10 +96,13 @@ const Index = () => {
                     </div>
                   </Col>
                 </Row>
-                <CardBody className="pt-0 pt-md-4">
+                <CardBody
+                  className="pt-0 pt-md-4 d-flex align-items-center justify-content-center"
+                  style={{ height: "490px" }}
+                >
                   <div className="card-profile-stats d-flex justify-content-center mt-md-4"></div>
                   <div className="text-center">
-                    <h3>Hellp AdminUserName!</h3>
+                    <h3>Hello {admin.username}!</h3>
                     <div className="h5 mt-4">
                       <i className="ni business_briefcase-24 mr-2" />
                       Welcome to the Admin Dashboard!
@@ -81,13 +114,7 @@ const Index = () => {
                       valuable metrics on sales value, gain a deeper
                       understanding of social traffic with detailed analytics on
                       referrals from platforms like Facebook and Google, and
-                      monitor page visits to evaluate user engagement. This
-                      intuitive dashboard equips you with the tools to make
-                      informed decisions, ensuring your system thrives with
-                      efficiency and engagement. Stay ahead, stay informed, and
-                      take charge of your system's success. With dynamic charts
-                      and detailed statistics at your fingertips, navigating
-                      your system's performance has never been more insightful.
+                      monitor page visits to evaluate user engagement.
                     </div>
                   </div>
                 </CardBody>

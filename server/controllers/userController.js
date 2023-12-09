@@ -12,7 +12,7 @@ const login = async (req, res) => {
     const { username, password } = req.body;
     // Check Doctor database
     const doctor = await Doctor.findOne({ username, password }).exec();
-    if (doctor) {
+    if (doctor && doctor.isRegistered) {
       const token = createToken(doctor.username);
       return res.status(200).json({
         userType: "doctor",
