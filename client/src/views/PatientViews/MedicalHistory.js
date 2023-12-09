@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useContext } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
 import {
@@ -13,10 +13,11 @@ import {
   PaginationLink,
 } from "reactstrap";
 
-import { UserContext } from "../../contexts/UserContext";
+import { useAuthContext } from "../../hooks/useAuthContext";
 
 const MedicalHistory = () => {
-  const { user } = useContext(UserContext);
+  const { user } = useAuthContext();
+
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [acceptedFiles, setAcceptedFiles] = useState([]);
 
@@ -52,7 +53,12 @@ const MedicalHistory = () => {
   useEffect(() => {
     const fetchMedicalHistory = async () => {
       try {
-        const response = await fetch(`/patients/myMedicalHistory/${user._id}`);
+        const response = await fetch(
+          `/patients/myMedicalHistory/${user.user._id.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
         const data = await response.json();
         if (response.ok) {
           setMedicalHistory(data.medicalHistory);
@@ -64,8 +70,11 @@ const MedicalHistory = () => {
         alert(error.message);
       }
     };
-    fetchMedicalHistory();
-  }, [user._id]);
+
+    if (user) {
+      fetchMedicalHistory();
+    }
+  }, [user]);
 
   const showDocument = async (path) => {
     window.open(`http://localhost:4000/uploads/` + path);

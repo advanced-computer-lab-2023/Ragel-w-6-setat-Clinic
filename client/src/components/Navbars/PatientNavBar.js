@@ -14,12 +14,18 @@ import {
   DropdownItem,
 } from "reactstrap";
 
+import { useAuthContext } from "../../hooks/useAuthContext.js";
+
 const PatientNavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const toggle = () => setIsOpen(!isOpen);
 
+  const { dispatch } = useAuthContext();
+
   const handleLogOut = async (e) => {
+    localStorage.removeItem("user");
+    dispatch({ type: "LOGOUT" });
+
     window.location.href = "http://localhost:3000/auth/login";
   };
 

@@ -17,7 +17,12 @@ import {
 } from "../controllers/adminController.js";
 import { body, validationResult } from "express-validator";
 
+import { requireAuthAdmin } from "../middlewares/requireAuthAdmin.js";
+
 const router = express.Router();
+
+//require auth
+router.use(requireAuthAdmin);
 
 router.post("/addAdmin/:id", createAdmin);
 router.get("/getAllPackages/:id", getAllPackages);

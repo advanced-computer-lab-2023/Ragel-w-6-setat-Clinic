@@ -1,7 +1,8 @@
 // reactstrap components
 
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../../hooks/useAuthContext.js";
 
 import {
   Button,
@@ -18,8 +19,6 @@ import {
   Alert,
 } from "reactstrap";
 
-import { UserContext } from "contexts/UserContext";
-
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -27,8 +26,7 @@ const Login = () => {
   const [visible, setVisible] = useState(false);
   const onDismiss = () => setVisible(false);
   const [alertMessage, setAlertMessage] = useState("");
-  // eslint-disable-next-line
-  const { user, setUser } = useContext(UserContext);
+  const { dispatch } = useAuthContext();
 
   const handleLogin = async () => {
     try {
@@ -43,7 +41,8 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setUser({ _id: data.user._id.toString() });
+        localStorage.setItem("user", JSON.stringify(data));
+        dispatch({ type: "LOGIN", payload: data });
         switch (data.userType) {
           case "doctor":
             navigate("/doctor");

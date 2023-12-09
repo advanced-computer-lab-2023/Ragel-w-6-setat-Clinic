@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 //components
 import {
@@ -24,10 +24,9 @@ import {
 } from "reactstrap";
 
 // contexts
-import { UserContext } from "contexts/UserContext";
 
 const HomeDoctor = () => {
-  const { user } = useContext(UserContext);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const [agree, setAgree] = useState(false);
 
@@ -51,7 +50,9 @@ const HomeDoctor = () => {
   useEffect(() => {
     const fetchDoctorDetails = async () => {
       try {
-        const response = await fetch(`/doctors/doctorProfile/${user._id}`);
+        const response = await fetch(
+          `/doctors/doctorProfile/${user.user._id.toString()}`
+        );
         const json = await response.json();
         if (response.ok) {
           setDoctorDetails(json);
@@ -62,7 +63,7 @@ const HomeDoctor = () => {
     };
 
     fetchDoctorDetails();
-  }, [user._id]);
+  }, [user]);
 
   const [editMode, setEditMode] = useState(false);
   const [editedValues, setEditedValues] = useState({
