@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-
 import {
   Button,
   Card,
@@ -14,15 +13,155 @@ import {
   FormGroup,
   Input,
   Alert,
+  Pagination,
+  PaginationItem,
+  PaginationLink,
 } from "reactstrap";
 
 // context
 import { useAuthContext } from "../../hooks/useAuthContext";
 
+const UserTypeTable = ({ users, removeUser, userType }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 4;
+  const lastIndex = currentPage * recordsPerPage;
+  const firstIndex = lastIndex - recordsPerPage;
+  const records = users.slice(firstIndex, lastIndex);
+  const npage = Math.ceil(users.length / recordsPerPage);
+  const numbers = [...Array(npage + 1).keys()].slice(1);
+
+  // pagination functions
+  function prevPage() {
+    if (currentPage !== 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  }
+
+  function nextPage() {
+    if (currentPage !== npage) {
+      setCurrentPage(currentPage + 1);
+    }
+  }
+
+  function changeCurrentPage(id) {
+    setCurrentPage(id);
+  }
+
+  return (
+    <Card
+      className="shadow"
+      style={{
+        backgroundColor: "#0C356A",
+      }}
+    >
+      <CardHeader
+        className="border-0"
+        style={{
+          backgroundColor: "#0C356A",
+        }}
+      >
+        <h3
+          className="mb-0"
+          style={{
+            color: "#f7fafc",
+          }}
+        >
+          {userType} Users ({users.length})
+        </h3>
+      </CardHeader>
+      <Table className="align-items-center table-flush" responsive>
+        <thead className="thead-light">
+          <tr>
+            <th
+              scope="col"
+              style={{
+                backgroundColor: "#0C356A",
+                color: "#f7fafc",
+              }}
+            >
+              Username
+            </th>
+            <th
+              scope="col"
+              style={{
+                backgroundColor: "#0C356A",
+                color: "#f7fafc",
+              }}
+            ></th>
+          </tr>
+        </thead>
+        <tbody>
+          {/* Map over users */}
+          {records.map((user) => (
+            <tr key={user._id}>
+              <th
+                scope="row"
+                style={{
+                  color: "#f7fafc",
+                }}
+              >
+                <Media className="align-items-center">
+                  <Media>
+                    <span className="mb-0 text-sm">{user.username}</span>
+                  </Media>
+                </Media>
+              </th>
+
+              <td>
+                <Button
+                  color="secondary"
+                  onClick={() => removeUser(user.username)}
+                  size="sm"
+                >
+                  Remove User
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+      <Pagination
+        className="pagination justify-content-center mt-2"
+        listClassName="justify-content-center"
+      >
+        <PaginationItem>
+          <PaginationLink onClick={prevPage}>
+            <i className="fa fa-angle-left" />
+            <span className="sr-only">Previous</span>
+          </PaginationLink>
+        </PaginationItem>
+        {numbers.map((n, i) => (
+          <PaginationItem
+            key={i}
+            className={`${currentPage === n ? "active" : ""}`}
+          >
+            <PaginationLink
+              style={{
+                backgroundColor: currentPage === n ? "#0C356A" : "", // Apply custom color when active
+                color: currentPage === n ? "#ffffff" : "", // Text color when active
+              }}
+              onClick={() => changeCurrentPage(n)}
+            >
+              {n}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+
+        <PaginationItem>
+          <PaginationLink onClick={nextPage}>
+            <i className="fa fa-angle-right" />
+            <span className="sr-only">Next</span>
+          </PaginationLink>
+        </PaginationItem>
+      </Pagination>
+    </Card>
+  );
+};
+
 const AllUsers = () => {
   const [patientUsers, setPatientUsers] = useState([]);
   const [adminUsers, setAdminUsers] = useState([]);
-  const [doctorUsers, setDoctortUsers] = useState([]);
+  const [doctorUsers, setDoctorUsers] = useState([]);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -35,66 +174,30 @@ const AllUsers = () => {
   const [alertColor, setAlertColor] = useState("");
 
   useEffect(() => {
-    const fetchPatientUsers = async () => {
+    const fetchUsers = async (url, setUserFunc) => {
       try {
-        const response = await fetch(`/admins/allPatients/${user.user._id}`, {
+        const response = await fetch(url, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const json = await response.json();
         if (response.ok) {
-          setPatientUsers(json);
+          setUserFunc(json);
         }
       } catch (error) {
         console.error("An error occurred:", error.response.data.message);
       }
     };
 
-    fetchPatientUsers();
+    fetchUsers(`/admins/allPatients/${user.user._id}`, setPatientUsers);
+    fetchUsers(`/admins/allAdmins/${user.user._id}`, setAdminUsers);
+    fetchUsers(`/admins/allDoctors/${user.user._id}`, setDoctorUsers);
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    const fetchAdminUsers = async () => {
-      try {
-        const response = await fetch(`/admins/allAdmins/${user.user._id}`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        const json = await response.json();
-        if (response.ok) {
-          setAdminUsers(json);
-        }
-      } catch (error) {
-        console.error("An error occurred:", error.response.data.message);
-      }
-    };
-
-    fetchAdminUsers();
-    // eslint-disable-next-line
-  }, []);
-
-  useEffect(() => {
-    const fetchDoctorUsers = async () => {
-      try {
-        const response = await fetch(`/admins/allDoctors/${user.user._id}`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        const json = await response.json();
-        if (response.ok) {
-          setDoctortUsers(json);
-        }
-      } catch (error) {
-        console.error("An error occurred:", error.response.data.message);
-      }
-    };
-
-    fetchDoctorUsers();
-    // eslint-disable-next-line
-  }, []);
-
-  const removePatient = async (userName) => {
+  const removeUser = async (userName, userType, setUserFunc) => {
     try {
       const response = await axios.delete(
-        `/admins/deletePatient/${user.user._id}/${userName}`,
+        `/admins/delete${userType}/${user.user._id}/${userName}`,
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -102,50 +205,8 @@ const AllUsers = () => {
         }
       );
       if (response.status === 200) {
-        setPatientUsers((prevPatients) =>
-          prevPatients.filter((patient) => patient.username !== userName)
-        );
-      }
-    } catch (error) {
-      console.error(error.response.data.message);
-    }
-  };
-
-  const removeDoctor = async (userName) => {
-    try {
-      const response = await axios.delete(
-        `/admins/deleteDoctor/${user.user._id}/${userName}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        setDoctortUsers((prevDoctors) =>
-          prevDoctors.filter((doctor) => doctor.username !== userName)
-        );
-      }
-    } catch (error) {
-      console.error(error.response.data.message);
-    }
-  };
-
-  const removeAdmin = async (userName) => {
-    try {
-      const response = await axios.delete(
-        `/admins/deleteAdmin/${user.user._id}/${userName}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        setAdminUsers((prevAdmins) =>
-          prevAdmins.filter((admin) => admin.username !== userName)
+        setUserFunc((prevUsers) =>
+          prevUsers.filter((user) => user.username !== userName)
         );
       }
     } catch (error) {
@@ -169,7 +230,7 @@ const AllUsers = () => {
       );
 
       if (response.status === 200) {
-        setAdminUsers((prevAdmins) => [...prevAdmins, response.data.admin]);
+        setAdminUsers((prevUsers) => [...prevUsers, response.data.admin]);
         setVisible(true);
         setAlertColor("success");
         setAlertMessage(response.data.message);
@@ -262,239 +323,36 @@ const AllUsers = () => {
         </Row>
         <Row className="mb-5">
           <Col xl="4">
-            <Card
-              className="shadow"
-              style={{
-                backgroundColor: "#0C356A",
-              }}
-            >
-              <CardHeader
-                className="border-0"
-                style={{
-                  backgroundColor: "#0C356A",
-                }}
-              >
-                <h3
-                  className="mb-0"
-                  style={{
-                    color: "#f7fafc",
-                  }}
-                >
-                  Patient Users
-                </h3>
-              </CardHeader>
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    >
-                      Username
-                    </th>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    ></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Map over patientUsers */}
-                  {patientUsers.map((patient) => (
-                    <tr key={patient._id}>
-                      <th
-                        scope="row"
-                        style={{
-                          color: "#f7fafc",
-                        }}
-                      >
-                        <Media className="align-items-center">
-                          <Media>
-                            <span className="mb-0 text-sm">
-                              {patient.username}
-                            </span>
-                          </Media>
-                        </Media>
-                      </th>
-
-                      <td>
-                        <Button
-                          color="secondary"
-                          onClick={() => removePatient(patient.username)}
-                          size="sm"
-                        >
-                          Remove User
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card>
+            <UserTypeTable
+              users={patientUsers}
+              removeUser={(userName) =>
+                removeUser(userName, "Patient", setPatientUsers)
+              }
+              userType="Patient"
+            />
           </Col>
           <Col xl="4">
-            <Card
-              className="shadow"
-              style={{
-                backgroundColor: "#0C356A",
-              }}
-            >
-              <CardHeader
-                className="border-0"
-                style={{
-                  backgroundColor: "#0C356A",
-                }}
-              >
-                <h3
-                  className="mb-0"
-                  style={{
-                    color: "#f7fafc",
-                  }}
-                >
-                  Admin Users
-                </h3>
-              </CardHeader>
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    >
-                      Username
-                    </th>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    ></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Map over adminUsers */}
-                  {adminUsers.map((admin) => (
-                    <tr key={admin._id}>
-                      <th
-                        scope="row"
-                        style={{
-                          color: "#f7fafc",
-                        }}
-                      >
-                        <Media className="align-items-center">
-                          <Media>
-                            <span className="mb-0 text-sm">
-                              {admin.username}
-                            </span>
-                          </Media>
-                        </Media>
-                      </th>
-
-                      <td>
-                        <Button
-                          color="secondary"
-                          onClick={() => removeAdmin(admin.username)}
-                          size="sm"
-                        >
-                          Remove User
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card>
+            <UserTypeTable
+              users={adminUsers}
+              removeUser={(userName) =>
+                removeUser(userName, "Admin", setAdminUsers)
+              }
+              userType="Admin"
+            />
           </Col>
           <Col xl="4">
-            <Card
-              className="shadow"
-              style={{
-                backgroundColor: "#0C356A",
-              }}
-            >
-              <CardHeader
-                className="border-0"
-                style={{
-                  backgroundColor: "#0C356A",
-                }}
-              >
-                <h3
-                  className="mb-0"
-                  style={{
-                    color: "#f7fafc",
-                  }}
-                >
-                  Doctor Users
-                </h3>
-              </CardHeader>
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    >
-                      Username
-                    </th>
-                    <th
-                      scope="col"
-                      style={{
-                        backgroundColor: "#0C356A",
-                        color: "#f7fafc",
-                      }}
-                    ></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Map over doctorUsers */}
-                  {doctorUsers.map((doctor) => (
-                    <tr key={doctor._id}>
-                      <th
-                        scope="row"
-                        style={{
-                          color: "#f7fafc",
-                        }}
-                      >
-                        <Media className="align-items-center">
-                          <Media>
-                            <span className="mb-0 text-sm">
-                              {doctor.username}
-                            </span>
-                          </Media>
-                        </Media>
-                      </th>
-
-                      <td>
-                        <Button
-                          color="secondary"
-                          onClick={() => removeDoctor(doctor.username)}
-                          size="sm"
-                        >
-                          Remove User
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card>
+            <UserTypeTable
+              users={doctorUsers}
+              removeUser={(userName) =>
+                removeUser(userName, "Doctor", setDoctorUsers)
+              }
+              userType="Doctor"
+            />
           </Col>
         </Row>
       </Container>
     </>
   );
 };
+
 export default AllUsers;
