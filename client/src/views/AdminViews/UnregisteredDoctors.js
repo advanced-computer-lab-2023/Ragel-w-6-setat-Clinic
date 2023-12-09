@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Button,
   Card,
@@ -9,7 +11,80 @@ import {
   Table,
 } from "reactstrap";
 
+// context
+import { useAuthContext } from "../../hooks/useAuthContext";
+
 const UnregisteredDoctors = () => {
+  const [unregisteredDoctors, setUnregisteredDoctors] = useState([]);
+
+  const { user } = useAuthContext();
+
+  useEffect(() => {
+    const fetchUnregisteredDoctors = async () => {
+      try {
+        const response = await axios.get(
+          `/admins/viewUnregisteredDoctors/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        setUnregisteredDoctors(response.data);
+      } catch (error) {
+        console.error(
+          "Error fetching unregistered doctors:",
+          error.response.data.message
+        );
+      }
+    };
+    fetchUnregisteredDoctors();
+  }, [user]);
+
+  const showDocument = async (path) => {
+    window.open(`http://localhost:4000/uploads/` + path);
+  };
+
+  const handleAccept = async (username) => {
+    try {
+      const response = await axios.patch(
+        `/admins/setToRegistered/${user.user._id}?username=${username}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setUnregisteredDoctors(
+          unregisteredDoctors.filter((doctor) => doctor.username !== username)
+        );
+      }
+    } catch (error) {
+      console.error("Error accepting doctor:", error.response.data.message);
+    }
+  };
+
+  const handleReject = async (username) => {
+    try {
+      const response = await axios.delete(
+        `/admins/rejectDoctor/${user.user._id}?username=${username}`,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setUnregisteredDoctors(
+          unregisteredDoctors.filter((doctor) => doctor.username !== username)
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Error rejecting and deleting doctor:",
+        error.response.data.message
+      );
+    }
+  };
+
   return (
     <>
       <Container className="mt-5" fluid>
@@ -148,65 +223,82 @@ const UnregisteredDoctors = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td>nohaahmed</td>
-                            <td>noha</td>
-                            <td>ahmed</td>
-                            <td>Ain Shams University</td>
-                            <td>180</td>
-                            <td>Cairo University</td>
-                            <td>Surgeon</td>
-                            <td>
-                              <Button
-                                className="mt-3"
-                                style={{
-                                  backgroundColor: "#0C356A",
-                                  color: "#f7fafc",
-                                }}
-                                size="sm"
-                              >
-                                View Document
-                              </Button>
-                            </td>
-                            <td>
-                              <Button
-                                className="mt-3"
-                                style={{
-                                  backgroundColor: "#0C356A",
-                                  color: "#f7fafc",
-                                }}
-                                size="sm"
-                              >
-                                View Document
-                              </Button>
-                            </td>
-                            <td>
-                              <Button
-                                className="mt-3"
-                                style={{
-                                  backgroundColor: "#0C356A",
-                                  color: "#f7fafc",
-                                }}
-                                size="sm"
-                              >
-                                View Document
-                              </Button>
-                            </td>
-                            <td>
-                              <Button
-                                className="mt-3"
-                                color="success"
-                                size="sm"
-                              >
-                                Accept
-                              </Button>
-                            </td>
-                            <td>
-                              <Button className="mt-3" color="danger" size="sm">
-                                Reject
-                              </Button>
-                            </td>
-                          </tr>
+                          {unregisteredDoctors.map((doctor) => (
+                            <tr key={doctor._id}>
+                              <td>{doctor.username}</td>
+                              <td>{doctor.fName}</td>
+                              <td>{doctor.lName}</td>
+                              <td>{doctor.educationalBackground}</td>
+                              <td>{doctor.hourlyRate}</td>
+                              <td>{doctor.affiliation}</td>
+                              <td>{doctor.specialty}</td>
+                              <td>
+                                <Button
+                                  className="mt-3"
+                                  style={{
+                                    backgroundColor: "#0C356A",
+                                    color: "#f7fafc",
+                                  }}
+                                  onClick={() =>
+                                    showDocument(doctor.documentID)
+                                  }
+                                  size="sm"
+                                >
+                                  View Document
+                                </Button>
+                              </td>
+                              <td>
+                                <Button
+                                  className="mt-3"
+                                  style={{
+                                    backgroundColor: "#0C356A",
+                                    color: "#f7fafc",
+                                  }}
+                                  onClick={() =>
+                                    showDocument(doctor.medicalLicense)
+                                  }
+                                  size="sm"
+                                >
+                                  View Document
+                                </Button>
+                              </td>
+                              <td>
+                                <Button
+                                  className="mt-3"
+                                  style={{
+                                    backgroundColor: "#0C356A",
+                                    color: "#f7fafc",
+                                  }}
+                                  onClick={() =>
+                                    showDocument(doctor.medicalDegree)
+                                  }
+                                  size="sm"
+                                >
+                                  View Document
+                                </Button>
+                              </td>
+                              <td>
+                                <Button
+                                  className="mt-3"
+                                  color="success"
+                                  size="sm"
+                                  onClick={() => handleAccept(doctor.username)}
+                                >
+                                  Accept
+                                </Button>
+                              </td>
+                              <td>
+                                <Button
+                                  className="mt-3"
+                                  color="danger"
+                                  size="sm"
+                                  onClick={() => handleReject(doctor.username)}
+                                >
+                                  Reject
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </Table>
                     </Card>

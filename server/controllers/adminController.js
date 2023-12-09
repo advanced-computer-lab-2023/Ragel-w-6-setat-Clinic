@@ -299,29 +299,21 @@ const viewUnregisteredDoctors = async (req, res) => {
 const setToRegistered = async (req, res) => {
   try {
     const adminId = req.params.id;
-    const doctorUsername = req.query.username; // Extract doctor ID from request params
+    const doctorUsername = req.query.username;
 
-    // Find the contract by doctor ID and update the isApproved field to true
     const updatedDoctor = await Doctor.findOneAndUpdate(
       { username: doctorUsername },
       { isRegistered: true },
-      { new: true } // Return the updated contract
+      { new: true }
     );
-
-    if (!updatedDoctor) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Doctor not found for the specified username",
-      });
-    }
 
     res.status(200).json({
       status: "success",
       message: "Doctor registered successfully",
-      contract: updatedDoctor,
+      doctor: updatedDoctor,
     });
   } catch (err) {
-    res.status(500).json({
+    res.status(400).json({
       status: "error",
       message: err.message,
     });
