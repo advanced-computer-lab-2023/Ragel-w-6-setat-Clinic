@@ -24,9 +24,11 @@ import { UserContext } from "../../contexts/UserContext";
 const PatientPrescriptions = () => {
   const navigate = useNavigate();
   
-    const handleViewDetailsClick = () => {
-      navigate("/patient/prescriptionDetails");
-    };
+  const handleViewDetailsClick = (prescriptionId) => {
+    // Construct the URL with the prescription ID
+    const url = `/patient/prescriptionDetails/${prescriptionId}`;
+    navigate(url);
+  };
 
   const [doctorsOptions, setDoctorsOptions] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
@@ -316,9 +318,9 @@ const PatientPrescriptions = () => {
                         </Badge>
                       </td>
                       <td>
-                        <Button color="secondary" size="sm" onClick = {handleViewDetailsClick}>
-                          View Details
-                        </Button>
+                      <Button color="secondary" size="sm" onClick={() => handleViewDetailsClick(prescription._id)}>
+            View Details
+          </Button>
                       </td>
                       <td>
                       <Button

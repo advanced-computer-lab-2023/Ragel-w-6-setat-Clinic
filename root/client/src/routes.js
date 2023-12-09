@@ -85,13 +85,15 @@ var routes = [
     component: <PatientPrescriptions />,
     layout: "/patient",
   },
+  //altered
   {
-    path: "/prescriptionDetails",
+    path: "/prescriptionDetails/:prescriptionId",
     name: "Prescription Details",
     icon: "ni ni-circle-08 text-pink",
     component: <PrescriptionDetails />,
     layout: "/patient",
   },
+  
   {
     path: "/familyMemberDetails",
     name: "Family Member Details",

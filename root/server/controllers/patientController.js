@@ -691,7 +691,7 @@ const formatNotifications = (notifications) => {
 
 const downloadPrescriptionPDF = async (req, res) => {
   try {
-    const  prescriptionId  = req.params.id;
+    const prescriptionId = req.params.id;
 
     // Check if the prescription exists
     const prescription = await Prescription.findById(prescriptionId);
@@ -711,8 +711,10 @@ const downloadPrescriptionPDF = async (req, res) => {
     doc.pipe(res);
 
     // Add prescription data to the PDF
-    doc.fontSize(12).text(`Medication: ${prescription.medication}`);
-    doc.fontSize(12).text(`Dosage: ${prescription.dosage}`);
+    doc.fontSize(12).text('Medication:');
+    prescription.medication.forEach((med) => {
+      doc.fontSize(12).text(`- Name: ${med.name}, Dosage: ${med.dosage}, Price: ${med.price} EGP`);
+    });
     doc.fontSize(12).text(`Notes: ${prescription.notes}`);
     doc.fontSize(12).text(`Date: ${prescription.date}`);
     doc.fontSize(12).text(`Is Filled: ${prescription.isFilled ? 'Yes' : 'No'}`);
@@ -728,6 +730,7 @@ const downloadPrescriptionPDF = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 
 

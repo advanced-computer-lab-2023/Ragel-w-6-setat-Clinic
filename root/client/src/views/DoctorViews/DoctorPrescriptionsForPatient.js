@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 import {
@@ -26,8 +27,15 @@ import {
 } from "reactstrap";
 
 import ReactDatetime from "react-datetime";
+import { UserContext } from "../../contexts/UserContext";
 
 const DoctorPrescriptionsForPatient = () => {
+  const navigate = useNavigate();
+  
+  const handleViewDetailsClick = () => {
+    navigate("/doctor/patientPrescriptions");
+  };
+
   const [modal, setModal] = useState(false);
   const toggleModal = () => setModal(!modal);
 
@@ -35,6 +43,32 @@ const DoctorPrescriptionsForPatient = () => {
     { value: "Medicine1", label: "Medicine1" },
     { value: "Medicine2", label: "Medicine2" },
   ];
+
+  const [doctorsOptions, setDoctorsOptions] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const toggle = () => setDropdownOpen((prevState) => !prevState);
+  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedFilledStatus, setSelectedFilledStatus] = useState("");
+  const [doctorOptions, setDoctorOptions] = useState([]);
+  const [selectedPrescriptions, setSelectedPrescriptions] = useState([]);
+
+  const { user } = useContext(UserContext);
+
+  useEffect(() => {
+  const fetchPrescriptions = async () => {
+    try {
+      const response = await fetch(`/patients/viewPrescription/${user._id}`);
+      const data = await response.json();
+      setPrescriptions(data.prescriptions);
+    } catch (error) {
+      console.error("Error fetching prescriptions:", error);
+    }
+  };
+
+  fetchPrescriptions();
+}, [user._id]);
 
   return (
     <>
@@ -260,7 +294,7 @@ const DoctorPrescriptionsForPatient = () => {
                       </Badge>
                     </td>
                     <td>
-                      <Button color="secondary" size="sm">
+                      <Button color="secondary" size="sm"  onClick = {handleViewDetailsClick}>
                         View Details
                       </Button>
                     </td>
