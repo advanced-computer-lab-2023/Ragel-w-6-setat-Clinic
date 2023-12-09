@@ -25,11 +25,13 @@ import {
 
 import ReactDatetime from "react-datetime";
 
-const PatientAppointments = () => {
+const DoctorAppointments = () => {
   const [modal, setModal] = useState(false);
   const toggleModal = () => setModal(!modal);
   const [modal2, setModal2] = useState(false);
   const toggleModal2 = () => setModal2(!modal2);
+  const [modal3, setModal3] = useState(false);
+  const toggleModal3 = () => setModal3(!modal3);
 
   return (
     <>
@@ -127,9 +129,71 @@ const PatientAppointments = () => {
                     backgroundColor: "#0C356A",
                   }}
                 >
-                  <h3 className="mb-0" style={{ color: "#f7fafc" }}>
-                    My Appointments
-                  </h3>
+                  <Row>
+                    <Col lg="6">
+                      <h3 className="mb-0" style={{ color: "#f7fafc" }}>
+                        My Appointments
+                      </h3>
+                    </Col>
+                    <Col lg="6">
+                      <Button
+                        color="secondary"
+                        size="sm"
+                        onClick={toggleModal2}
+                      >
+                        Add Available Appointment
+                      </Button>
+                      <Modal isOpen={modal2} toggle={toggleModal2}>
+                        <ModalHeader toggle={toggleModal2}>
+                          Add an extra available time-slot for an appointment
+                        </ModalHeader>
+                        <ModalBody>
+                          <Row>
+                            <Col lg="6">
+                              <FormGroup>
+                                <label className="form-control-label">
+                                  Appointment Date:
+                                </label>
+                                <br />
+                                <InputGroup className="input-group-alternative">
+                                  <InputGroupAddon addonType="prepend">
+                                    <InputGroupText>
+                                      <i className="ni ni-calendar-grid-58" />
+                                    </InputGroupText>
+                                  </InputGroupAddon>
+                                  <ReactDatetime
+                                    inputProps={{
+                                      placeholder: "From Date",
+                                    }}
+                                    timeFormat={true}
+                                  />
+                                </InputGroup>
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col lg="6">
+                              <FormGroup>
+                                <label className="form-control-label">
+                                  Price of Appointment
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  type="number"
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                        </ModalBody>
+                        <ModalFooter>
+                          <Button color="default">Add Appointment</Button>{" "}
+                          <Button color="secondary" onClick={toggleModal2}>
+                            Cancel
+                          </Button>
+                        </ModalFooter>
+                      </Modal>
+                    </Col>
+                  </Row>
                 </CardHeader>
                 <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
@@ -141,7 +205,7 @@ const PatientAppointments = () => {
                           color: "#f7fafc",
                         }}
                       >
-                        Doctor
+                        Patient
                       </th>
                       <th
                         scope="col"
@@ -207,9 +271,7 @@ const PatientAppointments = () => {
                       <th scope="row">
                         <Media className="align-items-center">
                           <Media>
-                            <span className="mb-0 text-sm">
-                              Dr. Jessica Jones
-                            </span>
+                            <span className="mb-0 text-sm">Sara Elshemy</span>
                           </Media>
                         </Media>
                       </th>
@@ -274,13 +336,13 @@ const PatientAppointments = () => {
                         <Button
                           color="secondary"
                           size="sm"
-                          onClick={toggleModal2}
+                          onClick={toggleModal3}
                         >
-                          Request Follow-up
+                          Schedule Follow-up
                         </Button>
-                        <Modal isOpen={modal2} toggle={toggleModal2}>
-                          <ModalHeader toggle={toggleModal2}>
-                            Request a Follow-up Appointment
+                        <Modal isOpen={modal3} toggle={toggleModal3}>
+                          <ModalHeader toggle={toggleModal3}>
+                            Schedule a Follow-up Appointment
                           </ModalHeader>
                           <ModalBody>
                             <Row>
@@ -308,7 +370,7 @@ const PatientAppointments = () => {
                           </ModalBody>
                           <ModalFooter>
                             <Button color="default">Confirm Request</Button>
-                            <Button color="secondary" onClick={toggleModal2}>
+                            <Button color="secondary" onClick={toggleModal3}>
                               Cancel
                             </Button>
                           </ModalFooter>
@@ -330,5 +392,4 @@ const PatientAppointments = () => {
     </>
   );
 };
-
-export default PatientAppointments;
+export default DoctorAppointments;

@@ -1,25 +1,89 @@
-//components
-
 import {
+  Button,
   Card,
+  CardHeader,
   Container,
   Row,
   Col,
-  CardHeader,
-  CardBody,
-  Button,
-  Form,
   FormGroup,
+  Form,
+  CardBody,
   Input,
   UncontrolledTooltip,
 } from "reactstrap";
 
-const FamilyMemberList = () => {
+const DoctorPatients = () => {
   return (
     <>
       <Container className="mt-5" fluid>
         <Row>
-          <Col xl="6">
+          <Col xl="4">
+            <Card
+              className="shadow"
+              style={{
+                backgroundColor: "#0C356A",
+              }}
+            >
+              <CardBody>
+                <Form>
+                  <h6 className="heading-small text-muted mb-4">
+                    Filter/Search for Patients
+                  </h6>
+                  <div className="pl-lg-4">
+                    <Row>
+                      <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            style={{ color: "#f7fafc" }}
+                          >
+                            First Name of Patient:
+                          </label>
+                          <br />
+                          <Input
+                            className="form-control-alternative"
+                            type="text"
+                          />
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg="12">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            style={{ color: "#f7fafc" }}
+                          >
+                            Last Name of Patient:
+                          </label>
+                          <br />
+                          <Input
+                            className="form-control-alternative"
+                            type="text"
+                          />
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col sm="12">
+                        <Button color="secondary" size="sm">
+                          Search Patients
+                        </Button>
+                      </Col>
+                    </Row>
+                    <Row className="mt-3">
+                      <Col sm="12">
+                        <Button color="secondary" size="sm">
+                          Get Patients with Upcoming Appointments
+                        </Button>
+                      </Col>
+                    </Row>
+                  </div>
+                </Form>
+              </CardBody>
+            </Card>
+          </Col>
+          <Col xl="8">
             <Container fluid>
               <Row>
                 <Col className="order-xl-6 mb-4" xl="6">
@@ -62,7 +126,7 @@ const FamilyMemberList = () => {
                       <div className="text-center">
                         <div className="h5 font-weight-300">
                           <i className="ni location_pin mr-2" />
-                          Sister
+                          Female
                         </div>
                         <h3>
                           Jessica Jones
@@ -70,7 +134,7 @@ const FamilyMemberList = () => {
                         </h3>
                         <div className="h5 font-weight-300">
                           <i className="ni location_pin mr-2" />
-                          Linked: Yes
+                          Phone No.: 01000000000
                         </div>
                       </div>{" "}
                     </CardBody>
@@ -116,7 +180,7 @@ const FamilyMemberList = () => {
                       <div className="text-center">
                         <div className="h5 font-weight-300">
                           <i className="ni location_pin mr-2" />
-                          Husband
+                          Male
                         </div>
                         <h3>
                           Jackson Smith
@@ -124,14 +188,12 @@ const FamilyMemberList = () => {
                         </h3>
                         <div className="h5 font-weight-300">
                           <i className="ni location_pin mr-2" />
-                          Linked: No
+                          Phone No.: 01000000000
                         </div>
                       </div>
                     </CardBody>
                   </Card>
                 </Col>
-              </Row>
-              <Row>
                 <Col className="order-xl-6 mb-4" xl="6">
                   <Card
                     className="card-profile shadow"
@@ -172,7 +234,7 @@ const FamilyMemberList = () => {
                       <div className="text-center">
                         <div className="h5 font-weight-300">
                           <i className="ni location_pin mr-2" />
-                          Sister
+                          Female
                         </div>
                         <h3>
                           Jessica Jones
@@ -180,7 +242,7 @@ const FamilyMemberList = () => {
                         </h3>
                         <div className="h5 font-weight-300">
                           <i className="ni location_pin mr-2" />
-                          Linked: Yes
+                          Phone No.: 01000000000
                         </div>
                       </div>{" "}
                     </CardBody>
@@ -226,7 +288,7 @@ const FamilyMemberList = () => {
                       <div className="text-center">
                         <div className="h5 font-weight-300">
                           <i className="ni location_pin mr-2" />
-                          Husband
+                          Male
                         </div>
                         <h3>
                           Jackson Smith
@@ -234,7 +296,7 @@ const FamilyMemberList = () => {
                         </h3>
                         <div className="h5 font-weight-300">
                           <i className="ni location_pin mr-2" />
-                          Linked: No
+                          Phone No.: 01000000000
                         </div>
                       </div>
                     </CardBody>
@@ -243,171 +305,10 @@ const FamilyMemberList = () => {
               </Row>
             </Container>
           </Col>
-          <Col xl="6">
-            <Container fluid>
-              <Card className="bg-secondary shadow shadow w-100">
-                <CardHeader
-                  className="border-0"
-                  style={{ backgroundColor: "#0C356A" }}
-                >
-                  <Row className="align-items-center">
-                    <Col xs="8"></Col>
-                    <Col className="text-right" xs="4">
-                      <Button color="secondary" href="#pablo" size="sm">
-                        Add Family Member
-                      </Button>
-                    </Col>
-                  </Row>
-                </CardHeader>
-                <CardBody style={{ backgroundColor: "#0C356A" }}>
-                  <Form>
-                    <h6 className="heading-small text-muted mb-4">
-                      Family Member Information
-                    </h6>
-                    <div className="pl-lg-4">
-                      <Row>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              style={{ color: "#f7fafc" }}
-                            >
-                              First name
-                            </label>
-                            <Input
-                              required
-                              className="form-control-alternative"
-                              type="text"
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              style={{ color: "#f7fafc" }}
-                            >
-                              Last name
-                            </label>
-                            <Input
-                              required
-                              className="form-control-alternative"
-                              type="text"
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              style={{ color: "#f7fafc" }}
-                            >
-                              National ID
-                            </label>
-                            <Input
-                              required
-                              className="form-control-alternative"
-                              type="text"
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              style={{ color: "#f7fafc" }}
-                            >
-                              Date of Birth
-                            </label>
-                            <Input
-                              required
-                              className="form-control-alternative"
-                              type="date"
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              style={{ color: "#f7fafc" }}
-                            >
-                              Gender:
-                            </label>
-                            <br />
-                            <Input name="select" type="select">
-                              <option value="male">Male</option>
-                              <option value="female">Female</option>
-                            </Input>
-                          </FormGroup>
-                        </Col>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              style={{ color: "#f7fafc" }}
-                            >
-                              Relationaship:
-                            </label>
-                            <br />
-                            <Input name="select" type="select">
-                              <option value="wife">Wife</option>
-                              <option value="husband">Husband</option>
-                              <option value="child">Child</option>
-                              <option value="sibling">Sibling</option>
-                              <option value="parent">Parent</option>
-                            </Input>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                    </div>
-                    <hr
-                      className="my-4"
-                      style={{ backgroundColor: "#f7fafc" }}
-                    />
-                    <h6 className="heading-small text-muted mb-4">
-                      Is your family member a registered patient? Link their
-                      account with yours!
-                    </h6>
-                    <div className="pl-lg-4">
-                      <Row>
-                        <Col lg="6">
-                          <FormGroup>
-                            <label
-                              className="form-control-label"
-                              style={{ color: "#f7fafc" }}
-                            >
-                              Email (Must match the email your family member
-                              registered with)
-                            </label>
-                            <Input
-                              className="form-control-alternative"
-                              type="email"
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col lg="6">
-                          <Button color="secondary" href="#pablo" size="sm">
-                            Link Family Member
-                          </Button>
-                        </Col>
-                      </Row>
-                    </div>
-                  </Form>
-                </CardBody>
-              </Card>
-            </Container>
-          </Col>
         </Row>
       </Container>
     </>
   );
 };
 
-export default FamilyMemberList;
+export default DoctorPatients;

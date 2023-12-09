@@ -10,7 +10,7 @@ import {
   Container,
 } from "reactstrap";
 
-const PatientNavBar = () => {
+const DoctorNavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
@@ -48,33 +48,36 @@ const PatientNavBar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/patient/home" className="mb-sm-1 mb-md-0">
+                <NavLink href="/doctor/home" className="mb-sm-1 mb-md-0">
                   <i className="fa-solid fa-house"></i>
                   Home
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/patient/allDoctors" className="mb-sm-1 mb-md-0">
+                <NavLink href="/doctor/myPatients" className="mb-sm-1 mb-md-0">
                   <i className="fa-solid fa-user-doctor"></i>
-                  Doctors
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="/components/" className="mb-sm-1 mb-md-0">
-                  <i className="fa-solid fa-calendar-check"></i>
-                  Available Appointments
+                  My Patients
                 </NavLink>
               </NavItem>
               <NavItem>
                 <NavLink
-                  href="/patient/healthPackages"
+                  href="/doctor/myAppointments"
                   className="mb-sm-1 mb-md-0"
                 >
-                  <i className="fa-solid fa-box-archive"></i>
-                  Health Packages
+                  <i className="fa-solid fa-calendar-check"></i>
+                  My Appointments
                 </NavLink>
               </NavItem>
-            </Nav>{" "}
+              <NavItem>
+                <NavLink
+                  href="/doctor/appointmentRequests"
+                  className="mb-sm-1 mb-md-0"
+                >
+                  <i class="fa-solid fa-person-circle-question"></i>
+                  Appointments Requests
+                </NavLink>
+              </NavItem>
+            </Nav>
           </Container>
           <Nav className="ml-auto" style={{ marginRight: "5px" }} navbar>
             <NavItem className="ml-auto">
@@ -98,4 +101,4 @@ const PatientNavBar = () => {
   );
 };
 
-export default PatientNavBar;
+export default DoctorNavBar;

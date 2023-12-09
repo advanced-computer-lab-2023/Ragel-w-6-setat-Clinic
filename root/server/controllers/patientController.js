@@ -1050,6 +1050,42 @@ const getFamilyMembers = async (req, res) => {
   }
 };
 
+//added for sprint 3 frontend 
+async function doctorsDisplayName(patientID, doctors) {
+  const patient = await Patient.findById(patientID);
+  const patientPackage = patient.subscribedPackage;
+  let sessionDiscount = 0;
+  
+  if (patientPackage) {
+    const packageOffered = await Package.findById({
+      _id: patientPackage.packageId,
+    });
+    
+    if (packageOffered) {
+      sessionDiscount = packageOffered.sessionDiscount || 0;
+    }
+  }
+  
+  const doctorToDisplay = doctors.map((doctor) => {
+    const originalSessionPrice = doctor.sessionPrice;
+    const discountedPrice =
+      originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+    
+    return {
+      _id: doctor._id,
+      name: doctor.fName + " " + doctor.lName,
+      specialty: doctor.specialty,
+      sessionPrice: discountedPrice,
+    };
+  });
+  
+  const doctorNames = doctorToDisplay.map((doctor) => doctor.name);
+
+  return { doctors: doctorToDisplay, names: doctorNames };
+}
+
+
+//used doctorsdisplaynames here 
 const getAllDoctors = async (req, res) => {
   try {
     const patientID = req.params.id;
@@ -1057,16 +1093,19 @@ const getAllDoctors = async (req, res) => {
     filter.isRegistered = true;
     const doctors = await Doctor.find(filter).lean();
     const uniqueSpecialtiesSet = new Set();
+    
     doctors.forEach((doctor) => {
       uniqueSpecialtiesSet.add(doctor.specialty);
     });
+    
     const uniqueSpecialties = [...uniqueSpecialtiesSet];
 
-    const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
+    const { doctors: doctorsToDisplay, names } = await doctorsDisplayName(patientID, doctors);
 
     res.status(200).json({
       status: "success",
       doctors: doctorsToDisplay,
+      names: names,
       uniqueSpecialties: uniqueSpecialties,
     });
   } catch (error) {

@@ -9,7 +9,7 @@ import {
   Button,
 } from "reactstrap";
 
-const MedicalHistory = () => {
+const DoctorMedicalHistoryForPatient = () => {
   const onDrop = useCallback((acceptedFiles) => {
     // Do something with the dropped files
     console.log("Accepted Files:", acceptedFiles);
@@ -34,7 +34,7 @@ const MedicalHistory = () => {
                     color: "#0C356A",
                   }}
                 ></i>{" "}
-                Records Uploaded by You
+                Records Uploaded by Patient
               </h4>
               <ListGroup flush>
                 <ListGroupItem style={{ backgroundColor: "#f8f9fe" }}>
@@ -144,7 +144,7 @@ const MedicalHistory = () => {
                     color: "#f8f9fe",
                   }}
                 ></i>{" "}
-                Records Uploaded by Doctors
+                Records Uploaded by You
               </h4>
               <ListGroup flush>
                 <ListGroupItem
@@ -238,4 +238,4 @@ const dropzoneTextStyles = {
   color: "#0C356A",
 };
 
-export default MedicalHistory;
+export default DoctorMedicalHistoryForPatient;
