@@ -51,7 +51,10 @@ const HomeDoctor = () => {
     const fetchDoctorDetails = async () => {
       try {
         const response = await fetch(
-          `/doctors/doctorProfile/${user.user._id.toString()}`
+          `/doctors/doctorProfile/${user.user._id.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
         );
         const json = await response.json();
         if (response.ok) {
@@ -63,7 +66,8 @@ const HomeDoctor = () => {
     };
 
     fetchDoctorDetails();
-  }, [user]);
+    // eslint-disable-next-line
+  }, []);
 
   const [editMode, setEditMode] = useState(false);
   const [editedValues, setEditedValues] = useState({
@@ -149,7 +153,9 @@ const HomeDoctor = () => {
               <CardBody className="pt-0 pt-md-4">
                 <div className="card-profile-stats d-flex justify-content-center mt-md-4"></div>
                 <div className="text-center">
-                  <h3>Hello, Dr. Jessica Jones!</h3>
+                  <h3>
+                    Hello, Dr. {doctorDetails.fName} {doctorDetails.lName}!
+                  </h3>
                   <Row className="justify-content-center">
                     <Col>
                       {editMode ? (

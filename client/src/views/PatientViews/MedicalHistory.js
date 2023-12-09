@@ -71,10 +71,10 @@ const MedicalHistory = () => {
       }
     };
 
-    if (user) {
-      fetchMedicalHistory();
-    }
-  }, [user]);
+    fetchMedicalHistory();
+
+    // eslint-disable-next-line
+  }, []);
 
   const showDocument = async (path) => {
     window.open(`http://localhost:4000/uploads/` + path);
