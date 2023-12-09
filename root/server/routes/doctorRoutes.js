@@ -24,7 +24,10 @@ import {
   getAppNotifications,
   createPrescription,
   updatePrescription,
-  downloadPrescriptionPDF
+  downloadPrescriptionPDF,
+  viewAllPrescription,
+  selectPrescription,
+  filterThePrescription
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 // multer
@@ -77,6 +80,7 @@ router.get("/searchForPatients/:id", searchForPatient);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
 router.get("/upcomingAppointments/:id", upcomingAppointments);
 router.get("/getMyAppointments/:id", getMyAppointments);
+router.get("/viewAllPrescription/:id",viewAllPrescription); 
 
 //SARAS ROUTES
 
@@ -95,5 +99,10 @@ router.get("/getDoctorNotifications/:id", getDoctorNotifications);
 router.get("/getAppNotifications/:id", getAppNotifications);
 router.post("/createPrescription/:id", createPrescription);
 router.patch("/updatePrescription/:id", updatePrescription);
+router.get(
+  "/selectPrescription/:doctorid/:prescriptionid",
+  selectPrescription
+);
+router.get("/filterThePrescription/:id", filterThePrescription);
 
 export default router;

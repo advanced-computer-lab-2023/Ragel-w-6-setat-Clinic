@@ -85,7 +85,7 @@ var routes = [
     component: <PatientPrescriptions />,
     layout: "/patient",
   },
-  //altered
+  //altered for sprint 3
   {
     path: "/prescriptionDetails/:prescriptionId",
     name: "Prescription Details",
@@ -159,8 +159,9 @@ var routes = [
     component: <DoctorPrescriptionsForPatient />,
     layout: "/doctor",
   },
+  //altered for sprint 3
   {
-    path: "/patientPrescriptionDetails",
+    path: "/patientPrescriptionDetails/:prescriptionId",
     name: "Patient Prescription Details",
     icon: "ni ni-single-02 text-yellow",
     component: <DoctorPrescriptionDetailsForPatient />,

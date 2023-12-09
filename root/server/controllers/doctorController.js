@@ -660,6 +660,98 @@ const downloadPrescriptionPDF = async (req, res) => {
   }
 };
 
+const viewAllPrescription = async (req, res) => {
+  const doctorId = req.params.id;
+
+  try {
+    // Check if the patient exists
+    const doctor = await Doctor.findById(doctorId);
+
+    // Find all the prescriptions for the patient
+    const prescriptions = await Prescription.find({
+      doctor: doctorId,
+    }).populate("patient");
+
+    const doctorsSet = await Doctor.find({ isRegistered: true }).select(
+      "username"
+    ); // ??? what for
+
+    res.status(200).json({
+      status: "success",
+      prescriptions: prescriptions,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const selectPrescription = async (req, res) => {
+  const prescriptionId = req.params.prescriptionid;
+  const doctorId = req.params.doctorid;
+
+  try {
+    const prescription = await Prescription.findOne({
+      _id: prescriptionId,
+      doctor: doctorId,
+    }).populate("patient");
+
+    if (!prescription) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Prescription not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      prescription: prescription,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const filterThePrescription = async (req, res) => {
+  const doctorId = req.params.id;
+  try {
+    const filter = {};
+
+
+    if (req.query.date != "") {
+      var min_date = new Date(req.query.date);
+      var max_date = new Date(req.query.date);
+      min_date.setHours(0, 0, 0, 0);
+      max_date.setHours(23, 59, 59, 999);
+      filter.date = {
+        $gte: min_date,
+        $lt: max_date,
+      };
+    }
+    if (req.query.isFilled != "") {
+      filter.isFilled = req.query.isFilled;
+    }
+
+
+    const prescriptions = await Prescription.find(filter).populate("patient");
+
+    res.status(200).json({
+      status: "success",
+      prescriptions: prescriptions,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
 export {
   createDoctor,
   updateDoctorProfile,
@@ -683,5 +775,8 @@ export {
   getAppNotifications,
   createPrescription,
   updatePrescription,
-  downloadPrescriptionPDF
+  downloadPrescriptionPDF,
+  viewAllPrescription,
+  selectPrescription,
+  filterThePrescription
 };

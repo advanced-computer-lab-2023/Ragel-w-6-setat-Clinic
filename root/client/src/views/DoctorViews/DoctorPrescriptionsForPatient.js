@@ -32,8 +32,10 @@ import { UserContext } from "../../contexts/UserContext";
 const DoctorPrescriptionsForPatient = () => {
   const navigate = useNavigate();
   
-  const handleViewDetailsClick = () => {
-    navigate("/doctor/patientPrescriptions");
+  const handleViewDetailsClick = (prescriptionId) => {
+    // Construct the URL with the prescription ID
+    const url = `/doctor/patientPrescriptionDetails/${prescriptionId}`;
+    navigate(url);
   };
 
   const [modal, setModal] = useState(false);
@@ -57,19 +59,70 @@ const DoctorPrescriptionsForPatient = () => {
   const { user } = useContext(UserContext);
 
   useEffect(() => {
-  const fetchPrescriptions = async () => {
+    const fetchPrescriptions = async () => {
+      try {
+        const response = await fetch(`/doctors/viewAllPrescription/${user._id}`);
+        const data = await response.json();
+        setPrescriptions(data.prescriptions);
+      } catch (error) {
+        console.error("Error fetching prescriptions:", error);
+      }
+    };
+
+    fetchPrescriptions();
+  }, [user._id]);
+
+  const downloadPDF = async (prescriptionId) => {
     try {
-      const response = await fetch(`/patients/viewPrescription/${user._id}`);
-      const data = await response.json();
-      setPrescriptions(data.prescriptions);
+      const response = await fetch(`/patients/downloadPrescriptionPDF/${prescriptionId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/pdf",
+        },
+      });
+       // Create a blob from the PDF data
+       const blob = await response.blob();
+
+       // Create a temporary URL for the blob
+       const url = window.URL.createObjectURL(blob);
+ 
+       // Create an <a> element to trigger the download
+       const a = document.createElement("a");
+       a.href = url;
+       a.download = `Prescription_${prescriptionId}.pdf`;
+ 
+       // Append the <a> element to the body
+       document.body.appendChild(a);
+ 
+       // Click the <a> element to start the download
+       a.click();
+ 
+       // Remove the <a> element from the body
+       document.body.removeChild(a);
+ 
+       // Revoke the URL to release resources
+       window.URL.revokeObjectURL(url);
+     } catch (error) {
+       console.error("Error downloading prescription:", error);
+     }
+   };
+
+   const handleFilterPrescriptions = async () => {
+    try {
+      const response = await fetch(
+        `/doctors/filterThePrescription/${user._id}?date=${selectedDate}&isFilled=${selectedFilledStatus}`
+      );
+      const json = await response.json();
+
+      if (response.ok) {
+        setPrescriptions(json.prescriptions);
+      }
+      setSelectedDate("");
+      setSelectedFilledStatus("");
     } catch (error) {
-      console.error("Error fetching prescriptions:", error);
+      console.error("An error occurred:", error);
     }
   };
-
-  fetchPrescriptions();
-}, [user._id]);
-
   return (
     <>
       <Container className="mt-5" fluid>
@@ -103,7 +156,8 @@ const DoctorPrescriptionsForPatient = () => {
                                 <i className="ni ni-calendar-grid-58" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <ReactDatetime timeFormat={false} />
+                            <ReactDatetime key={selectedDate} timeFormat={false}  value={selectedDate}
+                              onChange={(date) => setSelectedDate(date)}/> 
                           </InputGroup>
                         </FormGroup>
                       </Col>
@@ -118,7 +172,10 @@ const DoctorPrescriptionsForPatient = () => {
                             Filled/Unfilled:
                           </label>
                           <br />
-                          <Input name="select" type="select">
+                          <Input name="selectIsFilled" type="select" value={selectedFilledStatus}
+                            onChange={(e) =>
+                              setSelectedFilledStatus(e.target.value)
+                            }>
                             <option value="">All</option>
                             <option value="true">Filled</option>
                             <option value="false">Unfilled</option>
@@ -128,7 +185,7 @@ const DoctorPrescriptionsForPatient = () => {
                     </Row>
                     <Row>
                       <Col sm="12">
-                        <Button color="secondary" size="sm">
+                      <Button color="secondary" size="sm"  onClick={handleFilterPrescriptions}>
                           Filter Prescriptions
                         </Button>
                       </Col>
@@ -239,7 +296,7 @@ const DoctorPrescriptionsForPatient = () => {
                         color: "#f7fafc",
                       }}
                     >
-                      Doctor
+                      Patient
                     </th>
                     <th
                       scope="col"
@@ -276,34 +333,40 @@ const DoctorPrescriptionsForPatient = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr key="1" style={{ color: "#f7fafc" }}>
-                    <th scope="row">
-                      <Media className="align-items-center">
-                        <Media>
-                          <span className="mb-0 text-sm">
-                            Dr. Jessica Jones
-                          </span>
+                  {prescriptions.map((prescription) => (
+                    <tr key={prescription._id} style={{ color: "#f7fafc" }}>
+                      <th scope="row">
+                        <Media className="align-items-center">
+                          <Media>
+                            <span className="mb-0 text-sm">
+                              {prescription.patient.username}
+                            </span>
+                          </Media>
                         </Media>
-                      </Media>
-                    </th>
-                    <td>24-12-2024 </td>
-                    <td>
-                      <Badge color="" className="badge-dot mr-4">
-                        <i className="bg-danger" />
-                        No
-                      </Badge>
-                    </td>
-                    <td>
-                      <Button color="secondary" size="sm"  onClick = {handleViewDetailsClick}>
-                        View Details
-                      </Button>
-                    </td>
-                    <td>
-                      <Button color="secondary" size="sm">
-                        Download as PDF
-                      </Button>
-                    </td>
-                  </tr>
+                      </th>
+                      <td>{prescription.date}</td>
+                      <td>
+                        <Badge color="" className="badge-dot mr-4">
+                          <i className={`bg-${prescription.isFilled ? 'success' : 'danger'}`} />
+                          {prescription.isFilled ? 'Yes' : 'No'}
+                        </Badge>
+                      </td>
+                      <td>
+                      <Button color="secondary" size="sm" onClick={() => handleViewDetailsClick(prescription._id)}>
+            View Details
+          </Button>
+                      </td>
+                      <td>
+                      <Button
+                color="secondary"
+                size="sm"
+                onClick={() => downloadPDF(prescription._id)}
+              >
+                Download as PDF
+              </Button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </Table>
             </Card>
@@ -313,4 +376,5 @@ const DoctorPrescriptionsForPatient = () => {
     </>
   );
 };
+
 export default DoctorPrescriptionsForPatient;
