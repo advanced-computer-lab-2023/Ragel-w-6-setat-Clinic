@@ -36,7 +36,7 @@ const getAllPackages = async (req, res) => {
     res.status(200).json(packages);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -85,7 +85,7 @@ const createPackage = async (req, res) => {
     const pack = await Package.create(req.body);
     const packages = await Package.find({});
     const adminId = req.params.id;
-    res.status(201).json({ message: "package successfully added" });
+    res.status(200).json({ message: "package successfully added", packages });
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -103,18 +103,18 @@ const deletePackage = async (req, res) => {
       req.params.packageid
     );
     if (deletedPackage) {
-      // Find all patients subscribed to the deleted package
+      // find all patients subscribed to the deleted package
       const patientsToUpdate = await Patient.find({
         "subscribedPackage.packageId": deletedPackage._id,
       });
 
-      // Update each patient's subscribedPackage to null
+      // update each patient's subscribedPackage to null
       const updatePromises = patientsToUpdate.map(async (patient) => {
         patient.subscribedPackage = null;
         return patient.save();
       });
 
-      // Wait for all updates to complete
+      // wait for all updates to complete
       await Promise.all(updatePromises);
     }
     res.status(200).json({ message: "deleted package successfully" });
@@ -138,8 +138,9 @@ const updatePackage = async (req, res) => {
       }
     );
     const packages = await Package.find({});
-    res.status(201).json({
+    res.status(200).json({
       message: "updated successfully",
+      packages,
     });
   } catch (err) {
     res.status(400).json({

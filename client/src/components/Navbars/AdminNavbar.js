@@ -77,7 +77,7 @@ const PatientNavBar = () => {
               </NavItem>
               <NavItem>
                 <NavLink
-                  href="/patient/healthPackages"
+                  href="/admin/healthPackagesManagement"
                   className="mb-sm-1 mb-md-0"
                 >
                   <i className="fa-solid fa-box-archive"></i>

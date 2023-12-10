@@ -22,6 +22,7 @@ import HealthPackages from "views/PatientViews/HealthPackages";
 import HomeAdmin from "views/AdminViews/HomeAdmin";
 import AllUsers from "views/AdminViews/AllUsers";
 import UnregisteredDoctors from "views/AdminViews/UnregisteredDoctors";
+import HealthPackagesManagement from "views/AdminViews/HealthPackagesManagement";
 
 //doctor users
 
@@ -185,6 +186,13 @@ var routes = [
     name: "Unregistered Doctors",
     icon: "ni ni-single-02 text-yellow",
     component: <UnregisteredDoctors />,
+    layout: "/admin",
+  },
+  {
+    path: "/healthPackagesManagement",
+    name: "Health Packages Management",
+    icon: "ni ni-single-02 text-yellow",
+    component: <HealthPackagesManagement />,
     layout: "/admin",
   },
 
