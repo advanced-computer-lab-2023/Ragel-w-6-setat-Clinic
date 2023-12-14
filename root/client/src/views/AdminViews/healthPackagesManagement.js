@@ -1,58 +1,58 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-// reactstrap components
 import axios from "axios";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  ListGroup,
-  ListGroupItem,
-  Button,
+  Box,
+  Tab,
+  Paper,
+  Tabs,
+  Switch,
+  Slide,
+  FormControlLabel,
+} from "@mui/material";
+
+import {
+  Container,
   Card,
-  Collapse,
   CardHeader,
   CardBody,
+  CardTitle,
+  CardText,
   FormGroup,
   Form,
   Input,
-  Container,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroup,
   Row,
   Col,
-  CardTitle,
-  CardText,
-  CardLink,
   Label,
+  Button,
+  Alert,
 } from "reactstrap";
-// core components
-import UserHeader from "components/Headers/UserHeader.js";
-import { UserContext } from "../../contexts/UserContext";
-import { HealthPackagesContext } from "../../contexts/HealthPackagesContext";
 
-const ManageHealthPackages = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggle = () => setIsOpen(!isOpen);
+import { useAuthContext } from "../../hooks/useAuthContext";
 
-  const { user } = useContext(UserContext);
-  const { healthPackages, setHealthPackages } = useContext(
-    HealthPackagesContext
-  );
+const HealthPackagesManagement = () => {
+  const { user } = useAuthContext();
+
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("danger");
+
+  const [value, setValue] = useState(0);
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+  const [checked, setChecked] = useState(false);
+  const handleChangeChecked = () => {
+    setVisible(false);
+    setChecked((prev) => !prev);
+  };
 
   const [editableIndex, setEditableIndex] = useState(null);
+
+  const [healthPackages, setHealthPackages] = useState([]);
   const [updatedPackage, setUpdatedPackage] = useState({
     name: "",
     description: "",
@@ -61,7 +61,6 @@ const ManageHealthPackages = () => {
     medicineDiscount: "",
     subscriptionDiscount: "",
   });
-
   const [packageName, setPackageName] = useState("");
   const [packagePrice, setPackagePrice] = useState(0);
   const [packageSessionDiscount, setPackageSessionDiscount] = useState(0);
@@ -73,84 +72,24 @@ const ManageHealthPackages = () => {
   useEffect(() => {
     const fetchHealthPackages = async () => {
       try {
-        const response = await fetch(`/admins/getAllPackages/${user._id}`);
+        const response = await fetch(
+          `/admins/getAllPackages/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
         const json = await response.json();
         if (response.ok) {
           setHealthPackages(json);
         }
       } catch (error) {
-        console.error("An error occurred:", error);
+        console.error("An error occurred:", error.response.data.message);
       }
     };
 
     fetchHealthPackages();
-  }, [healthPackages]);
-
-  const addPackage = async () => {
-    try {
-      const response = await axios.post(
-        `/admins/packageManagement/${user._id}`,
-        {
-          name: packageName,
-          price: packagePrice,
-          description: packageDescription,
-          sessionDiscount: packageSessionDiscount,
-          medicineDiscount: packageMedicineDiscount,
-          subscriptionDiscount: packageSubscriptionDiscount,
-        }
-      );
-
-      alert(response.data.message);
-      setPackageName("");
-      setPackagePrice(0);
-      setPackageSessionDiscount(0);
-      setPackageMedicineDiscount(0);
-      setPackageSubscriptionDiscount(0);
-      setPackageDescription("");
-    } catch (error) {
-      // If there was an error in the subscription process, you can handle it accordingly.
-      console.error(error.response.data.message);
-      alert("Please make sure to fill in the blanks");
-    }
-  };
-
-  const deletePackage = async (packageId) => {
-    try {
-      const response = await axios.delete(
-        `/admins/packageManagement/${user._id}/${packageId}`
-      );
-      alert(response.data.message);
-    } catch (error) {
-      // If there was an error in the subscription process, you can handle it accordingly.
-      console.error(error.response.data.message);
-      alert("Failed: " + error.response.data.message);
-    }
-  };
-
-  const handleEdit = (index) => {
-    setEditableIndex(index);
-    setUpdatedPackage(healthPackages[index]);
-  };
-
-  const handleDone = async () => {
-    setEditableIndex(null); // Set editableIndex to null to exit edit mode
-
-    try {
-      // Call your API to update the package using the updatedPackage data
-      await axios.patch(
-        `/admins/packageManagement/${user._id}/${updatedPackage._id}`,
-        updatedPackage
-      );
-
-      // Provide user feedback about the successful update
-      alert("Package updated successfully");
-    } catch (error) {
-      // Handle errors appropriately
-      console.error("An error occurred while updating the package:", error);
-      // You may want to provide user feedback about the update failure
-      alert("Failed to update package. Please try again.");
-    }
-  };
+    // eslint-disable-next-line
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -160,160 +99,524 @@ const ManageHealthPackages = () => {
     }));
   };
 
-  return (
-    <>
-      <div
-        className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
-        style={{
-          minHeight: "100px",
-          backgroundSize: "cover",
-          backgroundPosition: "center top",
-        }}
-      >
-        {/* Mask */}
-        <span className="mask bg-gradient-default opacity-8" />
-        {/* Header container */}
-      </div>
-      {/* Page content */}
-      <Container className="mt--7" fluid>
-        <Row>
-          <Col className="order-xl-1" xl="8">
-            <Card className="bg-secondary shadow">
-              <CardHeader className="bg-white border-0">
-                <Row className="align-items-center">
-                  <Col xs="8"></Col>
-                  <Col className="text-right" xs="4">
-                    <Button
-                      color="primary"
-                      href="#pablo"
-                      onClick={addPackage}
-                      size="sm"
+  const addPackage = async () => {
+    try {
+      if (
+        !packageName ||
+        !packagePrice ||
+        !packageDescription ||
+        !packageSessionDiscount ||
+        !packageMedicineDiscount ||
+        !packageSubscriptionDiscount
+      ) {
+        setVisible(true);
+        setAlertMessage(`Please complete all the form`);
+        setAlertColor("danger");
+        return;
+      }
+      const response = await axios.post(
+        `/admins/packageManagement/${user.user._id}`,
+        {
+          name: packageName,
+          price: packagePrice,
+          description: packageDescription,
+          sessionDiscount: packageSessionDiscount,
+          medicineDiscount: packageMedicineDiscount,
+          subscriptionDiscount: packageSubscriptionDiscount,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setHealthPackages(response.data.packages);
+        setAlertMessage(response.data.message);
+        setVisible(true);
+        setAlertColor("success");
+      }
+      setPackageName("");
+      setPackagePrice(0);
+      setPackageSessionDiscount(0);
+      setPackageMedicineDiscount(0);
+      setPackageSubscriptionDiscount(0);
+      setPackageDescription("");
+    } catch (error) {
+      console.error(error.response.data.message);
+      setPackageName("");
+      setPackagePrice(0);
+      setPackageSessionDiscount(0);
+      setPackageMedicineDiscount(0);
+      setPackageSubscriptionDiscount(0);
+      setPackageDescription("");
+    }
+  };
+
+  const deletePackage = async (packageId) => {
+    try {
+      const response = await axios.delete(
+        `/admins/packageManagement/${user.user._id}/${packageId}`,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      if (response.status === 200) {
+        setHealthPackages(
+          healthPackages.filter(
+            (healthPackage) => healthPackage._id !== packageId
+          )
+        );
+        setValue((prev) => prev - 1);
+      }
+    } catch (error) {
+      console.error(error.response.data.message);
+    }
+  };
+
+  const handleEdit = (index) => {
+    setEditableIndex(index);
+    setUpdatedPackage(healthPackages[index]);
+  };
+
+  const handleDone = async () => {
+    setEditableIndex(null);
+    try {
+      const response = await axios.patch(
+        `/admins/packageManagement/${user.user._id}/${updatedPackage._id}`,
+        updatedPackage,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setHealthPackages(response.data.packages);
+      }
+    } catch (error) {
+      console.error(
+        "An error occurred while updating the package:",
+        error.response.data.message
+      );
+    }
+  };
+
+  const packageForm = (
+    <Paper elevation={4} className="mb-5">
+      <Card className="bg-secondary shadow">
+        <CardHeader
+          className=" border-0"
+          style={{ backgroundColor: "#0C356A" }}
+        >
+          <Row className="align-items-center">
+            <Col>
+              <h3 style={{ color: "#f7fafc" }}>Add a New Health Package</h3>
+            </Col>
+            <Col className="text-right">
+              <Button
+                style={{ backgroundColor: "#f7fafc", color: "#0C356A" }}
+                size="sm"
+                onClick={addPackage}
+              >
+                Add Package
+              </Button>
+            </Col>
+          </Row>
+        </CardHeader>
+        <CardBody style={{ backgroundColor: "#eef5ff" }}>
+          <Form>
+            <h6 className="heading-small mb-4" style={{ color: "#0C356A" }}>
+              Health Package Information
+            </h6>
+            <div className="pl-lg-4">
+              <Row>
+                <Col lg="6">
+                  <FormGroup>
+                    <Label
+                      style={{ color: "#0C356A" }}
+                      className="form-control-label"
                     >
-                      Add Package
-                    </Button>
-                  </Col>
-                </Row>
-              </CardHeader>
-              <CardBody>
-                <Form>
-                  <h6 className="heading-small text-muted mb-4">
-                    Health Package Information
-                  </h6>
-                  <div className="pl-lg-4">
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label className="form-control-label">Name</label>
-                          <Input
-                            className="form-control-alternative"
-                            type="text"
-                            value={packageName}
-                            onChange={(e) => setPackageName(e.target.value)}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label className="form-control-label">Price</label>
-                          <Input
-                            className="form-control-alternative"
-                            type="number"
-                            value={packagePrice}
-                            onChange={(e) => setPackagePrice(e.target.value)}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label className="form-control-label">
-                            Session Discount
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="number"
-                            value={packageSessionDiscount}
-                            onChange={(e) =>
-                              setPackageSessionDiscount(e.target.value)
-                            }
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label className="form-control-label">
-                            Medicine Discount
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="number"
-                            value={packageMedicineDiscount}
-                            onChange={(e) =>
-                              setPackageMedicineDiscount(e.target.value)
-                            }
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label className="form-control-label">
-                            Subscription Discount
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="number"
-                            value={packageSubscriptionDiscount}
-                            onChange={(e) =>
-                              setPackageSubscriptionDiscount(e.target.value)
-                            }
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="12">
-                        <FormGroup>
-                          <label>Description</label>
-                          <Input
-                            className="form-control-alternative"
-                            rows="4"
-                            type="textarea"
-                            value={packageDescription}
-                            onChange={(e) =>
-                              setPackageDescription(e.target.value)
-                            }
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                  </div>
-                  <hr className="my-4" />
-                  {/* packages */}
-                </Form>
-                <Row>
-                  {healthPackages
-                    ? healthPackages.map((healthPackage, index) => (
-                        <Card
-                          style={{
-                            width: "18rem",
-                            backgroundColor: "#435585",
-                          }}
-                          className="mt-3 mr-3"
-                        >
-                          <CardBody>
-                            <CardText
-                              style={{
-                                color: "white",
-                              }}
-                            >
+                      Name
+                    </Label>
+                    <Input
+                      className="form-control-alternative"
+                      type="text"
+                      value={packageName}
+                      onChange={(e) => setPackageName(e.target.value)}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col lg="6">
+                  <FormGroup>
+                    <Label
+                      className="form-control-label"
+                      style={{ color: "#0C356A" }}
+                    >
+                      Price
+                    </Label>
+                    <Input
+                      className="form-control-alternative"
+                      type="number"
+                      value={packagePrice}
+                      onChange={(e) => setPackagePrice(e.target.value)}
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col lg="4">
+                  <FormGroup>
+                    <Label
+                      className="form-control-label"
+                      style={{ color: "#0C356A" }}
+                    >
+                      Session Discount
+                    </Label>
+                    <Input
+                      className="form-control-alternative"
+                      type="number"
+                      value={packageSessionDiscount}
+                      onChange={(e) =>
+                        setPackageSessionDiscount(e.target.value)
+                      }
+                    />
+                  </FormGroup>
+                </Col>
+                <Col lg="4">
+                  <FormGroup>
+                    <Label
+                      className="form-control-label"
+                      style={{ color: "#0C356A" }}
+                    >
+                      Medicine Discount
+                    </Label>
+                    <Input
+                      className="form-control-alternative"
+                      type="number"
+                      value={packageMedicineDiscount}
+                      onChange={(e) =>
+                        setPackageMedicineDiscount(e.target.value)
+                      }
+                    />
+                  </FormGroup>
+                </Col>
+                <Col lg="4">
+                  <FormGroup>
+                    <Label
+                      className="form-control-label"
+                      style={{ color: "#0C356A" }}
+                    >
+                      Subscription Discount
+                    </Label>
+                    <Input
+                      className="form-control-alternative"
+                      type="number"
+                      value={packageSubscriptionDiscount}
+                      onChange={(e) =>
+                        setPackageSubscriptionDiscount(e.target.value)
+                      }
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <Row>
+                <Col lg="12">
+                  <FormGroup>
+                    <Label
+                      className="form-control-label"
+                      style={{ color: "#0C356A" }}
+                    >
+                      Description
+                    </Label>
+                    <Input
+                      className="form-control-alternative"
+                      rows="4"
+                      type="textarea"
+                      value={packageDescription}
+                      onChange={(e) => setPackageDescription(e.target.value)}
+                    />
+                  </FormGroup>
+                </Col>
+              </Row>
+            </div>
+          </Form>
+          <Alert
+            className="mt-3"
+            color={alertColor}
+            isOpen={visible}
+            toggle={onDismiss}
+          >
+            {alertMessage}
+          </Alert>
+        </CardBody>
+      </Card>
+    </Paper>
+  );
+
+  return (
+    <Container
+      className="mt-5"
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+      fluid
+    >
+      <Row>
+        <Col>
+          <Box sx={{ maxWidth: { xs: 330, sm: 880 }, bgcolor: "#f7fafc" }}>
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              style={{ backgroundColor: "#eef5ff" }}
+              variant="scrollable"
+              scrollButtons
+              allowScrollButtonsMobile
+              aria-label="scrollable force tabs example"
+            >
+              {healthPackages.map((healthPackage, index) => (
+                <Tab
+                  style={{ color: "#0C356A" }}
+                  key={index}
+                  label={`Package ${index + 1}`}
+                />
+              ))}
+            </Tabs>
+
+            <Box>
+              {healthPackages.map((healthPackage, index) => (
+                <div key={index} hidden={value !== index}>
+                  <Card
+                    className="my-2"
+                    inverse
+                    style={{
+                      width: "40rem",
+                      backgroundColor: "#0C356A",
+                    }}
+                  >
+                    <CardHeader
+                      style={{ color: "#0C356A", backgroundColor: "#eef5ff" }}
+                    >
+                      <Row>
+                        <Col>
+                          {" "}
+                          <h3>{healthPackage.name} Package</h3>
+                        </Col>
+                        <Col className="text-right">
+                          {editableIndex === index ? (
+                            <>
+                              <Button
+                                style={{
+                                  backgroundColor: "#0C356A",
+                                  color: "#f7fafc",
+                                }}
+                                onClick={handleDone}
+                                size="sm"
+                              >
+                                Done
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                style={{
+                                  backgroundColor: "#0C356A",
+                                  color: "#f7fafc",
+                                }}
+                                onClick={() => deletePackage(healthPackage._id)}
+                                size="sm"
+                              >
+                                Delete Package
+                              </Button>
+                              <Button
+                                style={{
+                                  backgroundColor: "#0C356A",
+                                  color: "#f7fafc",
+                                }}
+                                onClick={() => handleEdit(index)}
+                                size="sm"
+                              >
+                                Update Package
+                              </Button>
+                            </>
+                          )}
+                        </Col>
+                      </Row>
+                    </CardHeader>
+                    <CardBody>
+                      <CardTitle tag="h5" style={{ color: "#f7fafc" }}>
+                        Package Details
+                      </CardTitle>
+                      <CardText>
+                        <Form>
+                          <Row>
+                            <Col md="6">
                               <FormGroup>
-                                <Label for="exampleText">
+                                <Label
+                                  className="form-control-label"
+                                  style={{
+                                    color: "#f7fafc",
+                                  }}
+                                >
+                                  Package Name
+                                </Label>
+                                <Input
+                                  className="form-control-alternative"
+                                  type="text"
+                                  value={
+                                    editableIndex === index
+                                      ? updatedPackage.name
+                                      : healthPackage.name
+                                  }
+                                  onChange={handleInputChange}
+                                  name="name"
+                                  readOnly={editableIndex !== index}
+                                />
+                              </FormGroup>
+                            </Col>
+                            <Col md="6">
+                              <FormGroup>
+                                <Label
+                                  className="form-control-label"
+                                  style={{
+                                    color: "#f7fafc",
+                                  }}
+                                >
+                                  Package Price
+                                </Label>
+                                <Input
+                                  className="form-control-alternative"
+                                  value={
+                                    editableIndex === index
+                                      ? updatedPackage.price
+                                      : healthPackage.price
+                                  }
+                                  onChange={handleInputChange}
+                                  name="price"
+                                  readOnly={editableIndex !== index}
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col md="4">
+                              <FormGroup>
+                                <Label
+                                  className="form-control-label"
+                                  style={{
+                                    color: "white",
+                                  }}
+                                >
+                                  Session Discount
+                                </Label>
+
+                                <InputGroup className="mb-4">
+                                  <InputGroupAddon
+                                    addonType="prepend"
+                                    className=""
+                                  >
+                                    <InputGroupText>
+                                      <i class="fa-solid fa-percent"></i>
+                                    </InputGroupText>
+                                  </InputGroupAddon>
+                                  <Input
+                                    className="form-control-alternative"
+                                    value={
+                                      editableIndex === index
+                                        ? ` ${updatedPackage.sessionDiscount}`
+                                        : ` ${healthPackage.sessionDiscount}`
+                                    }
+                                    onChange={handleInputChange}
+                                    name="sessionDiscount"
+                                    readOnly={editableIndex !== index}
+                                  />
+                                </InputGroup>
+                              </FormGroup>
+                            </Col>
+                            <Col md="4">
+                              <FormGroup>
+                                <Label
+                                  className="form-control-label"
+                                  style={{
+                                    color: "white",
+                                  }}
+                                >
+                                  Medicine Discount
+                                </Label>
+
+                                <InputGroup className="mb-4">
+                                  <InputGroupAddon
+                                    addonType="prepend"
+                                    className=""
+                                  >
+                                    <InputGroupText>
+                                      <i class="fa-solid fa-percent"></i>
+                                    </InputGroupText>
+                                  </InputGroupAddon>
+                                  <Input
+                                    className="form-control-alternative"
+                                    value={
+                                      editableIndex === index
+                                        ? ` ${updatedPackage.medicineDiscount}`
+                                        : ` ${healthPackage.medicineDiscount}`
+                                    }
+                                    onChange={handleInputChange}
+                                    name="medicineDiscount"
+                                    readOnly={editableIndex !== index}
+                                  />
+                                </InputGroup>
+                              </FormGroup>
+                            </Col>
+                            <Col md="4">
+                              <FormGroup>
+                                <Label
+                                  className="form-control-label"
+                                  style={{
+                                    color: "#f7fafc",
+                                  }}
+                                >
+                                  Subscription Discount
+                                </Label>
+
+                                <InputGroup className="mb-4">
+                                  <InputGroupAddon
+                                    addonType="prepend"
+                                    className=""
+                                  >
+                                    <InputGroupText>
+                                      <i class="fa-solid fa-percent"></i>
+                                    </InputGroupText>
+                                  </InputGroupAddon>
+                                  <Input
+                                    className="form-control-alternative"
+                                    value={
+                                      editableIndex === index
+                                        ? ` ${updatedPackage.subscriptionDiscount}`
+                                        : ` ${healthPackage.subscriptionDiscount}`
+                                    }
+                                    onChange={handleInputChange}
+                                    name="subscriptionDiscount"
+                                    readOnly={editableIndex !== index}
+                                  />
+                                </InputGroup>
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col md="12">
+                              <FormGroup>
+                                <Label
+                                  className="form-control-label"
+                                  style={{
+                                    color: "#f7fafc",
+                                  }}
+                                >
                                   Package Description
                                 </Label>
                                 <Input
                                   className="form-control-alternative"
                                   type="textarea"
+                                  rows="3"
                                   value={
                                     editableIndex === index
                                       ? updatedPackage.description
@@ -324,184 +627,34 @@ const ManageHealthPackages = () => {
                                   readOnly={editableIndex !== index}
                                 />
                               </FormGroup>
-                            </CardText>
-                          </CardBody>
-                          <ListGroup flush contentEditable={false}>
-                            <ListGroupItem
-                              style={{
-                                backgroundColor: "#435585",
-                                color: "white",
-                              }}
-                            >
-                              <label
-                                className="form-control-label"
-                                style={{
-                                  color: "white",
-                                }}
-                              >
-                                Package Name
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                type="text"
-                                value={
-                                  editableIndex === index
-                                    ? updatedPackage.name
-                                    : healthPackage.name
-                                }
-                                onChange={handleInputChange}
-                                name="name"
-                                readOnly={editableIndex !== index}
-                              />
-                            </ListGroupItem>
-                            <ListGroupItem
-                              style={{
-                                backgroundColor: "#435585",
-                                color: "white",
-                              }}
-                            >
-                              <label
-                                className="form-control-label"
-                                style={{
-                                  color: "white",
-                                }}
-                              >
-                                Package Price
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                value={
-                                  editableIndex === index
-                                    ? updatedPackage.price
-                                    : healthPackage.price
-                                }
-                                onChange={handleInputChange}
-                                name="price"
-                                readOnly={editableIndex !== index}
-                              />
-                            </ListGroupItem>
-                            <ListGroupItem
-                              style={{
-                                backgroundColor: "#435585",
-                                color: "white",
-                              }}
-                            >
-                              <label
-                                className="form-control-label"
-                                style={{
-                                  color: "white",
-                                }}
-                              >
-                                Session Discount
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                value={
-                                  editableIndex === index
-                                    ? updatedPackage.sessionDiscount
-                                    : healthPackage.sessionDiscount
-                                }
-                                onChange={handleInputChange}
-                                name="sessionDiscount"
-                                readOnly={editableIndex !== index}
-                              />
-                            </ListGroupItem>
-                            <ListGroupItem
-                              style={{
-                                backgroundColor: "#435585",
-                                color: "white",
-                              }}
-                            >
-                              <label
-                                className="form-control-label"
-                                style={{
-                                  color: "white",
-                                }}
-                              >
-                                Medicine Discount
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                value={
-                                  editableIndex === index
-                                    ? updatedPackage.medicineDiscount
-                                    : healthPackage.medicineDiscount
-                                }
-                                onChange={handleInputChange}
-                                name="medicineDiscount"
-                                readOnly={editableIndex !== index}
-                              />
-                            </ListGroupItem>
-                            <ListGroupItem
-                              style={{
-                                backgroundColor: "#435585",
-                                color: "white",
-                              }}
-                            >
-                              <label
-                                className="form-control-label"
-                                style={{
-                                  color: "white",
-                                }}
-                              >
-                                Subscription Discount
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                value={
-                                  editableIndex === index
-                                    ? updatedPackage.subscriptionDiscount
-                                    : healthPackage.subscriptionDiscount
-                                }
-                                onChange={handleInputChange}
-                                name="subscriptionDiscount"
-                                readOnly={editableIndex !== index}
-                              />
-                            </ListGroupItem>
-                          </ListGroup>
-                          <CardBody>
-                            {editableIndex === index ? (
-                              <>
-                                <Button
-                                  style={{ backgroundColor: "#F8F6F4" }}
-                                  onClick={handleDone}
-                                  size="sm"
-                                >
-                                  Done
-                                </Button>
-                              </>
-                            ) : (
-                              <>
-                                <Button
-                                  style={{ backgroundColor: "#F8F6F4" }}
-                                  onClick={() =>
-                                    deletePackage(healthPackage._id)
-                                  }
-                                  size="sm"
-                                >
-                                  Delete Package
-                                </Button>
-                                <Button
-                                  style={{ backgroundColor: "#F8F6F4" }}
-                                  onClick={() => handleEdit(index)}
-                                  size="sm"
-                                >
-                                  Update Package
-                                </Button>
-                              </>
-                            )}
-                          </CardBody>
-                        </Card>
-                      ))
-                    : ""}
-                </Row>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </>
+                            </Col>
+                          </Row>
+                        </Form>
+                      </CardText>
+                    </CardBody>
+                  </Card>
+                </div>
+              ))}
+            </Box>
+          </Box>
+        </Col>
+        <Col>
+          <Box>
+            <FormControlLabel
+              control={
+                <Switch checked={checked} onChange={handleChangeChecked} />
+              }
+              label="Slide to view health package form"
+              style={{ color: "#0C356A", fontWeight: "bold" }}
+            />
+            <Slide direction="up" in={checked} mountOnEnter unmountOnExit>
+              {packageForm}
+            </Slide>
+          </Box>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
-export default ManageHealthPackages;
+export default HealthPackagesManagement;

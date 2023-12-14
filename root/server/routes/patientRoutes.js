@@ -35,6 +35,7 @@ import {
   processPayment,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
+import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
 
 // multer
 const storage = multer.diskStorage({
@@ -52,6 +53,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const router = express.Router();
+
+//require auth
+router.use(requireAuthPatient);
 
 // HABIBAS ROUTES
 

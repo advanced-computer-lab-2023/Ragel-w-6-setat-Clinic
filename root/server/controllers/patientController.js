@@ -1,6 +1,7 @@
 import Patient from "../models/Patient.js";
 import Prescription from "../models/Prescription.js";
 import Doctor from "../models/Doctor.js";
+import Admin from "../models/Admin.js";
 import Appointments from "../models/Appointments.js";
 import Package from "../models/Package.js";
 import stripe from "stripe";
@@ -72,21 +73,48 @@ async function doctorDisplay(patientID, doctor) {
 
 const registerPatient = async (req, res) => {
   try {
+    const doctor = await Doctor.findOne({
+      username: req.body.patientFields.username,
+    });
+    const doctor2 = await Doctor.findOne({
+      email: req.body.patientFields.email,
+    });
+    const admin = await Admin.findOne({
+      username: req.body.patientFields.username,
+    });
+
+    if (doctor || admin) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this username" });
+    }
+
+    if (doctor2) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this email" });
+    }
+
     const patient = await Patient.create({
       ...req.body.patientFields,
       emergencyContact: {
         ...req.body.emergencyContact,
       },
     });
+
     res.status(201).json({
       status: "success",
       message: "Patient successfully registered.",
     });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+  } catch (error) {
+    console.error("Patient registration error:", error);
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      const message = `A user already exists with this ${duplicatedField}`;
+      res.status(500).json({ message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 };
 
@@ -237,15 +265,24 @@ const uploadDocument = async (req, res) => {
   const patientId = req.params.id;
   try {
     const patient = await Patient.findById(patientId);
-    patient.medicalHistory.push(req.file.filename);
+    const newHealthRecord = {
+      uploadByID: patientId,
+      uploadByType: "Patient",
+      name: req.file.originalname,
+      filePath: req.file.filename,
+      forWhomID: patientId,
+      fileType: req.file.mimetype,
+    };
+
+    patient.medicalHistory.push(newHealthRecord);
+    const medicalHistory = patient.medicalHistory;
     await patient.save();
     res.status(200).json({
-      status: "success",
-      message: "Document uploaded successfully.",
+      medicalHistory: medicalHistory,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -253,29 +290,30 @@ const getMedicalHistory = async (req, res) => {
   const patientId = req.params.id;
   try {
     const patient = await Patient.findById(patientId);
-    res.status(200).json(patient.medicalHistory);
+    res.status(200).json({ medicalHistory: patient.medicalHistory });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
 const removeDocument = async (req, res) => {
   const patientId = req.params.patientid;
   const documentId = req.params.documentid;
+
   try {
     const patient = await Patient.findById(patientId);
 
     // Remove the document from the medicalHistory array
     patient.medicalHistory = patient.medicalHistory.filter(
-      (document) => document !== documentId
+      (document) => document._id.toString() !== documentId
     );
     await patient.save();
 
     res.status(200).json({ message: "Document removed successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 

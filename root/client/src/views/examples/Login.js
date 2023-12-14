@@ -17,10 +17,6 @@
 */
 
 // reactstrap components
-
-import { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-
 import {
   Button,
   Card,
@@ -34,75 +30,58 @@ import {
   InputGroup,
   Row,
   Col,
-  Alert,
 } from "reactstrap";
 
-import { UserContext } from "contexts/UserContext";
-
 const Login = () => {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState(null);
-  const { user, setUser } = useContext(UserContext);
-  const handleLogin = async () => {
-    try {
-      const response = await fetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Login successful, redirect or perform actions as needed
-        console.log("Login successful", data);
-        setMessage({ type: "success", text: "Login successful" });
-        setUser({ _id: data.user._id.toString() });
-        switch (data.userType) {
-          case "doctor":
-            navigate("/doctor");
-            break;
-          case "patient":
-            navigate("/patient");
-            break;
-          case "admin":
-            navigate("/admin");
-            break;
-          default:
-            // Default redirection or handle unknown user type
-            navigate("/default/dashboard");
-        }
-      } else {
-        // Login failed, handle errors
-        console.error("Login failed", data);
-        setMessage({
-          type: "danger",
-          text: "Login failed. Invalid credentials",
-        });
-      }
-    } catch (error) {
-      console.error("Error during login:", error);
-      setMessage({ type: "danger", text: "Internal server error" });
-    }
-  };
   return (
     <>
       <Col lg="5" md="7">
         <Card className="bg-secondary shadow border-0">
+          <CardHeader className="bg-transparent pb-5">
+            <div className="text-muted text-center mt-2 mb-3">
+              <small>Sign in with</small>
+            </div>
+            <div className="btn-wrapper text-center">
+              <Button
+                className="btn-neutral btn-icon"
+                color="default"
+                href="#pablo"
+                onClick={(e) => e.preventDefault()}
+              >
+                <span className="btn-inner--icon">
+                  <img
+                    alt="..."
+                    src={
+                      require("../../assets/img/icons/common/github.svg")
+                        .default
+                    }
+                  />
+                </span>
+                <span className="btn-inner--text">Github</span>
+              </Button>
+              <Button
+                className="btn-neutral btn-icon"
+                color="default"
+                href="#pablo"
+                onClick={(e) => e.preventDefault()}
+              >
+                <span className="btn-inner--icon">
+                  <img
+                    alt="..."
+                    src={
+                      require("../../assets/img/icons/common/google.svg")
+                        .default
+                    }
+                  />
+                </span>
+                <span className="btn-inner--text">Google</span>
+              </Button>
+            </div>
+          </CardHeader>
           <CardBody className="px-lg-5 py-lg-5">
             <div className="text-center text-muted mb-4">
-              <small>Sign in with credentials</small>
+              <small>Or sign in with credentials</small>
             </div>
-            {/* Display messages */}
-            {message && (
-              <Alert color={message.type} className="text-center">
-                {message.text}
-              </Alert>
-            )}
             <Form role="form">
               <FormGroup className="mb-3">
                 <InputGroup className="input-group-alternative">
@@ -112,10 +91,9 @@ const Login = () => {
                     </InputGroupText>
                   </InputGroupAddon>
                   <Input
-                    placeholder="Username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Email"
+                    type="email"
+                    autoComplete="new-email"
                   />
                 </InputGroup>
               </FormGroup>
@@ -129,8 +107,7 @@ const Login = () => {
                   <Input
                     placeholder="Password"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
                   />
                 </InputGroup>
               </FormGroup>
@@ -148,12 +125,7 @@ const Login = () => {
                 </label>
               </div>
               <div className="text-center">
-                <Button
-                  className="my-4"
-                  color="primary"
-                  type="button"
-                  onClick={handleLogin}
-                >
+                <Button className="my-4" color="primary" type="button">
                   Sign in
                 </Button>
               </div>
@@ -168,6 +140,15 @@ const Login = () => {
               onClick={(e) => e.preventDefault()}
             >
               <small>Forgot password?</small>
+            </a>
+          </Col>
+          <Col className="text-right" xs="6">
+            <a
+              className="text-light"
+              href="#pablo"
+              onClick={(e) => e.preventDefault()}
+            >
+              <small>Create new account</small>
             </a>
           </Col>
         </Row>

@@ -22,6 +22,8 @@ import {
   registerDoctor,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
+import { requireAuthDoctor } from "../middlewares/requireAuthDoctor.js";
+
 // multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -38,6 +40,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const router = express.Router();
+
+//require auth
+router.use(requireAuthDoctor);
 
 // HABIBAS ROUTES
 

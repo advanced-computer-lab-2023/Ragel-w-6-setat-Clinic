@@ -5,6 +5,19 @@ import Package from "../models/Package.js";
 import Appointment from "../models/Appointments.js";
 import Prescription from "../models/Prescription.js";
 
+// get an admin's details
+
+const getAdmin = async (req, res) => {
+  const adminId = req.params.id;
+  try {
+    const admin = await Admin.findById(adminId).select("username");
+    res.status(200).json({ admin });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getAllAdmins = async (req, res) => {
   const adminId = req.params.id;
   try {
@@ -23,25 +36,46 @@ const getAllPackages = async (req, res) => {
     res.status(200).json(packages);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
 // create an admin
 const createAdmin = async (req, res) => {
   const adminId = req.params.id;
-  console.log("heree");
+
+  const doctor = await Doctor.findOne({
+    username: req.body.username,
+  });
+
+  const patient = await Patient.findOne({
+    username: req.body.username,
+  });
+
+  if (doctor || patient) {
+    return res.status(400).json({
+      status: "fail",
+      message: "username already exists",
+    });
+  }
+
   try {
     const admin = await Admin.create(req.body);
-    res.status(201).json({
+    res.status(200).json({
       status: "success",
+      admin,
       message: "Admin successfully added.",
     });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+  } catch (error) {
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      const message = `${duplicatedField} already exists`;
+      res.status(400).json({ status: "fail", message });
+    } else {
+      res
+        .status(400)
+        .json({ status: "fail", message: "Internal Server Error" });
+    }
   }
 };
 
@@ -51,7 +85,7 @@ const createPackage = async (req, res) => {
     const pack = await Package.create(req.body);
     const packages = await Package.find({});
     const adminId = req.params.id;
-    res.status(201).json({ message: "package successfully added" });
+    res.status(200).json({ message: "package successfully added", packages });
   } catch (err) {
     res.status(400).json({
       status: "fail",
@@ -69,18 +103,18 @@ const deletePackage = async (req, res) => {
       req.params.packageid
     );
     if (deletedPackage) {
-      // Find all patients subscribed to the deleted package
+      // find all patients subscribed to the deleted package
       const patientsToUpdate = await Patient.find({
         "subscribedPackage.packageId": deletedPackage._id,
       });
 
-      // Update each patient's subscribedPackage to null
+      // update each patient's subscribedPackage to null
       const updatePromises = patientsToUpdate.map(async (patient) => {
         patient.subscribedPackage = null;
         return patient.save();
       });
 
-      // Wait for all updates to complete
+      // wait for all updates to complete
       await Promise.all(updatePromises);
     }
     res.status(200).json({ message: "deleted package successfully" });
@@ -104,8 +138,9 @@ const updatePackage = async (req, res) => {
       }
     );
     const packages = await Package.find({});
-    res.status(201).json({
+    res.status(200).json({
       message: "updated successfully",
+      packages,
     });
   } catch (err) {
     res.status(400).json({
@@ -152,7 +187,6 @@ const deleteAdmin = async (req, res) => {
     };
 
     const deleteAdminResult = await Admin.findOneAndDelete(filter);
-    console.log(deleteAdminResult);
 
     if (deleteAdminResult.length === 0) {
       res.status(404).json({
@@ -266,29 +300,21 @@ const viewUnregisteredDoctors = async (req, res) => {
 const setToRegistered = async (req, res) => {
   try {
     const adminId = req.params.id;
-    const doctorUsername = req.query.username; // Extract doctor ID from request params
+    const doctorUsername = req.query.username;
 
-    // Find the contract by doctor ID and update the isApproved field to true
     const updatedDoctor = await Doctor.findOneAndUpdate(
       { username: doctorUsername },
       { isRegistered: true },
-      { new: true } // Return the updated contract
+      { new: true }
     );
-
-    if (!updatedDoctor) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Doctor not found for the specified username",
-      });
-    }
 
     res.status(200).json({
       status: "success",
       message: "Doctor registered successfully",
-      contract: updatedDoctor,
+      doctor: updatedDoctor,
     });
   } catch (err) {
-    res.status(500).json({
+    res.status(400).json({
       status: "error",
       message: err.message,
     });
@@ -338,4 +364,5 @@ export {
   getAllPatients,
   setToRegistered,
   rejectDoctor,
+  getAdmin,
 };
