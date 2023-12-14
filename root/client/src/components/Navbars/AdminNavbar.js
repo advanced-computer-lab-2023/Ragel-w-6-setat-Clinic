@@ -8,12 +8,25 @@ import {
   NavItem,
   NavLink,
   Container,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
 } from "reactstrap";
+
+import { useAuthContext } from "../../hooks/useAuthContext.js";
 
 const PatientNavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const toggle = () => setIsOpen(!isOpen);
+
+  const { dispatch } = useAuthContext();
+
+  const handleLogOut = async (e) => {
+    localStorage.removeItem("user");
+    dispatch({ type: "LOGOUT" });
+    window.location.href = "http://localhost:3000/auth/login";
+  };
 
   return (
     <>
@@ -64,7 +77,7 @@ const PatientNavBar = () => {
               </NavItem>
               <NavItem>
                 <NavLink
-                  href="/patient/healthPackages"
+                  href="/admin/healthPackagesManagement"
                   className="mb-sm-1 mb-md-0"
                 >
                   <i className="fa-solid fa-box-archive"></i>
@@ -73,6 +86,23 @@ const PatientNavBar = () => {
               </NavItem>
             </Nav>{" "}
           </Container>
+          <Nav className="ml-auto" style={{ marginRight: "5px" }} navbar>
+            <NavItem>
+              <UncontrolledDropdown nav>
+                <DropdownToggle className="pr-0" nav>
+                  <span className="nav-link-icon d-block text-white">
+                    <i className="ni ni-button-power" />
+                  </span>
+                </DropdownToggle>
+                <DropdownMenu className="dropdown-menu-arrow" right>
+                  <DropdownItem href="#pablo" onClick={handleLogOut}>
+                    <i className="ni ni-user-run" />
+                    <span>Logout</span>
+                  </DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
+            </NavItem>
+          </Nav>
         </Collapse>
       </Navbar>
     </>

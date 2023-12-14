@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Collapse,
   Navbar,
@@ -8,12 +9,26 @@ import {
   NavItem,
   NavLink,
   Container,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
 } from "reactstrap";
+
+import { useAuthContext } from "../../hooks/useAuthContext.js";
 
 const PatientNavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const toggle = () => setIsOpen(!isOpen);
+
+  const { dispatch } = useAuthContext();
+
+  const handleLogOut = async (e) => {
+    localStorage.removeItem("user");
+    dispatch({ type: "LOGOUT" });
+
+    window.location.href = "http://localhost:3000/auth/login";
+  };
 
   return (
     <>
@@ -54,10 +69,12 @@ const PatientNavBar = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink href="/patient/allDoctors" className="mb-sm-1 mb-md-0">
-                  <i className="fa-solid fa-user-doctor"></i>
-                  Doctors
-                </NavLink>
+                <Link to="/patient/allDoctors">
+                  <NavLink className="mb-sm-1 mb-md-0">
+                    <i className="fa-solid fa-user-doctor"></i>
+                    Doctors
+                  </NavLink>
+                </Link>
               </NavItem>
               <NavItem>
                 <NavLink href="/components/" className="mb-sm-1 mb-md-0">
@@ -74,7 +91,7 @@ const PatientNavBar = () => {
                   Health Packages
                 </NavLink>
               </NavItem>
-            </Nav>{" "}
+            </Nav>
           </Container>
           <Nav className="ml-auto" style={{ marginRight: "5px" }} navbar>
             <NavItem className="ml-auto">
@@ -90,6 +107,21 @@ const PatientNavBar = () => {
                   <i className="fa-solid fa-video"></i>
                 </span>
               </NavLink>
+            </NavItem>
+            <NavItem>
+              <UncontrolledDropdown nav>
+                <DropdownToggle className="pr-0" nav>
+                  <span className="nav-link-icon d-block text-white">
+                    <i className="ni ni-button-power" />
+                  </span>
+                </DropdownToggle>
+                <DropdownMenu className="dropdown-menu-arrow" right>
+                  <DropdownItem href="#pablo" onClick={handleLogOut}>
+                    <i className="ni ni-user-run" />
+                    <span>Logout</span>
+                  </DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
             </NavItem>
           </Nav>
         </Collapse>

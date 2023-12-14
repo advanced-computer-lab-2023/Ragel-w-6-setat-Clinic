@@ -23,10 +23,6 @@ import {
 const HomePatient = () => {
   const navigate = useNavigate();
 
-  const handleMedicalHistoryClick = () => {
-    navigate("/patient/medicalHistory");
-  };
-
   const handleFamilyMembersClick = () => {
     navigate("/patient/familyMembers");
   };
@@ -35,6 +31,10 @@ const HomePatient = () => {
   };
   const handlePrescriptionsClick = () => {
     navigate("/patient/myPrescriptions");
+  };
+
+  const handleMedicalHistoryClick = () => {
+    navigate("/patient/medicalHistory");
   };
 
   return (

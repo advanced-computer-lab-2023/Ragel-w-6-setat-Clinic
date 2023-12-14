@@ -20,16 +20,10 @@ import {
   uploadDocumentForPatient,
   getMedicalHistoryForPatient,
   registerDoctor,
-  getDoctorNotifications,
-  getAppNotifications,
-  createPrescription,
-  updatePrescription,
-  downloadPrescriptionPDF,
-  viewAllPrescription,
-  selectPrescription,
-  filterThePrescription
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
+import { requireAuthDoctor } from "../middlewares/requireAuthDoctor.js";
+
 // multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -46,6 +40,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const router = express.Router();
+
+//require auth
+router.use(requireAuthDoctor);
 
 // HABIBAS ROUTES
 
@@ -80,7 +77,6 @@ router.get("/searchForPatients/:id", searchForPatient);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
 router.get("/upcomingAppointments/:id", upcomingAppointments);
 router.get("/getMyAppointments/:id", getMyAppointments);
-router.get("/viewAllPrescription/:id",viewAllPrescription); 
 
 //SARAS ROUTES
 
@@ -92,17 +88,5 @@ router.get("/viewMyPatients/:id", getMyPatients);
 router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
 router.get("/viewPastAppointments/:id", viewPastAppointments);
 router.post("/addAvailableAppointments/:id", addAvailableAppointments);
-router.get("/downloadPrescriptionPDF/:id", downloadPrescriptionPDF);
-
-//sprint 3
-router.get("/getDoctorNotifications/:id", getDoctorNotifications);
-router.get("/getAppNotifications/:id", getAppNotifications);
-router.post("/createPrescription/:id", createPrescription);
-router.patch("/updatePrescription/:id", updatePrescription);
-router.get(
-  "/selectPrescription/:doctorid/:prescriptionid",
-  selectPrescription
-);
-router.get("/filterThePrescription/:id", filterThePrescription);
 
 export default router;

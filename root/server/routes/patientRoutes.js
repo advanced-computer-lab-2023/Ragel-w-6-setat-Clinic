@@ -33,11 +33,9 @@ import {
   getMedicalHistory,
   removeDocument,
   processPayment,
-  getPatientNotifications,
-  getAppNotifications,
-  downloadPrescriptionPDF
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
+import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
 
 // multer
 const storage = multer.diskStorage({
@@ -55,6 +53,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const router = express.Router();
+
+//require auth
+router.use(requireAuthPatient);
 
 // HABIBAS ROUTES
 
@@ -97,11 +98,6 @@ router.get(
 router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
 router.get("/viewPastAppointments/:id", viewPastAppointments);
 router.get("/viewAppointments/:id", viewAppointments);
-
-// sprint 3
-router.get("/getPatientNotifications/:id", getPatientNotifications);
-router.get("/getAppNotifications/:id", getAppNotifications);
-router.get("/downloadPrescriptionPDF/:id", downloadPrescriptionPDF);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);

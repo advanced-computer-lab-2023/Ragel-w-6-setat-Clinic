@@ -22,6 +22,7 @@ import HealthPackages from "views/PatientViews/HealthPackages";
 import HomeAdmin from "views/AdminViews/HomeAdmin";
 import AllUsers from "views/AdminViews/AllUsers";
 import UnregisteredDoctors from "views/AdminViews/UnregisteredDoctors";
+import HealthPackagesManagement from "views/AdminViews/HealthPackagesManagement";
 
 //doctor users
 
@@ -85,15 +86,13 @@ var routes = [
     component: <PatientPrescriptions />,
     layout: "/patient",
   },
-  //altered for sprint 3
   {
-    path: "/prescriptionDetails/:prescriptionId",
+    path: "/prescriptionDetails",
     name: "Prescription Details",
     icon: "ni ni-circle-08 text-pink",
     component: <PrescriptionDetails />,
     layout: "/patient",
   },
-  
   {
     path: "/familyMemberDetails",
     name: "Family Member Details",
@@ -159,9 +158,8 @@ var routes = [
     component: <DoctorPrescriptionsForPatient />,
     layout: "/doctor",
   },
-  //altered for sprint 3
   {
-    path: "/patientPrescriptionDetails/:prescriptionId",
+    path: "/patientPrescriptionDetails",
     name: "Patient Prescription Details",
     icon: "ni ni-single-02 text-yellow",
     component: <DoctorPrescriptionDetailsForPatient />,
@@ -188,6 +186,13 @@ var routes = [
     name: "Unregistered Doctors",
     icon: "ni ni-single-02 text-yellow",
     component: <UnregisteredDoctors />,
+    layout: "/admin",
+  },
+  {
+    path: "/healthPackagesManagement",
+    name: "Health Packages Management",
+    icon: "ni ni-single-02 text-yellow",
+    component: <HealthPackagesManagement />,
     layout: "/admin",
   },
 
