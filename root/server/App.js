@@ -7,6 +7,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import { login } from "./controllers/userController.js";
 import multer from "multer";
 import path from "path";
+import morgan from "morgan";
 dotenv.config({ path: "./.env" });
 
 let uri = process.env.MONGODB_URI;
@@ -14,6 +15,7 @@ let port = process.env.PORT;
 
 // express app
 const app = express();
+app.use(morgan("dev"));
 
 // middleware
 app.use(express.json());

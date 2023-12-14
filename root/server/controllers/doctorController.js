@@ -420,7 +420,7 @@ const getMyPatients = async (req, res) => {
     for (const appointment of appointments) {
       if (appointment.patient !== null) {
         const patientId = appointment.patient;
-
+        console.log(patientId);
         const patient = await Patient.findById(patientId).exec();
         const isPatientExists = doctorPatients.some((docPatient) =>
           docPatient._id.equals(patient._id)
@@ -430,7 +430,6 @@ const getMyPatients = async (req, res) => {
         }
       }
     }
-
     res.status(200).json(doctorPatients);
   } catch (error) {
     console.error(error);
