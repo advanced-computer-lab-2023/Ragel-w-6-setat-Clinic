@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 // reactstrap components
 import {
   Button,
@@ -12,17 +13,13 @@ import {
   InputGroup,
   Row,
   Col,
-  Label,
+  Alert,
 } from "reactstrap";
 
 const RegisterDoctor = () => {
-  const [agree, setAgree] = useState(false);
-
-  const showEmploymentContract = async (path) => {
-    window.open(
-      "https://napr.memberclicks.net/assets/docs/OldSite/PhysicianHospitalContract3.pdf"
-    );
-  };
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const [doctorFields, setDoctorFields] = useState({
     username: "",
@@ -51,6 +48,73 @@ const RegisterDoctor = () => {
       ...prevFields,
       [name]: value,
     }));
+  };
+
+  const handleDoctorRegister = async () => {
+    try {
+      // Validate all fields
+      for (const key in doctorFields) {
+        if (!doctorFields[key]) {
+          setVisible(true);
+          setAlertMessage(`Please complete all the form`);
+          return;
+        }
+      }
+      if (!fileID) {
+        setVisible(true);
+        setAlertMessage(`Please complete all the form`);
+        return;
+      }
+      if (!fileMedicalDegree) {
+        setVisible(true);
+        setAlertMessage(`Please complete all the form`);
+        return;
+      }
+      if (!fileMedicalLicense) {
+        setVisible(true);
+        setAlertMessage(`Please complete all the form`);
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(doctorFields.email)) {
+        setVisible(true);
+        setAlertMessage("Please enter a valid email address");
+        return;
+      }
+
+      // Validate username format
+      const usernameRegex = /^[^\s]+$/;
+      if (!usernameRegex.test(doctorFields.username)) {
+        setVisible(true);
+        setAlertMessage("Username should not contain spaces");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("fileID", fileID);
+      formData.append("fileMedicalLicense", fileMedicalLicense);
+      formData.append("fileMedicalDegree", fileMedicalDegree);
+
+      const requestData = {
+        doctorFields: { ...doctorFields },
+      };
+
+      formData.append("requestData", JSON.stringify(requestData));
+
+      await axios.post("/doctors/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      window.location.href = "`http://localhost:3000/auth/login`";
+    } catch (error) {
+      console.error("Error registering doctor:", error);
+      setVisible(true);
+      setAlertMessage(error.response.data.message);
+    }
   };
 
   return (
@@ -217,7 +281,7 @@ const RegisterDoctor = () => {
                 </Col>
               </Row>
               <Row>
-                <Col md="6">
+                <Col md="12">
                   <FormGroup>
                     <InputGroup className="input-group-alternative mb-3">
                       <InputGroupAddon addonType="prepend">
@@ -277,24 +341,15 @@ const RegisterDoctor = () => {
                   </FormGroup>
                 </Col>
               </Row>
-              {/* <div className="text-muted font-italic">
-                <small>
-                  password strength:{" "}
-                  <span className="text-success font-weight-700">strong</span>
-                </small>
-              </div> */}
-
               <Row>
                 <Col md="12">
                   <small>Upload Personal ID</small>
-                  <div class="input-group mb-3">
-                    <label class="input-group-text mr-1" for="inputGroupFile01">
-                      Upload
-                    </label>
+                  <div className="input-group mb-3">
+                    <label className="input-group-text mr-1">Upload</label>
                     <input
                       type="file"
                       onChange={(e) => setFileID(e.target.files[0])}
-                      class="form-control"
+                      className="form-control"
                     />
                   </div>
                 </Col>
@@ -302,14 +357,12 @@ const RegisterDoctor = () => {
               <Row>
                 <Col md="12">
                   <small>Upload Meidcal License</small>
-                  <div class="input-group mb-3">
-                    <label class="input-group-text mr-1" for="inputGroupFile01">
-                      Upload
-                    </label>
+                  <div className="input-group mb-3">
+                    <label className="input-group-text mr-1">Upload</label>
                     <input
                       type="file"
                       onChange={(e) => setFileMedicalLicense(e.target.files[0])}
-                      class="form-control"
+                      className="form-control"
                     />
                   </div>
                 </Col>
@@ -317,63 +370,35 @@ const RegisterDoctor = () => {
               <Row>
                 <Col md="12">
                   <small>Upload Medical Degree</small>
-                  <div class="input-group mb-3">
-                    <label class="input-group-text mr-1" for="inputGroupFile01">
-                      Upload
-                    </label>
+                  <div className="input-group mb-3">
+                    <label className="input-group-text mr-1">Upload</label>
                     <input
                       type="file"
                       onChange={(e) => setFileMedicalDegree(e.target.files[0])}
-                      class="form-control"
+                      className="form-control"
                     />
                   </div>
                 </Col>
               </Row>
-
-              <Row className="my-4">
-                <Col xs="12">
-                  <div className="custom-control custom-control-alternative custom-checkbox">
-                    <Row>
-                      <Col xs="6">
-                        <input
-                          className="custom-control-input"
-                          id="customCheckRegister"
-                          type="checkbox"
-                        />
-                        <FormGroup check>
-                          <Input
-                            type="checkbox"
-                            onClick={(e) => {
-                              setAgree(!agree);
-                            }}
-                          />{" "}
-                          <Label check>
-                            <span className="text-muted">
-                              I agree with the Employment Contract
-                            </span>
-                          </Label>
-                        </FormGroup>
-                      </Col>
-                      <Col xs="6">
-                        <Button
-                          className="mt-3"
-                          color="primary"
-                          onClick={() => showEmploymentContract()}
-                          size="sm"
-                        >
-                          View Employment Contract
-                        </Button>
-                      </Col>
-                    </Row>
-                  </div>
-                </Col>
-              </Row>
               <div className="text-center">
-                <Button className="mt-4" color="primary" type="button">
+                <Button
+                  className="mt-4"
+                  color="primary"
+                  type="button"
+                  onClick={handleDoctorRegister}
+                >
                   Create account
                 </Button>
               </div>
             </Form>
+            <Alert
+              className="mt-3"
+              color="danger"
+              isOpen={visible}
+              toggle={onDismiss}
+            >
+              {alertMessage}
+            </Alert>
           </CardBody>
         </Card>
       </Col>

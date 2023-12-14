@@ -1,11 +1,7 @@
 import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
 import Appointments from "../models/Appointments.js";
-import Prescription from "../models/Prescription.js";
-import Notification from '../models/Notifications.js'; 
-import nodemailer from 'nodemailer'; // Import Nodemailer sprint 3
-import PDFDocument from 'pdfkit';
-import fs from 'fs';
+import Admin from "../models/Admin.js";
 
 // HABIBAS REQS
 
@@ -29,6 +25,22 @@ const registerDoctor = async (req, res) => {
     const medicalLicense = req.files.fileMedicalLicense[0].filename;
     const medicalDegree = req.files.fileMedicalDegree[0].filename;
 
+    const patient = await Patient.findOne({ username });
+    const patient2 = await Patient.findOne({ email });
+    const admin = await Admin.findOne({ username });
+
+    if (patient || admin) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this username" });
+    }
+
+    if (patient2) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this email" });
+    }
+
     const newDoctor = new Doctor({
       username,
       password,
@@ -51,7 +63,13 @@ const registerDoctor = async (req, res) => {
     res.status(201).json({ message: "Doctor registered successfully" });
   } catch (error) {
     console.error("Doctor registration error:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      const message = `A user already exists with this ${duplicatedField}`;
+      res.status(500).json({ message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 };
 
@@ -441,317 +459,6 @@ const addAvailableAppointments = async (req, res) => {
   }
 };
 
-//sprint 3
-const getDoctorNotifications = async (req, res) => {
-  try {
-    const doctorId = req.params.id;
-   
-
-    // Check if the patient exists
-    const doctor = await Doctor.findById(doctorId);
-  
-
-    if (!doctor) {
-      return res.status(404).json({ message: 'Doctor not found' });
-    }
-
-    // Retrieve all notifications for the specific patient
-    const notifications = await Notification.find({ doctor: doctorId });
-    console.log(notifications);
-
-    // Send notifications to the patient's email
-    await sendNotificationsByEmail(doctor.email, notifications);
-
-    res.status(200).json({ status: "success",notifications : notifications},);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-const getAppNotifications = async (req, res) => {
-  try {
-    const doctorId = req.params.id;
-  
-
-    // Check if the patient exists
-    const doctor = await Doctor.findById(doctorId);
-
-
-    if (!doctor) {
-      return res.status(404).json({ message: 'Doctor not found' });
-    }
-
-    // Retrieve cancelled or rescheduled appointments for the specific doctor
-    const appointments = await Appointments.find({
-      doctor: doctorId,
-      status: { $in: ["cancelled", "rescheduled"] },
-    });
-
-    let notifications = [];
-
-    // Check if there are cancelled or rescheduled appointments
-    if (appointments.length > 0) {
-      // Generate notification message based on the appointment status
-      const notificationMessage = appointments.map(appointment => {
-        if (appointment.status === "cancelled") {
-          return "Appointment has been cancelled";
-        } else if (appointment.status === "rescheduled") {
-          return "Appointment has been rescheduled";
-        }
-      });
-
-      // Create a new notification
-      const newNotification = await Notification.create({
-        doctor: doctorId,
-        title: "Appointment Update",
-        message: notificationMessage.join(", "),
-        date: new Date(),
-        read: false,
-      });
-
-      // Send the new notification to the patient's email
-      await sendNotificationsByEmail(doctor.email, [newNotification]);
-
-      // Add the new notification to the list
-      notifications.push(newNotification);
-    }
-
-    res.status(200).json({ status: "success", notifications: notifications });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-
-const sendNotificationsByEmail = async (patientEmail, notifications) => {
-  try {
-    // Create a nodemailer transporter
-    const transporter = nodemailer.createTransport({
-      // configure your email provider here
-      service: 'gmail',
-      auth: {
-        user: '3projectalpha3@gmail.com',
-        pass: 'ncgo dehg lebs zazh'
-      },
-    });
-
-    // Compose email message
-    const mailOptions = {
-      from: '3projectalpha3@gmail.com',
-      to: patientEmail,
-      subject: 'New Notifications',
-      text: `You have new notifications:\n\n${formatNotifications(notifications)}`,
-    };
-
-    // Send email
-    await transporter.sendMail(mailOptions);
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
-};
-
-// Helper function to format notifications for email
-const formatNotifications = (notifications) => {
-  // Customize the formatting based on your needs
-  return notifications.map((notification) => `${notification.title}: ${notification.message}`).join('\n');
-};
-
-
-const createPrescription = async (req, res) => {
-  try {
-    const { patientId, medication, dosage, notes } = req.body;
-    const doctorId = req.params.id;  // Assuming you have a user object in the request with the doctor's ID
-
-    // Check if the patient and doctor exist
-    const patient = await Patient.findById(patientId);
-    const doctor = await Doctor.findById(doctorId);
-
-    if (!patient || !doctor) {
-      return res.status(404).json({ message: 'Patient or Doctor not found' });
-    }
-
-    // Create a new prescription
-    const prescription = new Prescription({
-      patient: patientId,
-      doctor: doctorId,
-      medication,
-      dosage,
-      date: new Date(),
-      notes,
-    });
-
-    // Save the prescription
-    await prescription.save();
-
-    res.status(201).json({ status: 'success', prescription });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-const updatePrescription = async (req, res) => {
-  try {
-    const  prescriptionId  = req.params.id;
-    const { medication, dosage, notes, isFilled } = req.body;
-
-    // Check if the prescription exists
-    const prescription = await Prescription.findById(prescriptionId);
-
-    if (!prescription) {
-      return res.status(404).json({ message: 'Prescription not found' });
-    }
-
-    // Update prescription fields
-    prescription.medication = medication || prescription.medication;
-    prescription.dosage = dosage || prescription.dosage;
-    prescription.notes = notes || prescription.notes;
-    prescription.isFilled = isFilled !== undefined ? isFilled : prescription.isFilled;
-
-    // Save the updated prescription
-    const updatedPrescription = await prescription.save();
-
-    res.status(200).json({ status: 'success', prescription: updatedPrescription });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-const downloadPrescriptionPDF = async (req, res) => {
-  try {
-    const  prescriptionId  = req.params.id;
-
-    // Check if the prescription exists
-    const prescription = await Prescription.findById(prescriptionId);
-
-    if (!prescription) {
-      return res.status(404).json({ message: 'Prescription not found' });
-    }
-
-    // Create a new PDF document
-    const doc = new PDFDocument();
-
-    // Set response headers for PDF download
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=Prescription_${prescriptionId}.pdf`);
-
-    // Pipe the PDF to the response stream
-    doc.pipe(res);
-
-    // Add prescription data to the PDF
-    doc.fontSize(12).text(`Medication: ${prescription.medication}`);
-    doc.fontSize(12).text(`Dosage: ${prescription.dosage}`);
-    doc.fontSize(12).text(`Notes: ${prescription.notes}`);
-    doc.fontSize(12).text(`Date: ${prescription.date}`);
-    doc.fontSize(12).text(`Is Filled: ${prescription.isFilled ? 'Yes' : 'No'}`);
-
-    // End the PDF creation
-    doc.end();
-
-    // You can save the PDF to a file if needed
-    // doc.pipe(fs.createWriteStream(`Prescription_${prescriptionId}.pdf`));
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-const viewAllPrescription = async (req, res) => {
-  const doctorId = req.params.id;
-
-  try {
-    // Check if the patient exists
-    const doctor = await Doctor.findById(doctorId);
-
-    // Find all the prescriptions for the patient
-    const prescriptions = await Prescription.find({
-      doctor: doctorId,
-    }).populate("patient");
-
-    const doctorsSet = await Doctor.find({ isRegistered: true }).select(
-      "username"
-    ); // ??? what for
-
-    res.status(200).json({
-      status: "success",
-      prescriptions: prescriptions,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "error",
-      message: err.message,
-    });
-  }
-};
-
-const selectPrescription = async (req, res) => {
-  const prescriptionId = req.params.prescriptionid;
-  const doctorId = req.params.doctorid;
-
-  try {
-    const prescription = await Prescription.findOne({
-      _id: prescriptionId,
-      doctor: doctorId,
-    }).populate("patient");
-
-    if (!prescription) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Prescription not found",
-      });
-    }
-
-    res.status(200).json({
-      status: "success",
-      prescription: prescription,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "error",
-      message: err.message,
-    });
-  }
-};
-
-const filterThePrescription = async (req, res) => {
-  const doctorId = req.params.id;
-  try {
-    const filter = {};
-
-
-    if (req.query.date != "") {
-      var min_date = new Date(req.query.date);
-      var max_date = new Date(req.query.date);
-      min_date.setHours(0, 0, 0, 0);
-      max_date.setHours(23, 59, 59, 999);
-      filter.date = {
-        $gte: min_date,
-        $lt: max_date,
-      };
-    }
-    if (req.query.isFilled != "") {
-      filter.isFilled = req.query.isFilled;
-    }
-
-
-    const prescriptions = await Prescription.find(filter).populate("patient");
-
-    res.status(200).json({
-      status: "success",
-      prescriptions: prescriptions,
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "error",
-      message: err.message,
-    });
-  }
-};
-
 export {
   createDoctor,
   updateDoctorProfile,
@@ -771,12 +478,4 @@ export {
   uploadDocumentForPatient,
   getMedicalHistoryForPatient,
   registerDoctor,
-  getDoctorNotifications,
-  getAppNotifications,
-  createPrescription,
-  updatePrescription,
-  downloadPrescriptionPDF,
-  viewAllPrescription,
-  selectPrescription,
-  filterThePrescription
 };

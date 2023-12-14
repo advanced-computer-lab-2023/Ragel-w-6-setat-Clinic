@@ -1,6 +1,34 @@
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
+const healthRecordSchema = new Schema({
+  uploadByID: {
+    type: String,
+    required: true,
+  },
+  uploadByType: {
+    type: String,
+    required: true,
+    enum: ["Patient", "Doctor"],
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  filePath: {
+    type: String,
+    required: true,
+  },
+  forWhomID: {
+    type: String,
+    required: true,
+  },
+  fileType: {
+    type: String,
+    required: true,
+  },
+});
+
 const familyMemberSchema = new Schema({
   email: {
     type: String,
@@ -116,7 +144,7 @@ const patientSchema = new Schema({
     default: [],
   },
   medicalHistory: {
-    type: Array,
+    type: [healthRecordSchema],
     default: [],
   },
   wallet: {

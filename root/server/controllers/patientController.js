@@ -1,14 +1,10 @@
 import Patient from "../models/Patient.js";
 import Prescription from "../models/Prescription.js";
 import Doctor from "../models/Doctor.js";
+import Admin from "../models/Admin.js";
 import Appointments from "../models/Appointments.js";
 import Package from "../models/Package.js";
-import Notification from '../models/Notifications.js'; 
 import stripe from "stripe";
-import nodemailer from 'nodemailer'; // Import Nodemailer sprint 3
-import Appointment from "../models/Appointments.js";
-import PDFDocument from 'pdfkit';
-import fs from 'fs';
 
 // Set your Stripe secret key
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
@@ -77,21 +73,48 @@ async function doctorDisplay(patientID, doctor) {
 
 const registerPatient = async (req, res) => {
   try {
+    const doctor = await Doctor.findOne({
+      username: req.body.patientFields.username,
+    });
+    const doctor2 = await Doctor.findOne({
+      email: req.body.patientFields.email,
+    });
+    const admin = await Admin.findOne({
+      username: req.body.patientFields.username,
+    });
+
+    if (doctor || admin) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this username" });
+    }
+
+    if (doctor2) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this email" });
+    }
+
     const patient = await Patient.create({
       ...req.body.patientFields,
       emergencyContact: {
         ...req.body.emergencyContact,
       },
     });
+
     res.status(201).json({
       status: "success",
       message: "Patient successfully registered.",
     });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err.message,
-    });
+  } catch (error) {
+    console.error("Patient registration error:", error);
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      const message = `A user already exists with this ${duplicatedField}`;
+      res.status(500).json({ message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 };
 
@@ -242,15 +265,24 @@ const uploadDocument = async (req, res) => {
   const patientId = req.params.id;
   try {
     const patient = await Patient.findById(patientId);
-    patient.medicalHistory.push(req.file.filename);
+    const newHealthRecord = {
+      uploadByID: patientId,
+      uploadByType: "Patient",
+      name: req.file.originalname,
+      filePath: req.file.filename,
+      forWhomID: patientId,
+      fileType: req.file.mimetype,
+    };
+
+    patient.medicalHistory.push(newHealthRecord);
+    const medicalHistory = patient.medicalHistory;
     await patient.save();
     res.status(200).json({
-      status: "success",
-      message: "Document uploaded successfully.",
+      medicalHistory: medicalHistory,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -258,29 +290,30 @@ const getMedicalHistory = async (req, res) => {
   const patientId = req.params.id;
   try {
     const patient = await Patient.findById(patientId);
-    res.status(200).json(patient.medicalHistory);
+    res.status(200).json({ medicalHistory: patient.medicalHistory });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
 const removeDocument = async (req, res) => {
   const patientId = req.params.patientid;
   const documentId = req.params.documentid;
+
   try {
     const patient = await Patient.findById(patientId);
 
     // Remove the document from the medicalHistory array
     patient.medicalHistory = patient.medicalHistory.filter(
-      (document) => document !== documentId
+      (document) => document._id.toString() !== documentId
     );
     await patient.save();
 
     res.status(200).json({ message: "Document removed successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -564,180 +597,6 @@ const viewPastAppointments = async (req, res) => {
     });
   }
 };
-
-
-// sprint 3
-
-const getPatientNotifications = async (req, res) => {
-  try {
-    const patientId = req.params.id;
-    console.log(patientId);
-
-    // Check if the patient exists
-    const patient = await Patient.findById(patientId);
-    console.log(patient);
-
-    if (!patient) {
-      return res.status(404).json({ message: 'Patient not found' });
-    }
-
-    // Retrieve all notifications for the specific patient
-    const notifications = await Notification.find({ patient: patientId });
-    console.log(notifications);
-
-    // Send notifications to the patient's email
-    await sendNotificationsByEmail(patient.email, notifications);
-
-    res.status(200).json({ status: "success",notifications : notifications},);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-
-const getAppNotifications = async (req, res) => {
-  try {
-    const patientId = req.params.id;
-    console.log(patientId);
-
-    // Check if the patient exists
-    const patient = await Patient.findById(patientId);
-    console.log(patient);
-
-    if (!patient) {
-      return res.status(404).json({ message: 'Patient not found' });
-    }
-
-    // Retrieve cancelled or rescheduled appointments for the specific patient
-    const appointments = await Appointment.find({
-      patient: patientId,
-      status: { $in: ["cancelled", "rescheduled"] },
-    });
-
-    let notifications = [];
-
-    // Check if there are cancelled or rescheduled appointments
-    if (appointments.length > 0) {
-      // Generate notification message based on the appointment status
-      const notificationMessage = appointments.map(appointment => {
-        if (appointment.status === "cancelled") {
-          return "Appointment has been cancelled";
-        } else if (appointment.status === "rescheduled") {
-          return "Appointment has been rescheduled";
-        }
-      });
-
-      // Create a new notification
-      const newNotification = await Notification.create({
-        patient: patientId,
-        title: "Appointment Update",
-        message: notificationMessage.join(", "),
-        date: new Date(),
-        read: false,
-      });
-
-      // Send the new notification to the patient's email
-      await sendNotificationsByEmail(patient.email, [newNotification]);
-
-      // Add the new notification to the list
-      notifications.push(newNotification);
-    }
-
-    res.status(200).json({ status: "success", notifications: notifications });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-
-
-
-
-// Function to send notifications to the patient's email
-const sendNotificationsByEmail = async (patientEmail, notifications) => {
-  try {
-    // Create a nodemailer transporter
-    const transporter = nodemailer.createTransport({
-      // configure your email provider here
-      service: 'gmail',
-      auth: {
-        user: '3projectalpha3@gmail.com',
-        pass: 'ncgo dehg lebs zazh'
-      },
-    });
-
-    // Compose email message
-    const mailOptions = {
-      from: '3projectalpha3@gmail.com',
-      to: patientEmail,
-      subject: 'New Notifications',
-      text: `You have new notifications:\n\n${formatNotifications(notifications)}`,
-    };
-
-    // Send email
-    await transporter.sendMail(mailOptions);
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
-};
-
-// Helper function to format notifications for email
-const formatNotifications = (notifications) => {
-  // Customize the formatting based on your needs
-  return notifications.map((notification) => `${notification.title}: ${notification.message}`).join('\n');
-};
-
-const downloadPrescriptionPDF = async (req, res) => {
-  try {
-    const prescriptionId = req.params.id;
-
-    // Check if the prescription exists
-    const prescription = await Prescription.findById(prescriptionId);
-
-    if (!prescription) {
-      return res.status(404).json({ message: 'Prescription not found' });
-    }
-
-    // Create a new PDF document
-    const doc = new PDFDocument();
-
-    // Set response headers for PDF download
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=Prescription_${prescriptionId}.pdf`);
-
-    // Pipe the PDF to the response stream
-    doc.pipe(res);
-
-    // Add prescription data to the PDF
-    doc.fontSize(12).text('Medication:');
-    prescription.medication.forEach((med) => {
-      doc.fontSize(12).text(`- Name: ${med.name}, Dosage: ${med.dosage}, Price: ${med.price} EGP`);
-    });
-    doc.fontSize(12).text(`Notes: ${prescription.notes}`);
-    doc.fontSize(12).text(`Date: ${prescription.date}`);
-    doc.fontSize(12).text(`Is Filled: ${prescription.isFilled ? 'Yes' : 'No'}`);
-
-    // End the PDF creation
-    doc.end();
-
-    // You can save the PDF to a file if needed
-    // doc.pipe(fs.createWriteStream(`Prescription_${prescriptionId}.pdf`));
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
-
-
-
-
-
-
-
 // MARIAMS REQS
 
 const searchForDoctor = async (req, res) => {
@@ -1053,42 +912,6 @@ const getFamilyMembers = async (req, res) => {
   }
 };
 
-//added for sprint 3 frontend 
-async function doctorsDisplayName(patientID, doctors) {
-  const patient = await Patient.findById(patientID);
-  const patientPackage = patient.subscribedPackage;
-  let sessionDiscount = 0;
-  
-  if (patientPackage) {
-    const packageOffered = await Package.findById({
-      _id: patientPackage.packageId,
-    });
-    
-    if (packageOffered) {
-      sessionDiscount = packageOffered.sessionDiscount || 0;
-    }
-  }
-  
-  const doctorToDisplay = doctors.map((doctor) => {
-    const originalSessionPrice = doctor.sessionPrice;
-    const discountedPrice =
-      originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
-    
-    return {
-      _id: doctor._id,
-      name: doctor.fName + " " + doctor.lName,
-      specialty: doctor.specialty,
-      sessionPrice: discountedPrice,
-    };
-  });
-  
-  const doctorNames = doctorToDisplay.map((doctor) => doctor.name);
-
-  return { doctors: doctorToDisplay, names: doctorNames };
-}
-
-
-//used doctorsdisplaynames here 
 const getAllDoctors = async (req, res) => {
   try {
     const patientID = req.params.id;
@@ -1096,19 +919,16 @@ const getAllDoctors = async (req, res) => {
     filter.isRegistered = true;
     const doctors = await Doctor.find(filter).lean();
     const uniqueSpecialtiesSet = new Set();
-    
     doctors.forEach((doctor) => {
       uniqueSpecialtiesSet.add(doctor.specialty);
     });
-    
     const uniqueSpecialties = [...uniqueSpecialtiesSet];
 
-    const { doctors: doctorsToDisplay, names } = await doctorsDisplayName(patientID, doctors);
+    const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
 
     res.status(200).json({
       status: "success",
       doctors: doctorsToDisplay,
-      names: names,
       uniqueSpecialties: uniqueSpecialties,
     });
   } catch (error) {
@@ -1332,7 +1152,4 @@ export {
   getMedicalHistory,
   removeDocument,
   processPayment,
-  getPatientNotifications,
-  getAppNotifications,
-  downloadPrescriptionPDF
 };
