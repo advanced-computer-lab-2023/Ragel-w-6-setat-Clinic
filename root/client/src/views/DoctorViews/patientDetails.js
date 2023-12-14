@@ -1,253 +1,190 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-// reactstrap components
-import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-
+//components
 import {
-  Button,
   Card,
   CardHeader,
   CardBody,
-  FormGroup,
-  Form,
-  Input,
   Container,
   Row,
   Col,
-  Table,
-  Media,
-  Badge,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
+  Form,
+  FormGroup,
+  Input,
+  Button,
 } from "reactstrap";
 
-import { UserContext } from "../../contexts/UserContext";
-
 const PatientDetails = () => {
-  const [modal, setModal] = useState(false);
-  const toggleModal = () => setModal(!modal);
-  const { user } = useContext(UserContext);
-  const { patientid } = useParams();
-  // State to store doctor details
-  const [PatientDetails, setPatientDetails] = useState({
-    username: "",
-    password: "",
-    email: "",
-    fName: "",
-    lName: "",
-    dateOfBirth: null,
-    educationalBackground: "",
-    hourlyRate: 0,
-    sessionPrice: 0,
-    affiliation: "",
-    specialty: "",
-    isRegistered: false,
-    wallet: 0,
-  });
-
-
-
-  useEffect(() => {  
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await fetch(
-          `/doctors/selectedPatient/$${user._id}/${patientid}`
-        );
-        const json = await response.json();
-        // Update the state with the fetched doctor details
-        if (response.ok) {
-          setPatientDetails(json);
-        }
-      } catch (error) {
-        console.error("An error occurred:", error);
-      }
-    };
-
-    fetchPatientDetails();
-  }, []);
-
-  const calculateAge = (dob) => {
-    const currentDate = new Date();
-    const birthDate = new Date(dob);
-    const age = currentDate.getFullYear() - birthDate.getFullYear();
-    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
-      return age - 1;
-    }
-    
-    return age;
-  };
-
- 
   return (
     <>
-      <div
-        className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
-        style={{
-          minHeight: "100px",
-        }}
-      >
-        {/* Mask */}
-        <span className="mask bg-gradient-default opacity-8" />
-      </div>
-      {/* Page content */}
-      <Container className="mt--7" fluid>
+      <Container className="mt-5" fluid>
         <Row>
-          <Col className="order-xl-1" xl="8">
-            <Card className="bg-secondary shadow">
-              <CardBody>
-                <Form>
-                  <h6 className="heading-small text-muted mb-4">
-                     Information
-                  </h6>
-                  <div className="pl-lg-4">
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-username"
-                          >
-                            Username
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="text"
-                            readOnly
-                            defaultValue={PatientDetails.username}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Email address
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="email"
-                            readOnly
-                            defaultValue={PatientDetails.email}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-first-name"
-                          >
-                            First name
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="text"
-                            readOnly
-                            defaultValue={PatientDetails.fName}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-last-name"
-                          >
-                            Last name
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="text"
-                            readOnly
-                            defaultValue={PatientDetails.lName}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="6">
-                      <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-last-name"
-                          >
-                            Gender
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="text"
-                            readOnly
-                            defaultValue={PatientDetails.gender}
-                          />
-                        </FormGroup>
-                      </Col>
-
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-last-name"
-                          >
-                            Phone Number
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="text"
-                            readOnly
-                            defaultValue={PatientDetails.phoneNum}
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-last-name"
-                          >
-                            Age
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            type="text"
-                            readOnly
-                            defaultValue={
-                              PatientDetails.dateOfBirth &&
-                              calculateAge(PatientDetails.dateOfBirth)
-                            }
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
+          <Col className="order-xl-2 mb-5 mb-xl-0 mx-auto" xl="8">
+            <Card
+              className="card-profile shadow mb-5"
+              style={{ backgroundColor: "#EEF5FF" }}
+            >
+              <Row className="justify-content-center">
+                <Col className="order-lg-2" lg="3">
+                  <div className="card-profile-image">
+                    <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                      <img
+                        alt="..."
+                        className="rounded-circle"
+                        src={require("../../assets/img/brand/patienticonf.png")}
+                        style={{
+                          height: "100px",
+                          width: "100px",
+                          background: "#EEF5FF",
+                        }}
+                      />
+                    </a>
                   </div>
-                </Form>
+                </Col>
+              </Row>
+              <CardHeader
+                className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4"
+                style={{ backgroundColor: "#EEF5FF" }}
+              ></CardHeader>
+              <CardBody className="pt-0 pt-md-4">
+                <div className="text-center">
+                  <div className="h5 mt-4">
+                    <Form>
+                      <h6 className="heading-small text-muted mb-4">
+                        Patient information
+                      </h6>
+
+                      <div className="pl-lg-4">
+                        <Row>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-username"
+                              >
+                                Username
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                id="input-username"
+                                type="text"
+                                value="drjones"
+                                readOnly={true}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-email"
+                              >
+                                Email address
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                type="email"
+                                readOnly
+                                value="drjones@gmail.com"
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label className="form-control-label">
+                                First name
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                type="text"
+                                value="Jessica"
+                                readOnly={true}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label className="form-control-label">
+                                Last name
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                type="text"
+                                value="jones"
+                                readOnly={true}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label className="form-control-label">
+                                Gender
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                type="text"
+                                value="female"
+                                readOnly={true}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label className="form-control-label">
+                                Phone Number
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                type="text"
+                                readOnly
+                                value="+201234567890"
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label className="form-control-label">Age</label>
+                              <Input
+                                className="form-control-alternative"
+                                type="text"
+                                value="27"
+                                readOnly={true}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                      </div>
+                      <div className="h5 mt-4">
+                        <Button
+                          block
+                          outline
+                          href="/doctor/patientPrescriptions"
+                          color="default"
+                          size="lg"
+                          type="button"
+                        >
+                          Patient's Prescriptions
+                        </Button>
+                      </div>
+                      <div className="h5 mt-4">
+                        <Button
+                          block
+                          outline
+                          href="/doctor/patientMedicalHistory"
+                          color="default"
+                          size="lg"
+                          type="button"
+                        >
+                          Patient's Medical History
+                        </Button>
+                      </div>
+                    </Form>
+                  </div>
+                </div>
               </CardBody>
             </Card>
           </Col>
@@ -256,5 +193,4 @@ const PatientDetails = () => {
     </>
   );
 };
-
 export default PatientDetails;

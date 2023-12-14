@@ -31,6 +31,11 @@ const familyMemberSchema = new Schema({
     type: String,
     required: true,
   },
+
+  linked: {
+type: Boolean,
+default: false,
+  }
 });
 
 const subscribedPackageSchema = new Schema({

@@ -56,6 +56,18 @@ const doctorSchema = new Schema({
     type: Number,
     default: 0,
   },
+  documentID: {
+    type: String,
+    required: true,
+  },
+  medicalLicense: {
+    type: String,
+    required: true,
+  },
+  medicalDegree: {
+    type: String,
+    required: true,
+  },
 });
 
 const Doctor = mongoose.model("Doctor", doctorSchema);

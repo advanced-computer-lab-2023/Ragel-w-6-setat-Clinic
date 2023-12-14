@@ -1,6 +1,8 @@
 import express from "express";
+import multer from "multer";
+import path from "path";
 import {
-  createPatient,
+  registerPatient,
   viewPrescription,
   getAllPatients,
   addFamilyMember,
@@ -13,7 +15,6 @@ import {
   doctorDetails,
   getFamilyMembers,
   getAllDoctors,
-  getMyAppointments,
   cancelHealthPackageSubscription,
   viewSelectedDoctorAvailableAppointments,
   registerForAnAppointmentPatient,
@@ -27,19 +28,41 @@ import {
   viewUpcomingAppointments,
   viewPastAppointments,
   getWalletAmount,
+  viewAppointments,
+  uploadDocument,
+  getMedicalHistory,
+  removeDocument,
+  processPayment,
   rescheduleAppointmentforPatient,
   rescheduleAppointmentforFamilyMember,
   cancelAppointmentForSelf,
   cancelAppointmentForFamilyMember,
   requestFollowUpAppointment,
+  linkedFamilyMembers,
+  linkedFamilyMemberAppointment,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
+
+// multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./public/uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    ); //Appending extension
+  },
+});
+
+const upload = multer({ storage: storage });
 
 const router = express.Router();
 
 // HABIBAS ROUTES
 
-router.post("/registeration", createPatient);
+router.post("/register", registerPatient);
 router.get("/allPatients", getAllPatients);
 router.get("/allHealthPackages/:id", getAllPackages);
 router.patch(
@@ -59,6 +82,11 @@ router.patch(
   registerForAnAppointmentFamilyMember
 );
 router.get("/myWalletAmount/:id", getWalletAmount);
+router.post("/uploadDocument/:id", upload.single("file"), uploadDocument);
+router.get("/myMedicalHistory/:id", getMedicalHistory);
+router.patch("/removeDocument/:patientid/:documentid", removeDocument);
+// Pay with wallet/credit card
+router.post("/processPayment/:id", processPayment);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);
@@ -72,12 +100,12 @@ router.get(
 //sprint 2
 router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
 router.get("/viewPastAppointments/:id", viewPastAppointments);
+router.get("/viewAppointments/:id", viewAppointments);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);
 router.get("/filterAvailableAppointments", filterAvailableAppointments);
 router.get("/filterMyAppointments/:id", filterMyAppointments);
-router.get("/getMyAppointments/:id", getMyAppointments);
 router.get("/filterDoctors/:id", filterDoctors);
 router.get("/doctorDetails/:patientid/:doctorid", doctorDetails);
 
@@ -104,10 +132,10 @@ router.patch(
   subscribeHealthPackageForFamilyMember
 );
 
-//sprint 3
 
+//sprint 3
 router.patch(
-  "/rescheduleAppointmentforPatient/:patientid/:appointmentid",
+  "/rescheduleAppointmentforPatient/:appointmentid",
   rescheduleAppointmentforPatient
 );
 
@@ -116,6 +144,8 @@ router.patch("/rescheduleAppointmentforFamilyMember/:patientid/:appointmentid",
 
  router.patch("/cancelAppointmentForSelf/:id",cancelAppointmentForSelf);
  router.patch("/cancelAppointmentForFamilyMember/:id",cancelAppointmentForFamilyMember);
- router.post("/followUp/:patientid/:id", requestFollowUpAppointment);
- 
+ router.post("/followUp/:id", requestFollowUpAppointment);
+ router.get("/linkedFamilyMembers/:id", linkedFamilyMembers);
+  router.get("/linkedFamilyMemberAppointment/:id", linkedFamilyMemberAppointment);
+
 export default router;

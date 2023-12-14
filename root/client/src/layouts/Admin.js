@@ -64,7 +64,7 @@ const Admin = (props) => {
     <>
       <Sidebar
         {...props}
-        routes={routes.filter((route) => route.layout === "/admin")}
+        routes={routes}
         logo={{
           innerLink: "/admin/index",
           imgSrc: require("../assets/img/brand/argon-react.png"),
@@ -72,10 +72,17 @@ const Admin = (props) => {
         }}
       />
       <div className="main-content" ref={mainContent}>
+        <AdminNavbar
+          {...props}
+          brandText={getBrandText(props?.location?.pathname)}
+        />
         <Routes>
           {getRoutes(routes)}
           <Route path="*" element={<Navigate to="/admin/index" replace />} />
         </Routes>
+        <Container fluid>
+          <AdminFooter />
+        </Container>
       </div>
     </>
   );

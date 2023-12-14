@@ -4,6 +4,52 @@ import Appointments from "../models/Appointments.js";
 
 // HABIBAS REQS
 
+const registerDoctor = async (req, res) => {
+  try {
+    const {
+      username,
+      password,
+      email,
+      fName,
+      lName,
+      dateOfBirth,
+      educationalBackground,
+      hourlyRate,
+      sessionPrice,
+      affiliation,
+      specialty,
+    } = JSON.parse(req.body.requestData).doctorFields;
+    // Access file buffers from req.files
+    const documentID = req.files.fileID[0].filename;
+    const medicalLicense = req.files.fileMedicalLicense[0].filename;
+    const medicalDegree = req.files.fileMedicalDegree[0].filename;
+
+    const newDoctor = new Doctor({
+      username,
+      password,
+      email,
+      fName,
+      lName,
+      dateOfBirth,
+      educationalBackground,
+      hourlyRate,
+      sessionPrice,
+      affiliation,
+      specialty,
+      documentID,
+      medicalLicense,
+      medicalDegree,
+    });
+
+    await newDoctor.save();
+
+    res.status(201).json({ message: "Doctor registered successfully" });
+  } catch (error) {
+    console.error("Doctor registration error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 const getAllDoctors = async (req, res) => {
   async (req, res) => {
     try {
@@ -98,15 +144,43 @@ const scheduleFollowUp = async (req, res) => {
 
 const getWalletAmount = async (req, res) => {
   const doctorId = req.params.id;
-  console.log("heree");
+
   try {
     // Find the doctor by ID and select the 'wallet' field
     const doctor = await Doctor.findById(doctorId).select("wallet").exec();
     // Return the wallet amount
-    console.log(doctor.wallet);
     res.status(200).json(doctor.wallet);
   } catch (err) {
     console.error("Error retrieving wallet amount:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const uploadDocumentForPatient = async (req, res) => {
+  const doctorId = req.params.doctorid;
+  const patientId = req.params.patientid;
+  try {
+    const patient = await Patient.findById(patientId);
+    patient.medicalHistory.push(req.file.filename);
+    await patient.save();
+    res.status(200).json({
+      status: "success",
+      message: "Document uploaded successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const getMedicalHistoryForPatient = async (req, res) => {
+  const doctorId = req.params.doctorid;
+  const patientId = req.params.patientid;
+  try {
+    const patient = await Patient.findById(patientId);
+    res.status(200).json(patient.medicalHistory);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -215,25 +289,23 @@ const upcomingAppointments = async (req, res) => {
       doctor: doctorId,
       status: "upcoming",
       //  date: { $gte: new Date() }, // Filter for appointments with dates in the future
-    });
-
-    const doctorPatients = [];
+    }).populate("patient");
+    const doctorPatientsWithUpcomingAppointments = [];
 
     for (const appointment of upcomingAppointments) {
       if (appointment.patient !== null) {
         const patientId = appointment.patient;
 
         const patient = await Patient.findById(patientId).exec();
-        const isPatientExists = doctorPatients.some((docPatient) =>
-          docPatient._id.equals(patient._id)
+        const isPatientExists = doctorPatientsWithUpcomingAppointments.some(
+          (docPatient) => docPatient._id.equals(patient._id)
         );
         if (!isPatientExists) {
-          doctorPatients.push(patient);
+          doctorPatientsWithUpcomingAppointments.push(patient);
         }
       }
     }
-
-    res.status(200).json(doctorPatients);
+    res.status(200).json(doctorPatientsWithUpcomingAppointments);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -272,12 +344,21 @@ const getMyPatients = async (req, res) => {
 };
 
 const getSinglePatient = async (req, res) => {
-  const doctorID = req.doctorid;
+  const doctorID = req.params.doctorid;
   const patientID = req.params.patientid;
-  try {  
+  try {
+    const appointment = await Appointments.findOne({
+      doctor: doctorID,
+      patient: patientID,
+    }).populate("patient");
+    if (!appointment) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    if (appointment != null) {
       const patient = await Patient.findById(patientID).exec();
-      res.status(200).json({ patient: patient });
-    
+      res.status(200).json(patient);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });
@@ -285,7 +366,9 @@ const getSinglePatient = async (req, res) => {
 };
 
 
-// req 48
+
+//sprint 3 
+
 const rescheduleAppointment = async (req, res) => {
   const appointmentId = req.params.appointmentid;
   const date = req.body.date;
@@ -387,9 +470,9 @@ const cancelAppointmentforPatient = async (req, res) => {
 
 //req 65
 
-const acceptOrRejectFollowUp = async (req, res) => {
+const acceptRequest = async (req, res) => {
   const appointmentId = req.params.id;
-  const { acceptance } = req.body;
+
 
   try {
     const appointment = await Appointments.findById(appointmentId);
@@ -414,7 +497,7 @@ const acceptOrRejectFollowUp = async (req, res) => {
       });
     }
 if(appointment.type === "follow-up"){
-    appointment.acceptance = acceptance;
+    appointment.acceptance = "accepted";
     await appointment.save();
     res.status(200).json({
       status: "success",
@@ -434,6 +517,124 @@ if(appointment.type === "follow-up"){
   }
 };
 
+//req 65 
+const rejectRequest = async (req, res) => {
+  const appointmentId = req.params.id;
+
+
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Appointment not found",
+      });
+    }
+
+    if (appointment.status !== "upcoming" || appointment.type !== "follow-up") {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid appointment type or status",
+      });
+    }
+
+    if (appointment.acceptance !== "pending") {
+      return res.status(400).json({
+        status: "fail",
+        message: "Appointment is not pending for acceptance/rejection",
+      });
+    }
+if(appointment.type === "follow-up"){
+    appointment.acceptance = "rejected";
+    await appointment.save();
+    res.status(200).json({
+      status: "success",
+      message: "Appointment acceptance/rejection updated",
+      updatedAppointment: appointment,
+    });
+
+}
+  }
+    
+    
+   catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+// LOJAINS REQS
+
+const viewUpcomingAppointments = async (req, res) => {
+  const doctorId = req.params.id;
+
+  try {
+    const appointments = await Appointments.find({
+      doctor: doctorId,
+      status: "upcoming",
+    }).populate("patient");
+
+    res.json({ appointments: appointments });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const viewPastAppointments = async (req, res) => {
+  const doctorId = req.params.id;
+
+  try {
+    const appointments = await Appointments.find({
+      doctor: doctorId,
+      status: "completed",
+    }).populate("patient");
+
+    res.json({ appointments: appointments });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+// Doctor can create new available appointments sprint #2
+const addAvailableAppointments = async (req, res) => {
+  try {
+    const { date, price } = req.query; // Extract date and type from the request body
+    const doctorId = req.params.id; // Assuming you have the doctorId in the route parameters
+    const doctor = await Doctor.findById(doctorId);
+
+    // Create a new appointment
+    const appointment = new Appointments({
+      doctor: doctorId,
+      patient: null,
+      date,
+      isAvailable: true,
+      price,
+      status: "available",
+    });
+
+    // Save the appointment to the database
+    await appointment.save();
+
+    res.status(201).json({
+      status: "success",
+      message: "Appointment created successfully",
+      data: appointment,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to create appointment",
+    });
+  }
+};
 
 export {
   createDoctor,
@@ -448,7 +649,14 @@ export {
   getMyAppointments,
   scheduleFollowUp,
   getWalletAmount,
+  viewUpcomingAppointments,
+  viewPastAppointments,
+  addAvailableAppointments,
+  uploadDocumentForPatient,
+  getMedicalHistoryForPatient,
+  registerDoctor,
   rescheduleAppointment,
   cancelAppointmentforPatient,
-  acceptOrRejectFollowUp,
+  acceptRequest,
+  rejectRequest,
 };

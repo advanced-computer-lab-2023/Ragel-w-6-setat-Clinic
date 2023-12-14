@@ -255,10 +255,66 @@ const viewUnregisteredDoctors = async (req, res) => {
       isRegistered: false,
     });
 
+    res.status(200).json(doctors);
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+const setToRegistered = async (req, res) => {
+  try {
+    const adminId = req.params.id;
+    const doctorUsername = req.query.username; // Extract doctor ID from request params
+
+    // Find the contract by doctor ID and update the isApproved field to true
+    const updatedDoctor = await Doctor.findOneAndUpdate(
+      { username: doctorUsername },
+      { isRegistered: true },
+      { new: true } // Return the updated contract
+    );
+
+    if (!updatedDoctor) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Doctor not found for the specified username",
+      });
+    }
+
     res.status(200).json({
       status: "success",
-      doctors: doctors,
+      message: "Doctor registered successfully",
+      contract: updatedDoctor,
     });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const rejectDoctor = async (req, res) => {
+  try {
+    const adminId = req.params.id;
+    const filter = {
+      username: req.query.username,
+    };
+    const deleteDoctorResult = await Doctor.deleteMany(filter);
+    const deleteRelatedAppointments = await Appointment.deleteMany({
+      doctor: deleteDoctorResult._id,
+    });
+    const deleteRelatedPrescriptions = await Prescription.deleteMany({
+      doctor: deleteDoctorResult._id,
+    });
+    const allDoctors = await Doctor.find();
+
+    if (deleteDoctorResult.deletedCount == 0) {
+      res.json("No such doctor in the system");
+    }
+
+    return res.json("Doctor deleted successfully");
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -280,4 +336,6 @@ export {
   viewUnregisteredDoctors,
   getAllDoctors,
   getAllPatients,
+  setToRegistered,
+  rejectDoctor,
 };

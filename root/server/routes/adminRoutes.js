@@ -12,6 +12,8 @@ import {
   viewUnregisteredDoctors,
   getAllDoctors,
   getAllPatients,
+  setToRegistered,
+  rejectDoctor,
 } from "../controllers/adminController.js";
 import { body, validationResult } from "express-validator";
 
@@ -31,5 +33,7 @@ router.delete("/deleteDoctor/:adminId/:doctorUser", deleteDoctor);
 router.get("/viewUnregisteredDoctors/:id", viewUnregisteredDoctors);
 router.get("/allDoctors/:id", getAllDoctors);
 router.get("/allPatients/:id", getAllPatients);
+router.patch("/setToRegistered/:id", setToRegistered);
+router.delete("/rejectDoctor/:id", rejectDoctor);
 
 export default router;
