@@ -1,1 +1,0 @@
- Static assets if serving some files directly from the server.
