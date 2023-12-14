@@ -50,6 +50,7 @@ const PatientPrescriptions = () => {
         const response = await fetch(`/patients/viewDoctors/${user._id}`);
         const data = await response.json();
         setDoctorsOptions(data.names);
+        setDoctorOptions(data.doctors);
       } catch (error) {
         console.error("Error fetching doctors:", error);
       }
@@ -163,15 +164,20 @@ const PatientPrescriptions = () => {
                             Doctor:
                           </label>
                           <br />
-                          <Input name="selectDoctor" type="select"  value={selectedDoctor}
-                            onChange={(e) => setSelectedDoctor(e.target.value)}>
-                            <option value="">All</option>
-                            {doctorsOptions.map((doctor) => (
-                              <option key={doctor} value={doctor}>
-                                {doctor}
-                              </option>
-                            ))}
-                          </Input>
+                          <Input
+  name="selectDoctor"
+  type="select"
+  value={selectedDoctor}
+  onChange={(e) => setSelectedDoctor(e.target.value)}
+>
+  <option value="">All</option>
+  {doctorsOptions.map((doctor, index) => (
+    <option key={index} value={doctorOptions[index]._id}>
+      {doctor}
+    </option>
+  ))}
+</Input>
+
                         </FormGroup>
                       </Col>
                     </Row>
