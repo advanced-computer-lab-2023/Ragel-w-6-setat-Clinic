@@ -1100,7 +1100,7 @@ const rescheduleAppointmentforPatient = async (req, res) => {
       });
     }
 
-    if (appointment.status === "completed" && appointment.status === "cancelled") {
+    if (appointment.status === "completed" || appointment.status === "cancelled") {
       return res.status(400).json({
         status: "fail",
         message: "Appointment is not available for rescheduling",
@@ -1441,24 +1441,33 @@ const linkedFamilyMembers = async (req, res) => {
 
 
 const linkedFamilyMemberAppointment = async (req, res) => { 
-const patientId = req.params.id;  
-const patient = await Patient.findById(patientId);
-const familyMembers = patient.familyMembers;
-try{
+  const patientId = req.params.id;  
+  try {
+    // Find the patient
+    const patient = await Patient.findById(patientId);
+    const familyMembers = patient.familyMembers;
+
     // Extract unique family member emails
     const familyMemberEmails = familyMembers.map(member => member.email);
     const uniqueEmails = [...new Set(familyMemberEmails)];
 
+    // Find linked patients by email
     const linkedPatients = await Patient.find({ email: { $in: uniqueEmails } });
-    const appointments = await Appointments.find({ patient: { $in: linkedPatients } }).populate("doctor");
+
+    // Find appointments for linked patients excluding follow-up and pending/rejected acceptances
+    const appointments = await Appointments.find({ 
+      patient: { $in: linkedPatients.map(linkedPatient => linkedPatient._id) }, 
+      type: { $ne: "follow-up" }, 
+      acceptance: { $nin: ['pending', 'rejected'] } 
+    }).populate("doctor");
     
     res.status(200).json(appointments); 
-}
-catch (error) { 
-  console.error(error);
-  res.status(500).json({ message: "Server Error" });
-}
+  } catch (error) { 
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
 };
+
 
 export {
   registerPatient,

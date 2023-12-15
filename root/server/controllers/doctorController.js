@@ -472,7 +472,7 @@ const cancelAppointmentforPatient = async (req, res) => {
 
 const acceptRequest = async (req, res) => {
   const appointmentId = req.params.id;
-
+  const doctorID = req.params.doctorID;
 
   try {
     const appointment = await Appointments.findById(appointmentId);
@@ -496,6 +496,11 @@ const acceptRequest = async (req, res) => {
         message: "Appointment is not pending for acceptance/rejection",
       });
     }
+    const pendingappointments = await Appointments.find({
+      doctor: doctorID,
+      acceptance: "pending",
+    }).populate("patient");
+
 if(appointment.type === "follow-up"){
     appointment.acceptance = "accepted";
     await appointment.save();
@@ -503,12 +508,10 @@ if(appointment.type === "follow-up"){
       status: "success",
       message: "Appointment acceptance/rejection updated",
       updatedAppointment: appointment,
+      pendingappointments: pendingappointments, 
     });
-
 }
   }
-    
-    
    catch (err) {
     res.status(400).json({
       status: "fail",
@@ -520,7 +523,7 @@ if(appointment.type === "follow-up"){
 //req 65 
 const rejectRequest = async (req, res) => {
   const appointmentId = req.params.id;
-
+  const doctorID = req.params.doctorID;
 
   try {
     const appointment = await Appointments.findById(appointmentId);
@@ -544,6 +547,13 @@ const rejectRequest = async (req, res) => {
         message: "Appointment is not pending for acceptance/rejection",
       });
     }
+
+    const pendingappointments = await Appointments.find({
+      doctor: doctorID,
+      acceptance: "pending",
+    }).populate("patient");
+
+
 if(appointment.type === "follow-up"){
     appointment.acceptance = "rejected";
     await appointment.save();
@@ -551,17 +561,43 @@ if(appointment.type === "follow-up"){
       status: "success",
       message: "Appointment acceptance/rejection updated",
       updatedAppointment: appointment,
+      pendingappointments: pendingappointments,
     });
-
 }
-  }
-    
-    
+  }    
    catch (err) {
     res.status(400).json({
       status: "fail",
       message: err.message,
     });
+  }
+};
+
+
+//retreive all pending requests for doctor
+const pendingReq = async (req, res) => {
+  const doctorID = req.params.id;
+  try {
+    const appointments = await Appointments.find({
+      doctor: doctorID,
+      acceptance: "pending",
+    }).populate("patient");
+
+    const formattedAppointments = appointments.map(appointment => ({
+      _id: appointment._id,
+      date: appointment.date,
+      type: appointment.type,
+      patient: {
+        _id: appointment.patient._id,
+        name: appointment.patient.fName + " " + appointment.patient.lName,
+      },
+    }));
+// Modify the response to directly return the array of appointments
+res.status(200).json(formattedAppointments);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -659,4 +695,5 @@ export {
   cancelAppointmentforPatient,
   acceptRequest,
   rejectRequest,
+  pendingReq, 
 };

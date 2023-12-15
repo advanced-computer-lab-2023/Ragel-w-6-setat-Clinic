@@ -388,7 +388,7 @@ const handleReschedule = async (appointment) => {
                           color="secondary"
                           size="sm"
                           onClick={() => toggleAppointmentModal(index)}
-                          disabled={appointment.status === 'completed'}
+                          disabled={appointment.status === 'completed' || appointment.status === 'cancelled'}
                         >
                           Reschedule
                         </Button>

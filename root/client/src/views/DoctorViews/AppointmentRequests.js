@@ -8,8 +8,51 @@ import {
   Col,
   Table,
 } from "reactstrap";
-
+import axois from "axios";  
+import { useEffect, useState, useContext } from "react";
+import axios from "axios";
+import { UserContext } from "../../contexts/UserContext"; 
+import ReactDatetime from "react-datetime";
 const AppointmentRequests = () => {
+
+const { user } = useContext(UserContext); 
+const [allAppointments, setAllAppointments] = useState([]);
+  useEffect(() => {
+    const fetchPendingAppointment = async () => {
+      try {
+        const response = await fetch(`/doctors/pendingRequests/${user._id}`);
+        const appointments = await response.json(); // Parse response as JSON
+
+        setAllAppointments(appointments); // Set appointments in state
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+    fetchPendingAppointment();
+  }, [user._id]); // Ensure useEffect re-runs when user ID changes
+
+
+  const handleAccept = async (appointmentId) => { 
+    try {
+      const response = await axios.patch(`/doctors/accept/${appointmentId}/${user._id}`);
+      const updatedAppointments = allAppointments.filter(appointment => appointment._id !== appointmentId);
+      setAllAppointments(updatedAppointments); // Se // Set appointments in state
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  }
+
+  const handleReject = async (appointmentId) => { 
+    try{
+    const response = await axios.patch(`/doctors/reject/${appointmentId}/${user._id}`);
+    const updatedAppointments = allAppointments.filter(appointment => appointment._id !== appointmentId); 
+    setAllAppointments(updatedAppointments); // Set appointments in state 
+  }
+  catch (error) {
+    console.error("An error occurred:", error);
+
+  }
+  }
   return (
     <>
       <Container className="mt-5" fluid>
@@ -92,25 +135,29 @@ const AppointmentRequests = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td>noha ahmed</td>
-                            <td>20-12-2023</td>
-                            <td>Follow-up</td>
+                        {allAppointments.map((appointment, index) => (
+                          <tr key={index}>
+                            <td>{appointment.patient.name}</td>
+                            <td>{appointment.date}</td>
+                            <td>{appointment.type}</td>
                             <td>
                               <Button
                                 className="mt-3"
                                 color="success"
                                 size="sm"
+                                onClick={() => handleAccept(appointment._id)}
                               >
                                 Accept
                               </Button>
                             </td>
                             <td>
-                              <Button className="mt-3" color="danger" size="sm">
+                              <Button className="mt-3" color="danger" size="sm"
+                                onClick={() => handleReject(appointment._id)}>
                                 Reject
                               </Button>
                             </td>
                           </tr>
+                        ))}
                         </tbody>
                       </Table>
                     </Card>

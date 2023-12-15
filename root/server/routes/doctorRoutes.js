@@ -24,6 +24,7 @@ import {
   cancelAppointmentforPatient,
   acceptRequest,
   rejectRequest,
+  pendingReq,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 // multer
@@ -85,8 +86,9 @@ router.get("/viewMyPatients/:id", getMyPatients);
 //sprint 3
 router.patch("/rescheduleAppointment/:appointmentid", rescheduleAppointment);
 router.patch("/cancelApp/:id",cancelAppointmentforPatient);
-router.patch("/accept/:id",acceptRequest);
-router.patch("/reject/:id",rejectRequest);
+router.patch("/accept/:id/:doctorID",acceptRequest);
+router.patch("/reject/:id/:doctorID",rejectRequest);
+router.get("/pendingRequests/:id",pendingReq);
 //LOJAINS ROUTES
 
 router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
