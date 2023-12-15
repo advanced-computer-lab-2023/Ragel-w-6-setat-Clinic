@@ -451,16 +451,18 @@ const addFamilyMember = async (req, res) => {
     };
 
     patient.familyMembers.push(newFamilyMember);
+    const familyMembers = patient.familyMembers;
     await patient.save();
-    res.status(201).json({
+    res.status(200).json({
       status: "success",
+      familyMembers: familyMembers,
       message: "Family Member added successfully!",
     });
   } catch (err) {
     console.log(err.message);
     res.status(500).json({
       status: "error",
-      message: "Make sure all fields are filled",
+      message: err.message,
     });
   }
 };
@@ -856,6 +858,7 @@ const linkFamilyMember = async (req, res) => {
     }
 
     matchingNationalIDMember.email = email;
+    const familyMembers = currentPatient.familyMembers;
     await currentPatient.save();
 
     const oppositeRelationship = findOutRelationship(
@@ -875,13 +878,14 @@ const linkFamilyMember = async (req, res) => {
     await patientToLink.save();
 
     return res
-      .status(201)
-      .json({ message: "Family members both got linked successfully" });
+      .status(200)
+      .json({
+        message: "Family members both got linked successfully",
+        familyMembers: familyMembers,
+      });
   } catch (error) {
     console.error(error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred while linking a family member" });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -891,24 +895,20 @@ const linkFamilyMember = async (req, res) => {
 
 const getFamilyMembers = async (req, res) => {
   try {
-    const patientID = req.params.id; // Get patient's email from the request body
+    const patientID = req.params.id;
 
-    // Find the patient using the provided email in the familyMembers array
     const patient = await Patient.findById(patientID);
 
     // Extract family members from the patient object
-    const familyMembers = patient.familyMembers.filter(
-      (member) => member.email
-    );
+    const familyMembers = patient.familyMembers;
 
     if (!familyMembers) {
       return res.status(200).json({ patientFamily: [] });
     } else {
-      res.status(200).json(familyMembers);
+      res.status(200).json({ patientFamily: familyMembers });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 

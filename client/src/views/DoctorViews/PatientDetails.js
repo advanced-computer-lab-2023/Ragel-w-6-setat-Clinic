@@ -1,4 +1,6 @@
 //components
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -12,7 +14,53 @@ import {
   Button,
 } from "reactstrap";
 
+import { useAuthContext } from "../../hooks/useAuthContext";
+
 const PatientDetails = () => {
+  const { patientid } = useParams();
+  const { user } = useAuthContext();
+  const [patientDetails, setPatientDetails] = useState("");
+
+  useEffect(() => {
+    const fetchPatientDetails = async () => {
+      try {
+        const response = await fetch(
+          `/doctors/selectedPatient/${user.user._id}/${patientid}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const json = await response.json();
+        // Update the state with the fetched doctor details
+        if (response.ok) {
+          setPatientDetails(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+        alert(error.response.data.message);
+      }
+    };
+
+    fetchPatientDetails();
+    // eslint-disable-next-line
+  }, []);
+
+  const calculateAge = (dob) => {
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
   return (
     <>
       <Container className="mt-5" fluid>
@@ -63,10 +111,10 @@ const PatientDetails = () => {
                                 Username
                               </label>
                               <Input
-                                className="form-control-alternative"
+                                className="form-control-alternative text-center"
                                 id="input-username"
                                 type="text"
-                                value="drjones"
+                                defaultValue={patientDetails.username}
                                 readOnly={true}
                               />
                             </FormGroup>
@@ -80,10 +128,10 @@ const PatientDetails = () => {
                                 Email address
                               </label>
                               <Input
-                                className="form-control-alternative"
+                                className="form-control-alternative text-center"
                                 type="email"
                                 readOnly
-                                value="drjones@gmail.com"
+                                defaultValue={patientDetails.email}
                               />
                             </FormGroup>
                           </Col>
@@ -95,9 +143,9 @@ const PatientDetails = () => {
                                 First name
                               </label>
                               <Input
-                                className="form-control-alternative"
+                                className="form-control-alternative text-center"
                                 type="text"
-                                value="Jessica"
+                                defaultValue={patientDetails.fName}
                                 readOnly={true}
                               />
                             </FormGroup>
@@ -108,9 +156,9 @@ const PatientDetails = () => {
                                 Last name
                               </label>
                               <Input
-                                className="form-control-alternative"
+                                className="form-control-alternative text-center"
                                 type="text"
-                                value="jones"
+                                defaultValue={patientDetails.lName}
                                 readOnly={true}
                               />
                             </FormGroup>
@@ -123,23 +171,25 @@ const PatientDetails = () => {
                                 Gender
                               </label>
                               <Input
-                                className="form-control-alternative"
+                                className="form-control-alternative text-center"
                                 type="text"
-                                value="female"
+                                defaultValue={patientDetails.gender}
                                 readOnly={true}
                               />
                             </FormGroup>
                           </Col>
                           <Col lg="6">
                             <FormGroup>
-                              <label className="form-control-label">
-                                Phone Number
-                              </label>
+                              <label className="form-control-label">Age</label>
                               <Input
-                                className="form-control-alternative"
+                                className="form-control-alternative text-center"
                                 type="text"
-                                readOnly
-                                value="+201234567890"
+                                defaultValue={
+                                  patientDetails.dateOfBirth
+                                    ? calculateAge(patientDetails.dateOfBirth)
+                                    : ""
+                                }
+                                readOnly={true}
                               />
                             </FormGroup>
                           </Col>
@@ -147,12 +197,31 @@ const PatientDetails = () => {
                         <Row>
                           <Col lg="6">
                             <FormGroup>
-                              <label className="form-control-label">Age</label>
+                              <label className="form-control-label">
+                                Phone Number
+                              </label>
                               <Input
-                                className="form-control-alternative"
+                                className="form-control-alternative text-center"
                                 type="text"
-                                value="27"
-                                readOnly={true}
+                                readOnly
+                                defaultValue={patientDetails.phoneNum}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label className="form-control-label">
+                                Emergency Contact Number
+                              </label>
+                              <Input
+                                className="form-control-alternative text-center"
+                                type="text"
+                                readOnly
+                                defaultValue={
+                                  patientDetails
+                                    ? patientDetails.emergencyContact.phoneNum
+                                    : ""
+                                }
                               />
                             </FormGroup>
                           </Col>
@@ -174,7 +243,7 @@ const PatientDetails = () => {
                         <Button
                           block
                           outline
-                          href="/doctor/patientMedicalHistory"
+                          href={`/doctor/patientMedicalHistory/${patientid}`}
                           color="default"
                           size="lg"
                           type="button"

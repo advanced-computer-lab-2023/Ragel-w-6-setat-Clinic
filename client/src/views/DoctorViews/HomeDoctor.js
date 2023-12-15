@@ -87,7 +87,13 @@ const HomeDoctor = () => {
 
   const handleSaveChanges = async () => {
     try {
-      await axios.patch(`/doctors/updateProfile/${user._id}`, editedValues);
+      await axios.patch(
+        `/doctors/updateProfile/${user.user._id}`,
+        editedValues,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
       setEditMode(false);
       setDoctorDetails((prevDetails) => ({
         ...prevDetails,
@@ -211,7 +217,7 @@ const HomeDoctor = () => {
                                 className="form-control-alternative"
                                 id="input-username"
                                 type="text"
-                                value="drjones"
+                                defaultValue={doctorDetails.username}
                                 readOnly={true}
                               />
                             </FormGroup>
@@ -231,7 +237,7 @@ const HomeDoctor = () => {
                                 value={
                                   editMode
                                     ? editedValues.email
-                                    : "jones@gmail.com"
+                                    : doctorDetails.email
                                 }
                                 readOnly={!editMode} // Updated this line
                                 onChange={handleChange}
@@ -248,7 +254,7 @@ const HomeDoctor = () => {
                               <Input
                                 className="form-control-alternative"
                                 type="text"
-                                value="Jessica"
+                                defaultValue={doctorDetails.fName}
                                 readOnly={true}
                               />
                             </FormGroup>
@@ -261,7 +267,7 @@ const HomeDoctor = () => {
                               <Input
                                 className="form-control-alternative"
                                 type="text"
-                                value="jones"
+                                defaultValue={doctorDetails.lName}
                                 readOnly={true}
                               />
                             </FormGroup>
@@ -276,7 +282,9 @@ const HomeDoctor = () => {
                               <Input
                                 className="form-control-alternative"
                                 type="text"
-                                value="ain shams uni"
+                                defaultValue={
+                                  doctorDetails.educationalBackground
+                                }
                                 readOnly={true}
                               />
                             </FormGroup>
@@ -290,7 +298,11 @@ const HomeDoctor = () => {
                                 className="form-control-alternative"
                                 type="text"
                                 name="hourlyRate"
-                                value={editMode ? editedValues.hourlyRate : 180}
+                                value={
+                                  editMode
+                                    ? editedValues.hourlyRate
+                                    : doctorDetails.hourlyRate
+                                }
                                 readOnly={!editMode}
                                 onChange={handleChange}
                               />
@@ -306,7 +318,7 @@ const HomeDoctor = () => {
                               <Input
                                 className="form-control-alternative"
                                 type="text"
-                                value="pediatric"
+                                defaultValue={doctorDetails.specialty}
                                 readOnly={true}
                               />
                             </FormGroup>
@@ -323,7 +335,7 @@ const HomeDoctor = () => {
                                 value={
                                   editMode
                                     ? editedValues.affiliation
-                                    : "ain shams hospital"
+                                    : doctorDetails.affiliation
                                 }
                                 readOnly={!editMode}
                                 onChange={handleChange}

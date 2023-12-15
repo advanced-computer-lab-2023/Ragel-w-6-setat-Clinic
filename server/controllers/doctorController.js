@@ -184,15 +184,24 @@ const uploadDocumentForPatient = async (req, res) => {
   const patientId = req.params.patientid;
   try {
     const patient = await Patient.findById(patientId);
-    patient.medicalHistory.push(req.file.filename);
+    const newHealthRecord = {
+      uploadByID: doctorId,
+      uploadByType: "Doctor",
+      name: req.file.originalname,
+      filePath: req.file.filename,
+      forWhomID: patientId,
+      fileType: req.file.mimetype,
+    };
+
+    patient.medicalHistory.push(newHealthRecord);
+    const medicalHistory = patient.medicalHistory;
     await patient.save();
     res.status(200).json({
-      status: "success",
-      message: "Document uploaded successfully.",
+      medicalHistory: medicalHistory,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -201,25 +210,26 @@ const getMedicalHistoryForPatient = async (req, res) => {
   const patientId = req.params.patientid;
   try {
     const patient = await Patient.findById(patientId);
-    res.status(200).json(patient.medicalHistory);
+    res.status(200).json({ medicalHistory: patient.medicalHistory });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
 // MARIAMS REQS
 
 const searchForPatient = async (req, res) => {
-  const doctorId = req.params.id;
-  const filter = {};
-  if (req.query.fName != "") {
-    filter.fName = req.query.fName;
-  }
-  if (req.query.lName != "") {
-    filter.lName = req.query.lName;
-  }
   try {
+    const doctorId = req.params.id;
+    const filter = {};
+    if (req.query.fName != "") {
+      filter.fName = req.query.fName;
+    }
+    if (req.query.lName != "") {
+      filter.lName = req.query.lName;
+    }
+
     const appointments = await Appointments.find({
       doctor: doctorId,
     }).populate("patient");
@@ -228,17 +238,13 @@ const searchForPatient = async (req, res) => {
     for (const appointment of appointments) {
       if (appointment.patient !== null) {
         const patientId = appointment.patient;
-        try {
-          const patient = await Patient.findById(patientId).exec();
-          const isPatientExists = doctorPatients.some((docPatient) =>
-            docPatient._id.equals(patient._id)
-          );
-          if (!isPatientExists) {
-            doctorPatients.push(patient);
-          }
-        } catch (error) {
-          console.error("Error finding patient:", error);
-          // Handle error if necessary
+
+        const patient = await Patient.findById(patientId).exec();
+        const isPatientExists = doctorPatients.some((docPatient) =>
+          docPatient._id.equals(patient._id)
+        );
+        if (!isPatientExists) {
+          doctorPatients.push(patient);
         }
       }
     }
@@ -256,7 +262,7 @@ const searchForPatient = async (req, res) => {
     res.status(200).json(filteredPatients);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -330,8 +336,7 @@ const upcomingAppointments = async (req, res) => {
     }
     res.status(200).json(doctorPatientsWithUpcomingAppointments);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -362,7 +367,7 @@ const getMyPatients = async (req, res) => {
     res.status(200).json(doctorPatients);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -370,21 +375,18 @@ const getSinglePatient = async (req, res) => {
   const doctorID = req.params.doctorid;
   const patientID = req.params.patientid;
   try {
-    const appointment = await Appointments.findOne({
-      doctor: doctorID,
-      patient: patientID,
-    }).populate("patient");
-    if (!appointment) {
-      return res.status(404).json({ message: "Patient not found" });
-    }
+    // const appointment = await Appointments.findOne({
+    //   doctor: doctorID,
+    //   patient: patientID,
+    // }).populate("patient");
+    // if (!appointment) {
+    //   return res.status(404).json({ message: "Patient not found" });
+    // }
 
-    if (appointment != null) {
-      const patient = await Patient.findById(patientID).exec();
-      res.status(200).json(patient);
-    }
+    const patient = await Patient.findById(patientID);
+    res.status(200).json(patient);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 

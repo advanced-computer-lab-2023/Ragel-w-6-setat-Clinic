@@ -138,14 +138,14 @@ var routes = [
     layout: "/doctor",
   },
   {
-    path: "/patientDetails",
+    path: "/patientDetails/:patientid",
     name: "Patient Details",
     icon: "ni ni-single-02 text-yellow",
     component: <PatientDetails />,
     layout: "/doctor",
   },
   {
-    path: "/patientMedicalHistory",
+    path: "/patientMedicalHistory/:patientid",
     name: "Patient Medical History",
     icon: "ni ni-single-02 text-yellow",
     component: <DoctorMedicalHistoryForPatient />,
