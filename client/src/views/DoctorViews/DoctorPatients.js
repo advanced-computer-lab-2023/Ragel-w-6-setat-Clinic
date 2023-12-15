@@ -85,7 +85,7 @@ const DoctorPatients = () => {
     }
   };
 
-  const handleFamilyMembersClick = (patiendID) => {
+  const handlePatientClick = (patiendID) => {
     navigate(`/doctor/patientDetails/${patiendID}`);
   };
 
@@ -201,9 +201,7 @@ const DoctorPatients = () => {
                           <div className="card-profile-image">
                             <a
                               href="#pablo"
-                              onClick={() =>
-                                handleFamilyMembersClick(patient._id)
-                              }
+                              onClick={() => handlePatientClick(patient._id)}
                             >
                               <img
                                 id="tooltip1"

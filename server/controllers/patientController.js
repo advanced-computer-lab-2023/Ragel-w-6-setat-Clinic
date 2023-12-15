@@ -5,6 +5,7 @@ import Admin from "../models/Admin.js";
 import Appointments from "../models/Appointments.js";
 import Package from "../models/Package.js";
 import stripe from "stripe";
+import PDFDocument from "pdfkit";
 
 // Set your Stripe secret key
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
@@ -170,8 +171,7 @@ const viewSelectedDoctorAvailableAppointments = async (req, res) => {
 
     res.status(200).json(appointments);
   } catch (err) {
-    res.status(400).json({
-      status: "fail",
+    res.status(500).json({
       message: err.message,
     });
   }
@@ -544,13 +544,6 @@ const selectPrescription = async (req, res) => {
       patient: patiendID,
     }).populate("doctor");
 
-    if (!prescription) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Prescription not found",
-      });
-    }
-
     res.status(200).json({
       status: "success",
       prescription: prescription,
@@ -599,6 +592,57 @@ const viewPastAppointments = async (req, res) => {
     });
   }
 };
+
+// sprint 3
+
+const downloadPrescriptionPDF = async (req, res) => {
+  try {
+    const prescriptionId = req.params.id;
+
+    // Check if the prescription exists
+    const prescription = await Prescription.findById(prescriptionId);
+
+    if (!prescription) {
+      return res.status(404).json({ message: "Prescription not found" });
+    }
+
+    // Create a new PDF document
+    const doc = new PDFDocument();
+
+    // Set response headers for PDF download
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=Prescription_${prescriptionId}.pdf`
+    );
+
+    // Pipe the PDF to the response stream
+    doc.pipe(res);
+
+    // Add prescription data to the PDF
+    doc.fontSize(12).text("Medication:");
+    prescription.medication.forEach((med) => {
+      doc
+        .fontSize(12)
+        .text(
+          `- Name: ${med.name}, Dosage: ${med.dosage}, Price: ${med.price} EGP`
+        );
+    });
+    doc.fontSize(12).text(`Notes: ${prescription.notes}`);
+    doc.fontSize(12).text(`Date: ${prescription.date}`);
+    doc.fontSize(12).text(`Is Filled: ${prescription.isFilled ? "Yes" : "No"}`);
+
+    // End the PDF creation
+    doc.end();
+
+    // You can save the PDF to a file if needed
+    // doc.pipe(fs.createWriteStream(`Prescription_${prescriptionId}.pdf`));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // MARIAMS REQS
 
 const searchForDoctor = async (req, res) => {
@@ -640,27 +684,24 @@ const searchForDoctor = async (req, res) => {
 
     if (doctors.length === 0) {
       res.status(200).json({
-        status: "success",
         doctors: [],
         uniqueSpecialties: uniqueSpecialties,
       });
     } else {
       res.status(200).json({
-        status: "success",
         doctors: doctorsToDisplay,
         uniqueSpecialties: uniqueSpecialties,
       });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
 const filterDoctors = async (req, res) => {
   try {
-    const specialty = req.query.specialty;
     const patientId = req.params.id;
+    const specialty = req.query.specialty;
     const date = req.query.date;
     const filter = {};
     const doctorIDS = [];
@@ -702,20 +743,18 @@ const filterDoctors = async (req, res) => {
 
     if (doctors.length === 0) {
       res.status(200).json({
-        status: "success",
         doctors: [],
         uniqueSpecialties: uniqueSpecialties,
       });
     } else {
       res.status(200).json({
-        status: "success",
         doctors: doctorsToDisplay,
         uniqueSpecialties: uniqueSpecialties,
       });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -795,15 +834,11 @@ const doctorDetails = async (req, res) => {
   const doctorId = req.params.doctorid;
   try {
     const doctor = await Doctor.findById({ _id: doctorId });
-    if (!doctor) {
-      return res.status(404).json({ message: "Doctor not found" });
-    }
-
     const doc = await doctorDisplay(patientId, doctor);
     res.status(200).json(doc);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -877,12 +912,10 @@ const linkFamilyMember = async (req, res) => {
 
     await patientToLink.save();
 
-    return res
-      .status(200)
-      .json({
-        message: "Family members both got linked successfully",
-        familyMembers: familyMembers,
-      });
+    return res.status(200).json({
+      message: "Family members both got linked successfully",
+      familyMembers: familyMembers,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: error.message });
@@ -927,13 +960,40 @@ const getAllDoctors = async (req, res) => {
     const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
 
     res.status(200).json({
-      status: "success",
       doctors: doctorsToDisplay,
       uniqueSpecialties: uniqueSpecialties,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getMyDoctors = async (req, res) => {
+  try {
+    const patientID = req.params.id;
+    const appointments = await Appointments.find({
+      patient: patientID,
+    }).populate("doctor");
+    if (!appointments) {
+      return res.status(200).json({ doctors: [] });
+    }
+    const uniqueDoctorIds = new Set();
+    const doctors = appointments.reduce((uniqueDoctors, appointment) => {
+      const doctorId = appointment.doctor._id.toString(); // Convert ObjectId to string
+      if (!uniqueDoctorIds.has(doctorId)) {
+        uniqueDoctorIds.add(doctorId);
+        uniqueDoctors.push(appointment.doctor);
+      }
+      return uniqueDoctors;
+    }, []);
+
+    const doctorsToDisplay = await doctorsDisplay(patientID, doctors);
+
+    res.status(200).json({ doctors: doctorsToDisplay });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -1135,6 +1195,7 @@ export {
   getFamilyMembers,
   getAllDoctors,
   viewAppointments,
+  getMyDoctors,
   cancelHealthPackageSubscription,
   viewSelectedDoctorAvailableAppointments,
   registerForAnAppointmentPatient,
@@ -1152,4 +1213,5 @@ export {
   getMedicalHistory,
   removeDocument,
   processPayment,
+  downloadPrescriptionPDF,
 };

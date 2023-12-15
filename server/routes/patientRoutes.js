@@ -33,6 +33,8 @@ import {
   getMedicalHistory,
   removeDocument,
   processPayment,
+  getMyDoctors,
+  downloadPrescriptionPDF,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
@@ -84,6 +86,7 @@ router.get("/myMedicalHistory/:id", getMedicalHistory);
 router.patch("/removeDocument/:patientid/:documentid", removeDocument);
 // Pay with wallet/credit card
 router.post("/processPayment/:id", processPayment);
+router.get("/myDoctors/:id", getMyDoctors);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);
@@ -98,6 +101,9 @@ router.get(
 router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
 router.get("/viewPastAppointments/:id", viewPastAppointments);
 router.get("/viewAppointments/:id", viewAppointments);
+
+// sprint 3
+router.get("/downloadPrescriptionPDF/:id", downloadPrescriptionPDF);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);

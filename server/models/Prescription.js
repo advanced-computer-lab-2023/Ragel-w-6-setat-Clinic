@@ -11,14 +11,22 @@ const prescriptionSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Doctor",
   },
-  medication: {
-    type: String,
-    required: true,
-  },
-  dosage: {
-    type: String,
-    required: true,
-  },
+  medication: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      dosage: {
+        type: String,
+        required: true,
+      },
+      price: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
   isFilled: {
     type: Boolean,
     default: false,

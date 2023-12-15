@@ -231,7 +231,7 @@ const PatientDetails = () => {
                         <Button
                           block
                           outline
-                          href="/doctor/patientPrescriptions"
+                          href={`/doctor/patientPrescriptions/${patientid}`}
                           color="default"
                           size="lg"
                           type="button"

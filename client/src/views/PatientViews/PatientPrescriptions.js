@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -16,10 +18,121 @@ import {
   Badge,
   Media,
 } from "reactstrap";
-
 import ReactDatetime from "react-datetime";
 
+import { useAuthContext } from "../../hooks/useAuthContext";
+
 const PatientPrescriptions = () => {
+  const navigate = useNavigate();
+
+  const { user } = useAuthContext();
+
+  const [doctorsOptions, setDoctorsOptions] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [isFilled, setIsFilled] = useState("");
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await fetch(`/patients/myDoctors/${user.user._id}`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const data = await response.json();
+        setDoctorsOptions(data.doctors);
+      } catch (error) {
+        console.error("Error fetching doctors:", error.response.data.message);
+      }
+    };
+
+    const fetchPrescriptions = async () => {
+      try {
+        const response = await fetch(
+          `/patients/viewPrescription/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const data = await response.json();
+        setPrescriptions(data.prescriptions);
+      } catch (error) {
+        console.error(
+          "Error fetching prescriptions:",
+          error.response.data.message
+        );
+      }
+    };
+
+    fetchDoctors();
+    fetchPrescriptions();
+  }, [user]);
+
+  const handleViewDetailsClick = (prescriptionId) => {
+    const url = `/patient/prescriptionDetails/${prescriptionId}`;
+    navigate(url);
+  };
+
+  const handleFilterPrescriptions = async () => {
+    try {
+      const response = await fetch(
+        `/patients/filterThePrescription/${user.user._id}?doctor=${selectedDoctor}&date=${selectedDate}&isFilled=${isFilled}`,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      const json = await response.json();
+
+      if (response.ok) {
+        setPrescriptions(json.prescriptions);
+      }
+      setSelectedDoctor("");
+      setSelectedDate("");
+      setIsFilled("");
+    } catch (error) {
+      console.error("An error occurred:", error.response.data.message);
+    }
+  };
+
+  const downloadPDF = async (prescriptionId) => {
+    try {
+      const response = await fetch(
+        `/patients/downloadPrescriptionPDF/${prescriptionId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/pdf",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      // Create a blob from the PDF data
+      const blob = await response.blob();
+
+      // Create a temporary URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create an <a> element to trigger the download
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Prescription_${prescriptionId}.pdf`;
+
+      // Append the <a> element to the body
+      document.body.appendChild(a);
+
+      // Click the <a> element to start the download
+      a.click();
+
+      // Remove the <a> element from the body
+      document.body.removeChild(a);
+
+      // Revoke the URL to release resources
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading prescription:", error);
+    }
+  };
+
   return (
     <>
       <Container className="mt-5" fluid>
@@ -47,16 +160,18 @@ const PatientPrescriptions = () => {
                             Doctor:
                           </label>
                           <br />
-                          <Input name="select" type="select">
+                          <Input
+                            name="select"
+                            type="select"
+                            value={selectedDoctor}
+                            onChange={(e) => setSelectedDoctor(e.target.value)}
+                          >
                             <option value="">All</option>
-                            <option value="Lojain Tarek's id">
-                              Lojain Tarek
-                            </option>
-                            <option value="Hana Younis' id">Hana younis</option>
-                            <option value="Habiba Hilal id">
-                              Habiba Hilal
-                            </option>
-                            <option value="Shahd Amer id">Shahd Amer</option>
+                            {doctorsOptions.map((doctor, index) => (
+                              <option key={index} value={doctor._id}>
+                                {doctor.name}
+                              </option>
+                            ))}
                           </Input>
                         </FormGroup>
                       </Col>
@@ -77,7 +192,15 @@ const PatientPrescriptions = () => {
                                 <i className="ni ni-calendar-grid-58" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <ReactDatetime timeFormat={false} />
+                            <ReactDatetime
+                              key={selectedDate}
+                              inputProps={{
+                                placeholder: "Date",
+                              }}
+                              timeFormat={false}
+                              value={selectedDate}
+                              onChange={(date) => setSelectedDate(date)}
+                            />
                           </InputGroup>
                         </FormGroup>
                       </Col>
@@ -92,7 +215,12 @@ const PatientPrescriptions = () => {
                             Filled/Unfilled:
                           </label>
                           <br />
-                          <Input name="select" type="select">
+                          <Input
+                            name="select"
+                            type="select"
+                            value={isFilled}
+                            onChange={(e) => setIsFilled(e.target.value)}
+                          >
                             <option value="">All</option>
                             <option value="true">Filled</option>
                             <option value="false">Unfilled</option>
@@ -102,7 +230,11 @@ const PatientPrescriptions = () => {
                     </Row>
                     <Row>
                       <Col sm="12">
-                        <Button color="secondary" size="sm">
+                        <Button
+                          color="secondary"
+                          size="sm"
+                          onClick={handleFilterPrescriptions}
+                        >
                           Filter Prescriptions
                         </Button>
                       </Col>
@@ -176,34 +308,56 @@ const PatientPrescriptions = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr key="1" style={{ color: "#f7fafc" }}>
-                    <th scope="row">
-                      <Media className="align-items-center">
-                        <Media>
-                          <span className="mb-0 text-sm">
-                            Dr. Jessica Jones
-                          </span>
+                  {prescriptions.map((prescription) => (
+                    <tr key={prescription._id} style={{ color: "#f7fafc" }}>
+                      <th scope="row">
+                        <Media className="align-items-center">
+                          <Media>
+                            <span className="mb-0 text-sm">
+                              Dr. {prescription.doctor.fName}{" "}
+                              {prescription.doctor.lName}
+                            </span>
+                          </Media>
                         </Media>
-                      </Media>
-                    </th>
-                    <td>24-12-2024 </td>
-                    <td>
-                      <Badge color="" className="badge-dot mr-4">
-                        <i className="bg-danger" />
-                        No
-                      </Badge>
-                    </td>
-                    <td>
-                      <Button color="secondary" size="sm">
-                        View Details
-                      </Button>
-                    </td>
-                    <td>
-                      <Button color="secondary" size="sm">
-                        Download as PDF
-                      </Button>
-                    </td>
-                  </tr>
+                      </th>
+                      <td>
+                        {new Date(prescription.date).toLocaleDateString(
+                          "en-US",
+                          { year: "numeric", month: "long", day: "numeric" }
+                        )}
+                      </td>
+                      <td>
+                        <Badge color="" className="badge-dot mr-4">
+                          <i
+                            className={
+                              prescription.isFilled ? "bg-success" : "bg-danger"
+                            }
+                          />
+                          {prescription.isFilled ? "Yes" : "No"}
+                        </Badge>
+                      </td>
+                      <td>
+                        <Button
+                          color="secondary"
+                          size="sm"
+                          onClick={() =>
+                            handleViewDetailsClick(prescription._id)
+                          }
+                        >
+                          View Details
+                        </Button>
+                      </td>
+                      <td>
+                        <Button
+                          color="secondary"
+                          size="sm"
+                          onClick={() => downloadPDF(prescription._id)}
+                        >
+                          Download as PDF
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </Table>
             </Card>

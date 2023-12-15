@@ -66,7 +66,7 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/doctorDetails",
+    path: "/doctorDetails/:doctorid",
     name: "Doctor Details",
     icon: "ni ni-circle-08 text-pink",
     component: <DoctorDetails />,
@@ -87,14 +87,14 @@ var routes = [
     layout: "/patient",
   },
   {
-    path: "/prescriptionDetails",
+    path: "/prescriptionDetails/:prescriptionid",
     name: "Prescription Details",
     icon: "ni ni-circle-08 text-pink",
     component: <PrescriptionDetails />,
     layout: "/patient",
   },
   {
-    path: "/familyMemberDetails",
+    path: "/familyMemberDetails/:familymemberemail",
     name: "Family Member Details",
     icon: "ni ni-circle-08 text-pink",
     component: <FamilyMemberDetails />,
@@ -152,14 +152,14 @@ var routes = [
     layout: "/doctor",
   },
   {
-    path: "/patientPrescriptions",
+    path: "/patientPrescriptions/:patientid",
     name: "Patient Prescription",
     icon: "ni ni-single-02 text-yellow",
     component: <DoctorPrescriptionsForPatient />,
     layout: "/doctor",
   },
   {
-    path: "/patientPrescriptionDetails",
+    path: "/patientPrescriptionDetails/:prescriptionid",
     name: "Patient Prescription Details",
     icon: "ni ni-single-02 text-yellow",
     component: <DoctorPrescriptionDetailsForPatient />,

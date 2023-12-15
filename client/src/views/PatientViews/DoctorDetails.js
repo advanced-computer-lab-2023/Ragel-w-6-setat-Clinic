@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
   Button,
   Card,
@@ -19,9 +19,76 @@ import {
   Input,
 } from "reactstrap";
 
+import { useAuthContext } from "../../hooks/useAuthContext";
+
 const DoctorDetails = () => {
   const [modal, setModal] = useState(false);
   const toggleModal = () => setModal(!modal);
+
+  const { doctorid } = useParams();
+  const { user } = useAuthContext();
+
+  const [doctorDetails, setDoctorDetails] = useState({
+    username: "",
+    password: "",
+    email: "",
+    fName: "",
+    lName: "",
+    dateOfBirth: null,
+    educationalBackground: "",
+    hourlyRate: 0,
+    sessionPrice: 0,
+    affiliation: "",
+    specialty: "",
+    isRegistered: false,
+    wallet: 0,
+  });
+  const [availableAppointments, setAvailableAppointments] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctorDetails = async () => {
+      try {
+        const response = await fetch(
+          `/patients/doctorDetails/${user.user._id}/${doctorid}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const json = await response.json();
+        if (response.ok) {
+          setDoctorDetails(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error.response.data.message);
+      }
+    };
+
+    fetchDoctorDetails();
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    const fetchAvailableAppointments = async () => {
+      try {
+        const response = await fetch(
+          `/patients/doctorDetails/availableAppointment/${user.user._id}/${doctorid}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const json = await response.json();
+        if (response.ok) {
+          setAvailableAppointments(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error.response.data.message);
+      }
+    };
+
+    fetchAvailableAppointments();
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <>
       <Container className="mt-5" fluid>
@@ -56,16 +123,18 @@ const DoctorDetails = () => {
               <div className="card-profile-stats d-flex justify-content-center mt-md-4"></div>
               <div className="text-center">
                 <h3>
-                  Dr. Jessica Jones
-                  <span className="font-weight-light">, Pediatric</span>
+                  Dr. {doctorDetails.fName} {doctorDetails.lName}
+                  <span className="font-weight-light">
+                    , {doctorDetails.specialty}
+                  </span>
                 </h3>
-                <div className="h5 mt-4">
+                <div className="h5 mt-2">
                   <i className="ni business_briefcase-24 mr-2" />
-                  From Ain Shams University
+                  From {doctorDetails.educationalBackground}
                 </div>
                 <div>
                   <i className="ni education_hat mr-2" />
-                  Doctor at New Giza Hospital
+                  Doctor at {doctorDetails.affiliation}
                 </div>
               </div>
             </CardBody>
@@ -160,70 +229,74 @@ const DoctorDetails = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr key="1" style={{ color: "#f7fafc" }}>
-                  <th scope="row">
-                    <Media className="align-items-center">
-                      <Media>
-                        <span className="mb-0 text-sm">Dr. Jessica Jones</span>
+                {availableAppointments.map((appointment) => (
+                  <tr key={appointment._id} style={{ color: "#f7fafc" }}>
+                    <th scope="row">
+                      <Media className="align-items-center">
+                        <Media>
+                          <span className="mb-0 text-sm">
+                            Dr. {doctorDetails.fName} {doctorDetails.lName}
+                          </span>
+                        </Media>
                       </Media>
-                    </Media>
-                  </th>
-                  <td>100 EGP </td>
-                  <td>
-                    <Badge color="" className="badge-dot mr-4">
-                      <i className="bg-success" />
-                      Available
-                    </Badge>
-                  </td>
-                  <td> 12-10-2023</td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <span className="mr-2">General</span>
-                    </div>
-                  </td>
-                  <td>
-                    <Button color="secondary" size="sm">
-                      Schedule With Wallet
-                    </Button>
-                  </td>
-                  <td>
-                    <Button color="secondary" size="sm">
-                      Schedule With Credit Card
-                    </Button>
-                  </td>
-                  <td>
-                    <Button color="secondary" size="sm" onClick={toggleModal}>
-                      Schedule For Family
-                    </Button>
-                    <Modal isOpen={modal} toggle={toggleModal}>
-                      <ModalHeader toggle={toggleModal}>
-                        Schedule For Family Member
-                      </ModalHeader>
-                      <ModalBody>
-                        <Row>
-                          <Col lg="6">
-                            <FormGroup>
-                              <label className="form-control-label">
-                                Email of Family Member
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                type="email"
-                              />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button color="default">Pay With Wallet</Button>
-                        <Button color="default">Pay With Credit Card</Button>
-                        <Button color="secondary" onClick={toggleModal}>
-                          Cancel
-                        </Button>
-                      </ModalFooter>
-                    </Modal>
-                  </td>
-                </tr>
+                    </th>
+                    <td>{doctorDetails.sessionPrice} EGP </td>
+                    <td>
+                      <Badge color="" className="badge-dot mr-4">
+                        <i className="bg-success" />
+                        {appointment.status}
+                      </Badge>
+                    </td>
+                    <td> {appointment.date} </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <span className="mr-2">{appointment.type}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <Button color="secondary" size="sm">
+                        Schedule With Wallet
+                      </Button>
+                    </td>
+                    <td>
+                      <Button color="secondary" size="sm">
+                        Schedule With Credit Card
+                      </Button>
+                    </td>
+                    <td>
+                      <Button color="secondary" size="sm" onClick={toggleModal}>
+                        Schedule For Family
+                      </Button>
+                      <Modal isOpen={modal} toggle={toggleModal}>
+                        <ModalHeader toggle={toggleModal}>
+                          Schedule For Family Member
+                        </ModalHeader>
+                        <ModalBody>
+                          <Row>
+                            <Col lg="6">
+                              <FormGroup>
+                                <label className="form-control-label">
+                                  Email of Family Member
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  type="email"
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                        </ModalBody>
+                        <ModalFooter>
+                          <Button color="default">Pay With Wallet</Button>
+                          <Button color="default">Pay With Credit Card</Button>
+                          <Button color="secondary" onClick={toggleModal}>
+                            Cancel
+                          </Button>
+                        </ModalFooter>
+                      </Modal>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </Table>
           </Card>

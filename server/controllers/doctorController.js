@@ -2,6 +2,9 @@ import Doctor from "../models/Doctor.js";
 import Patient from "../models/Patient.js";
 import Appointments from "../models/Appointments.js";
 import Admin from "../models/Admin.js";
+import Prescription from "../models/Prescription.js";
+import nodemailer from "nodemailer";
+import PDFDocument from "pdfkit";
 
 // HABIBAS REQS
 
@@ -461,6 +464,145 @@ const addAvailableAppointments = async (req, res) => {
   }
 };
 
+// sprint 3
+const viewAllPrescription = async (req, res) => {
+  const doctorId = req.params.doctorid;
+  const patientId = req.params.patientid;
+
+  try {
+    const prescriptions = await Prescription.find({
+      doctor: doctorId,
+      patient: patientId,
+    }).populate("patient doctor");
+
+    res.status(200).json({
+      status: "success",
+      prescriptions: prescriptions,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const downloadPrescriptionPDF = async (req, res) => {
+  try {
+    const prescriptionId = req.params.prescriptionid;
+
+    // Check if the prescription exists
+    const prescription = await Prescription.findById(prescriptionId);
+
+    if (!prescription) {
+      return res.status(404).json({ message: "Prescription not found" });
+    }
+
+    // Create a new PDF document
+    const doc = new PDFDocument();
+
+    // Set response headers for PDF download
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=Prescription_${prescriptionId}.pdf`
+    );
+
+    // Pipe the PDF to the response stream
+    doc.pipe(res);
+
+    // Add prescription data to the PDF
+    doc.fontSize(12).text("Medication:");
+    prescription.medication.forEach((med) => {
+      doc
+        .fontSize(12)
+        .text(
+          `- Name: ${med.name}, Dosage: ${med.dosage}, Price: ${med.price} EGP`
+        );
+    });
+    doc.fontSize(12).text(`Notes: ${prescription.notes}`);
+    doc.fontSize(12).text(`Date: ${prescription.date}`);
+    doc.fontSize(12).text(`Is Filled: ${prescription.isFilled ? "Yes" : "No"}`);
+
+    // End the PDF creation
+    doc.end();
+
+    // You can save the PDF to a file if needed
+    // doc.pipe(fs.createWriteStream(`Prescription_${prescriptionId}.pdf`));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const filterThePrescription = async (req, res) => {
+  const doctorId = req.params.doctorid;
+  const patientId = req.params.patientid;
+  try {
+    const filter = {};
+
+    if (req.query.date != "") {
+      var min_date = new Date(req.query.date);
+      var max_date = new Date(req.query.date);
+      min_date.setHours(0, 0, 0, 0);
+      max_date.setHours(23, 59, 59, 999);
+      filter.date = {
+        $gte: min_date,
+        $lt: max_date,
+      };
+    }
+    if (req.query.isFilled != "") {
+      filter.isFilled = req.query.isFilled;
+    }
+
+    filter.doctor = doctorId;
+    filter.patient = patientId;
+
+    const prescriptions = await Prescription.find(filter).populate(
+      "patient doctor"
+    );
+
+    res.status(200).json({
+      status: "success",
+      prescriptions: prescriptions,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
+const selectPrescription = async (req, res) => {
+  const prescriptionId = req.params.prescriptionid;
+  const doctorId = req.params.doctorid;
+
+  try {
+    const prescription = await Prescription.findOne({
+      _id: prescriptionId,
+      doctor: doctorId,
+    }).populate("patient doctor");
+
+    if (!prescription) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Prescription not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      prescription: prescription,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
 export {
   createDoctor,
   updateDoctorProfile,
@@ -480,4 +622,8 @@ export {
   uploadDocumentForPatient,
   getMedicalHistoryForPatient,
   registerDoctor,
+  viewAllPrescription,
+  downloadPrescriptionPDF,
+  filterThePrescription,
+  selectPrescription,
 };

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Select from "react-select";
 
 //components
@@ -21,10 +21,17 @@ import {
   ModalFooter,
 } from "reactstrap";
 
+import { useAuthContext } from "../../hooks/useAuthContext";
+
 const DoctorPrescriptionDetailsForPatient = () => {
+  const { prescriptionid } = useParams();
+  const { user } = useAuthContext();
+
   const [modal, setModal] = useState(false);
   const toggleModal = () => setModal(!modal);
   const [editMode, setEditMode] = useState(false);
+
+  const [prescription, setPrescription] = useState("");
 
   const options = [
     { value: "Medicine1", label: "Medicine1" },
@@ -42,6 +49,31 @@ const DoctorPrescriptionDetailsForPatient = () => {
   const handleEdit = () => {
     setEditMode(true);
   };
+
+  useEffect(() => {
+    const fetchPrescription = async () => {
+      try {
+        const response = await fetch(
+          `/doctors/selectPrescription/${user.user._id}/${prescriptionid}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const data = await response.json();
+        setPrescription(data.prescription);
+      } catch (error) {
+        console.error(
+          "Error fetching prescription:",
+          error.response.data.message
+        );
+      }
+    };
+    fetchPrescription();
+  }, [user, prescriptionid]);
+
+  if (!prescription) {
+    return <div>Loading...</div>; // Add a loading state or component
+  }
 
   return (
     <>
@@ -132,172 +164,55 @@ const DoctorPrescriptionDetailsForPatient = () => {
                   <h3>Prescription Details</h3>
                   <div className="h5 mt-4">
                     Prescribed by:{" "}
-                    <span className="font-weight-light">Dr. Jessica Jones</span>
+                    <span className="font-weight-light">
+                      Dr. {prescription.doctor.fName}{" "}
+                      {prescription.doctor.lName}
+                    </span>
                   </div>
                   <div className="h5 mt-4">
                     Medication: <br />
                     <Row>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  {editMode ? (
-                                    <Input type="text" placeholder="Dosage" />
-                                  ) : (
-                                    "2 times a day"
-                                  )}
+                      {prescription.medication.map((med, index) => (
+                        <Col xl="4" key={index}>
+                          <Card
+                            className="card-stats mb-4"
+                            style={{ backgroundColor: "#f7fafc" }}
+                          >
+                            <CardBody>
+                              <Row>
+                                <div className="col">
+                                  <CardTitle className="text-uppercase font-weight-bold mb-0">
+                                    {med.name}
+                                  </CardTitle>
+                                  <span className="h4 text-muted mb-0">
+                                    {editMode ? (
+                                      <Input type="text" placeholder="Dosage" />
+                                    ) : (
+                                      `Dosage: ${med.dosage}`
+                                    )}
+                                  </span>
+                                </div>
+                              </Row>
+                              <p className="mt-1 mb-0 text-muted text-sm">
+                                <span className="text-nowrap">
+                                  Price : {med.price} EGP
                                 </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                            {editMode && (
-                              <Button color="danger" size="sm">
-                                Delete Medicine
-                              </Button>
-                            )}
-                          </CardBody>
-                        </Card>
-                      </Col>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  {editMode ? (
-                                    <Input type="text" placeholder="Dosage" />
-                                  ) : (
-                                    "2 times a day"
-                                  )}
-                                </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                            {editMode && (
-                              <Button color="danger" size="sm">
-                                Delete Medicine
-                              </Button>
-                            )}
-                          </CardBody>
-                        </Card>
-                      </Col>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  {editMode ? (
-                                    <Input type="text" placeholder="Dosage" />
-                                  ) : (
-                                    "2 times a day"
-                                  )}
-                                </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                            {editMode && (
-                              <Button color="danger" size="sm">
-                                Delete Medicine
-                              </Button>
-                            )}
-                          </CardBody>
-                        </Card>
-                      </Col>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  {editMode ? (
-                                    <Input type="text" placeholder="Dosage" />
-                                  ) : (
-                                    "2 times a day"
-                                  )}
-                                </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                            {editMode && (
-                              <Button color="danger" size="sm">
-                                Delete Medicine
-                              </Button>
-                            )}
-                          </CardBody>
-                        </Card>
-                      </Col>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  {editMode ? (
-                                    <Input type="text" placeholder="Dosage" />
-                                  ) : (
-                                    "2 times a day"
-                                  )}
-                                </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                            {editMode && (
-                              <Button color="danger" size="sm">
-                                Delete Medicine
-                              </Button>
-                            )}
-                          </CardBody>
-                        </Card>
-                      </Col>
+                              </p>
+                              {editMode && (
+                                <Button color="danger" size="sm">
+                                  Delete Medicine
+                                </Button>
+                              )}
+                            </CardBody>
+                          </Card>
+                        </Col>
+                      ))}
                     </Row>
                   </div>
                   <div className="h5 mt-4">
                     Notes:{" "}
                     <span className="font-weight-light">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing
+                      {prescription.notes}
                     </span>
                   </div>
                 </div>

@@ -20,6 +20,10 @@ import {
   uploadDocumentForPatient,
   getMedicalHistoryForPatient,
   registerDoctor,
+  viewAllPrescription,
+  downloadPrescriptionPDF,
+  filterThePrescription,
+  selectPrescription,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthDoctor } from "../middlewares/requireAuthDoctor.js";
@@ -88,5 +92,12 @@ router.get("/viewMyPatients/:id", getMyPatients);
 router.get("/viewUpcomingAppointments/:id", viewUpcomingAppointments);
 router.get("/viewPastAppointments/:id", viewPastAppointments);
 router.post("/addAvailableAppointments/:id", addAvailableAppointments);
+router.get("/patientPrescriptions/:doctorid/:patientid", viewAllPrescription);
+router.get(
+  "/filterThePrescription/:doctorid/:patientid",
+  filterThePrescription
+);
+router.get("/downloadPrescriptionPDF/:prescriptionid", downloadPrescriptionPDF);
+router.get("/selectPrescription/:doctorid/:prescriptionid", selectPrescription);
 
 export default router;

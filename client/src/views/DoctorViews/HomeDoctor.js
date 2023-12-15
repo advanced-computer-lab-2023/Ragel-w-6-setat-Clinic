@@ -24,9 +24,10 @@ import {
 } from "reactstrap";
 
 // contexts
+import { useAuthContext } from "../../hooks/useAuthContext";
 
 const HomeDoctor = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user } = useAuthContext();
 
   const [agree, setAgree] = useState(false);
 

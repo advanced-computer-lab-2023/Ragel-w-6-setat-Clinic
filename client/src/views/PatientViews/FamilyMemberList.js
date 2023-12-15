@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 //components
@@ -21,6 +22,8 @@ import {
 import { useAuthContext } from "../../hooks/useAuthContext";
 
 const FamilyMemberList = () => {
+  const navigate = useNavigate();
+
   const { user } = useAuthContext();
 
   const [visible, setVisible] = useState(false);
@@ -147,6 +150,10 @@ const FamilyMemberList = () => {
     return age;
   };
 
+  const handleFamilyMemberClick = (memberEmail) => {
+    navigate(`/patient/familyMemberDetails/${memberEmail}`);
+  };
+
   return (
     <>
       <Container className="mt-5" fluid>
@@ -165,10 +172,14 @@ const FamilyMemberList = () => {
                           <div className="card-profile-image">
                             <a
                               href="#pablo"
-                              onClick={(e) => e.preventDefault()}
+                              onClick={(e) =>
+                                familyMember.email
+                                  ? handleFamilyMemberClick(familyMember.email)
+                                  : e.preventDefault()
+                              }
                             >
                               <img
-                                id="tooltip1"
+                                id={"tooltip" + index.toString()}
                                 alt="..."
                                 className="rounded-circle"
                                 src={require("../../assets/img/brand/patienticonf.png")}
@@ -179,13 +190,16 @@ const FamilyMemberList = () => {
                                 }}
                               />
                             </a>
+
                             <UncontrolledTooltip
                               delay={0}
                               placement="right"
-                              target="tooltip1"
+                              target={"tooltip" + index.toString()}
                               style={{ backgroundColor: "#0C356A" }}
                             >
-                              Click to view profile
+                              {familyMember.email
+                                ? "Click to view profile"
+                                : "Cannot view profile, must be linked first"}
                             </UncontrolledTooltip>
                           </div>
                         </Col>
@@ -400,6 +414,8 @@ const FamilyMemberList = () => {
                             <Input
                               className="form-control-alternative"
                               type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
                             />
                           </FormGroup>
                         </Col>

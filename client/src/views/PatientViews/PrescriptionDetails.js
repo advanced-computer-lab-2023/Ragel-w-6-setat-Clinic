@@ -1,5 +1,5 @@
-//components
-
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
   Button,
   Card,
@@ -10,7 +10,75 @@ import {
   CardTitle,
 } from "reactstrap";
 
+import { useAuthContext } from "../../hooks/useAuthContext";
+
 const PrescriptionDetails = () => {
+  const { user } = useAuthContext();
+
+  const [prescription, setPrescription] = useState("");
+  const { prescriptionid } = useParams();
+
+  useEffect(() => {
+    const fetchPrescription = async () => {
+      try {
+        const response = await fetch(
+          `/patients/selectPrescription/${user.user._id}/${prescriptionid}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const data = await response.json();
+        setPrescription(data.prescription);
+      } catch (error) {
+        console.error("Error fetching prescription:", error);
+      }
+    };
+    fetchPrescription();
+  }, [user, prescriptionid]);
+
+  if (!prescription) {
+    return <div>Loading...</div>; // Add a loading state or component
+  }
+
+  const downloadPDF = async (prescriptionId) => {
+    try {
+      const response = await fetch(
+        `/patients/downloadPrescriptionPDF/${prescriptionId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/pdf",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      // Create a blob from the PDF data
+      const blob = await response.blob();
+
+      // Create a temporary URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create an <a> element to trigger the download
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Prescription_${prescriptionId}.pdf`;
+
+      // Append the <a> element to the body
+      document.body.appendChild(a);
+
+      // Click the <a> element to start the download
+      a.click();
+
+      // Remove the <a> element from the body
+      document.body.removeChild(a);
+
+      // Revoke the URL to release resources
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading prescription:", error);
+    }
+  };
+
   return (
     <>
       <Container className="mt-5 mb-5" fluid>
@@ -22,7 +90,11 @@ const PrescriptionDetails = () => {
             >
               <Row>
                 <Col className="ml-3 mr-6 mt-3" xl="3">
-                  <Button color="secondary" size="sm">
+                  <Button
+                    color="secondary"
+                    size="sm"
+                    onClick={() => downloadPDF(prescription._id)}
+                  >
                     Download as PDF
                   </Button>
                 </Col>
@@ -43,127 +115,46 @@ const PrescriptionDetails = () => {
                   <h3>Prescription Details</h3>
                   <div className="h5 mt-4">
                     Prescribed by:{" "}
-                    <span className="font-weight-light">Dr. Jessica Jones</span>
+                    <span className="font-weight-light">
+                      Dr. {prescription.doctor.fName}{" "}
+                      {prescription.doctor.lName}
+                    </span>
                   </div>
                   <div className="h5 mt-4">
                     Medication: <br />
                     <Row>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  2 times a day
+                      {prescription.medication.map((med, index) => (
+                        <Col xl="4" key={index}>
+                          <Card
+                            className="card-stats mb-4"
+                            style={{ backgroundColor: "#f7fafc" }}
+                          >
+                            <CardBody>
+                              <Row>
+                                <div className="col">
+                                  <CardTitle className="text-uppercase font-weight-bold mb-0">
+                                    {med.name}
+                                  </CardTitle>
+                                  <span className="h4 text-muted mb-0">
+                                    Dosage: {med.dosage}
+                                  </span>
+                                </div>
+                              </Row>
+                              <p className="mt-1 mb-0 text-muted text-sm">
+                                <span className="text-nowrap">
+                                  Price: {med.price} EGP
                                 </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                          </CardBody>
-                        </Card>
-                      </Col>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  2 times a day
-                                </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                          </CardBody>
-                        </Card>
-                      </Col>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  2 times a day
-                                </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                          </CardBody>
-                        </Card>
-                      </Col>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  2 times a day
-                                </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                          </CardBody>
-                        </Card>
-                      </Col>
-                      <Col xl="4">
-                        <Card
-                          className="card-stats mb-4"
-                          style={{ backgroundColor: "#f7fafc" }}
-                        >
-                          <CardBody>
-                            <Row>
-                              <div className="col">
-                                <CardTitle className="text-uppercase font-weight-bold mb-0">
-                                  Panadol
-                                </CardTitle>
-                                <span className="h4 text-muted mb-0">
-                                  2 times a day
-                                </span>
-                              </div>
-                            </Row>
-                            <p className="mt-1 mb-0 text-muted text-sm">
-                              <span className="text-nowrap">100 EGP</span>
-                            </p>
-                          </CardBody>
-                        </Card>
-                      </Col>
+                              </p>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                      ))}
                     </Row>
                   </div>
                   <div className="h5 mt-4">
                     Notes:{" "}
                     <span className="font-weight-light">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing
+                      {prescription.notes}
                     </span>
                   </div>
                 </div>
@@ -175,4 +166,5 @@ const PrescriptionDetails = () => {
     </>
   );
 };
+
 export default PrescriptionDetails;
