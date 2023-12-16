@@ -24,6 +24,8 @@ import {
   downloadPrescriptionPDF,
   filterThePrescription,
   selectPrescription,
+  rescheduleAppointment,
+  cancelAppointmentforPatient,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthDoctor } from "../middlewares/requireAuthDoctor.js";
@@ -86,6 +88,14 @@ router.get("/getMyAppointments/:id", getMyAppointments);
 
 router.get("/selectedPatient/:doctorid/:patientid", getSinglePatient);
 router.get("/viewMyPatients/:id", getMyPatients);
+router.patch(
+  "/rescheduleAppointment/:doctorid/:appointmentid",
+  rescheduleAppointment
+);
+router.patch(
+  "/cancelAppointment/:doctorid/:appointmentid",
+  cancelAppointmentforPatient
+);
 
 //LOJAINS ROUTES
 

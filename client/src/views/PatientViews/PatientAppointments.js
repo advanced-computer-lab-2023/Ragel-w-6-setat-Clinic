@@ -311,6 +311,9 @@ const PatientAppointments = () => {
                               </InputGroupText>
                             </InputGroupAddon>
                             <ReactDatetime
+                              inputProps={{
+                                placeholder: "From Date",
+                              }}
                               key={fromDate}
                               timeFormat={false}
                               value={fromDate}
@@ -593,7 +596,10 @@ const PatientAppointments = () => {
                               </Row>
                             </ModalBody>
                             <ModalFooter>
-                              <Button color="default" onClick={handleFollowUp}>
+                              <Button
+                                color="default"
+                                onClick={() => handleFollowUp(appointment)}
+                              >
                                 Confirm Request
                               </Button>
                               <Button

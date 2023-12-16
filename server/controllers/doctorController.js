@@ -148,23 +148,57 @@ const scheduleFollowUp = async (req, res) => {
 
   try {
     const patient = await Patient.findById(patientId);
+    const doctor = await Doctor.findById(doctorId);
+    const doctorPrice = doctor.sessionPrice;
+
+    const patientPackage = patient.subscribedPackage;
+    let sessionDiscount = 0;
+    if (patientPackage) {
+      const packageOffered = await Package.findById({
+        _id: patientPackage.packageId,
+      });
+      if (packageOffered) {
+        sessionDiscount = packageOffered.sessionDiscount || 0;
+      }
+    }
+    const originalSessionPrice = doctorPrice;
+    const discountedPrice =
+      originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+
+    const appointmentDate = new Date(req.body.date);
+
+    const localDate = appointmentDate.toLocaleString("en-US", {
+      timeZone: "Africa/Cairo", // Replace with your actual time zone
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: true,
+    });
 
     const appointment = await Appointments.create({
       patient: patient._id,
       doctor: doctorId,
-      date: req.body.date,
+      date: localDate,
       isAvailable: false,
+      price: discountedPrice,
       type: "follow-up",
       status: "upcoming",
-      price: req.body.price,
+      acceptance: "accepted",
     });
 
-    res.status(201).json({
+    const doctorAppointments = await Appointments.find({
+      doctor: doctorId,
+    }).populate("patient");
+    res.status(200).json({
       status: "success",
       message: "Appointment created successfully.",
+      appointments: doctorAppointments,
     });
   } catch (error) {
-    res.status(500).json({ message: "Fill the options please" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -296,7 +330,7 @@ const filterMyAppointments = async (req, res) => {
     res.status(200).json({ appointments: appointments });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -309,7 +343,7 @@ const getMyAppointments = async (req, res) => {
     res.status(200).json({ appointments: appointments });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -345,6 +379,7 @@ const upcomingAppointments = async (req, res) => {
 
 // SARAS REQS
 
+//sprint 1
 const getMyPatients = async (req, res) => {
   try {
     const doctorId = req.params.id;
@@ -393,6 +428,89 @@ const getSinglePatient = async (req, res) => {
   }
 };
 
+//sprint 3
+const rescheduleAppointment = async (req, res) => {
+  const doctorId = req.params.doctorid;
+  const appointmentId = req.params.appointmentid;
+  const appointmentDate = new Date(req.body.date);
+  const localDate = appointmentDate.toLocaleString("en-US", {
+    timeZone: "Africa/Cairo", // Replace with your actual time zone
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
+  });
+
+  try {
+    const appointment = await Appointments.findById({
+      _id: appointmentId,
+      doctor: doctorId,
+    });
+
+    appointment.date = localDate;
+    appointment.status = "rescheduled";
+
+    // Save the changes
+    await appointment.save();
+
+    const doctorAppointments = await Appointments.find({
+      doctor: doctorId,
+    }).populate("patient");
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment rescheduled successfully.",
+      appointments: doctorAppointments,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+const cancelAppointmentforPatient = async (req, res) => {
+  const doctorId = req.params.doctorid;
+  const appointmentId = req.params.appointmentid;
+
+  try {
+    const appointment = await Appointments.findById({
+      _id: appointmentId,
+      doctor: doctorId,
+    });
+
+    const patientId = appointment.patient;
+
+    // Update patient's wallet
+    await Patient.findOneAndUpdate(
+      { _id: patientId },
+      { $inc: { wallet: appointment.price } }
+    );
+
+    appointment.status = "cancelled";
+    await appointment.save();
+
+    const doctorAppointments = await Appointments.find({
+      doctor: doctorId,
+    }).populate("patient");
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment cancelled.",
+      appointments: doctorAppointments,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 // LOJAINS REQS
 
 const viewUpcomingAppointments = async (req, res) => {
@@ -430,7 +548,7 @@ const viewPastAppointments = async (req, res) => {
     });
   }
 };
-// Doctor can create new available appointments sprint #2
+
 const addAvailableAppointments = async (req, res) => {
   try {
     const { date, price } = req.query; // Extract date and type from the request body
@@ -626,4 +744,6 @@ export {
   downloadPrescriptionPDF,
   filterThePrescription,
   selectPrescription,
+  rescheduleAppointment,
+  cancelAppointmentforPatient,
 };
