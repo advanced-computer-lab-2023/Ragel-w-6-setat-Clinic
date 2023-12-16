@@ -559,7 +559,7 @@ const formatNotifications = (notifications) => {
 };
 
 
-const createPrescription = async (req, res) => {
+const  ription = async (req, res) => {
   try {
     const { patientId, medication, dosage, notes } = req.body;
     const doctorId = req.params.id;  // Assuming you have a user object in the request with the doctor's ID
@@ -752,6 +752,62 @@ const filterThePrescription = async (req, res) => {
   }
 };
 
+const addDosage = async (req, res) => {
+  const doctorId = req.params.id;
+  const name = req.query.name;
+  const dosage = req.query.dosage;
+  try {
+    const prescription = await Prescription.findOne({doctor: doctorId });
+    if (!prescription) {
+      return res.status(404).json({ message: 'Prescription not found for the specified doctor' });
+    }
+    const medicineToUpdate = prescription.medication.find((medication) => medication.name === name);
+    console.log(medicineToUpdate);
+    if (!medicineToUpdate) {
+      return res.status(404).json({ message: 'Medicine not found in the prescription' });
+    }
+    medicineToUpdate.dosage = dosage;
+    await prescription.save();
+    res.json({ message: 'Dosage updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+const createPrescription = async (req, res) => {
+  try {
+    const { patientId, medication, dosage, notes } = req.body;
+    const doctorId = req.params.id;  // Assuming you have a user object in the request with the doctor's ID
+
+    // Check if the patient and doctor exist
+    const patient = await Patient.findById(patientId);
+    const doctor = await Doctor.findById(doctorId);
+
+    if (!patient || !doctor) {
+      return res.status(404).json({ message: 'Patient or Doctor not found' });
+    }
+
+    // Create a new prescription
+    const prescription = new Prescription({
+      patient: patientId,
+      doctor: doctorId,
+      medication,
+      dosage,
+      date: new Date(),
+      notes,
+    });
+
+    // Save the prescription
+    await prescription.save();
+
+    res.status(201).json({ status: 'success', prescription });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 export {
   createDoctor,
   updateDoctorProfile,
@@ -773,10 +829,11 @@ export {
   registerDoctor,
   getDoctorNotifications,
   getAppNotifications,
-  createPrescription,
   updatePrescription,
   downloadPrescriptionPDF,
   viewAllPrescription,
   selectPrescription,
-  filterThePrescription
+  filterThePrescription,
+  addDosage,
+  createPrescription
 };

@@ -22,12 +22,13 @@ import {
   registerDoctor,
   getDoctorNotifications,
   getAppNotifications,
-  createPrescription,
   updatePrescription,
   downloadPrescriptionPDF,
   viewAllPrescription,
   selectPrescription,
-  filterThePrescription
+  filterThePrescription,
+  addDosage,
+  createPrescription
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 // multer
@@ -97,12 +98,13 @@ router.get("/downloadPrescriptionPDF/:id", downloadPrescriptionPDF);
 //sprint 3
 router.get("/getDoctorNotifications/:id", getDoctorNotifications);
 router.get("/getAppNotifications/:id", getAppNotifications);
-router.post("/createPrescription/:id", createPrescription);
 router.patch("/updatePrescription/:id", updatePrescription);
 router.get(
   "/selectPrescription/:doctorid/:prescriptionid",
   selectPrescription
 );
+router.post("/createPrescription/:id", createPrescription);
 router.get("/filterThePrescription/:id", filterThePrescription);
+router.post("/addDosage/:id", addDosage);
 
 export default router;

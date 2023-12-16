@@ -1,30 +1,73 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation,useParams } from "react-router-dom";
 import { Button, Card, CardBody, Container, Row, Col, Input, CardTitle, FormGroup, Label, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import Select from "react-select";
 import { UserContext } from "../../contexts/UserContext";
 
 const DoctorPrescriptionDetailsForPatient = () => {
+  const location = useLocation();
   const [modal, setModal] = useState(false);
   const toggleModal = () => setModal(!modal);
   const [editMode, setEditMode] = useState(false);
+  const [dosageChanges, setDosageChanges] = useState({}); // State to track dosage changes
+  const [selectedName, setselectedName] = useState("");
+  const [selectedDosage, setselectedDosage] = useState("");
+
 
   const options = [
     { value: "Medicine1", label: "Medicine1" },
     { value: "Medicine2", label: "Medicine2" },
   ];
 
-  const handleDone = () => {
+  const handleDone = async () => {
     setEditMode(false);
+  
+    // Extract names from dosageChanges object and sort them
+    const medicineNames = Object.keys(dosageChanges).sort();
+  
+    // Create an array of query parameters in the correct order
+    const queryString = medicineNames.map(name => `${encodeURIComponent('name')}=${encodeURIComponent(name)}&${encodeURIComponent('dosage')}=${encodeURIComponent(dosageChanges[name])}`).join('&');
+  
+    // Send a request to update dosages in the backend
+    try {
+      const response = await fetch(`/doctors/addDosage/${user._id}?${queryString}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const data = await response.json();
+      console.log(data.message);
+  
+      // Clear dosageChanges state
+      setDosageChanges({});
+  
+    } catch (error) {
+      console.error("Error updating dosages:", error);
+    }
   };
+  
+  
 
   const handleCancel = () => {
     setEditMode(false);
+    // Reset dosageChanges when the user cancels the edit
+    setDosageChanges({});
   };
 
   const handleEdit = () => {
     setEditMode(true);
   };
+
+ // const handleDosageChange = (medicineName, dosage) => {
+   // // Update dosageChanges state when the user changes the dosage
+   // setDosageChanges((prevDosageChanges) => ({
+     // ...prevDosageChanges,
+      //[medicineName]: dosage,
+    //}));
+  //};
+
 
   const { user } = useContext(UserContext);
   const [prescription, setPrescription] = useState(null);
@@ -155,11 +198,16 @@ const DoctorPrescriptionDetailsForPatient = () => {
                                 <div className="col">
                                   <CardTitle className="text-uppercase font-weight-bold mb-0">{med.name}</CardTitle>
                                   <span className="h4 text-muted mb-0">
-  {editMode ? (
-    <Input type="text" placeholder="Dosage" />
-  ) : (
-    `Dosage: ${med.dosage}`
-  )}
+                                  {editMode ? (
+  <Input
+    type="text"
+    placeholder="Dosage"
+    value={dosageChanges[med.name] || ""}
+    onChange={(e) => setDosageChanges({ ...dosageChanges, [med.name]: e.target.value })}
+  />
+) : (
+  `Dosage: ${med.dosage}`
+)}
 </span>
 
                                 </div>
