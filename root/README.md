@@ -1,6 +1,5 @@
 
 # Health Space (Virtual Clinic)
-
 ![App Screenshot](https://media.discordapp.net/attachments/1157430089181577291/1159866558227693578/acl_clinic_6.png?ex=658edde8&is=657c68e8&hm=0cc036be1a1d14a84bf64aed1a7287c39bd700488a84e6a29f3b483e6d61aebc&=&format=webp&quality=lossless&width=625&height=625)
 
 A complete Online Learning System for the CSEN704 Course (Advanced Programming Lab) in GUC (German University in Cairo). An Online Health Clinic System as a web application through which clinical services are exchanged.
@@ -8,17 +7,15 @@ A complete Online Learning System for the CSEN704 Course (Advanced Programming L
 ## Motivation
 The motivation behind this project stems from a deep commitment to enhancing healthcare accessibility. By creating a centralized platform, the goal is to make healthcare services readily available to a wider audience, ensuring patients can easily connect with pharmacists and access vital medical information.
 with this project being a requirement for our ACL course in the GUC it was able to help us understand and implement the MERN Stack, and think critically about implementing a functioning website which nudges into our future career paths.
+
 ## Objectives
 - Learn how to properly use the Agile Methodology to plan out a project and develop the software.
-
-- Learn the process of following a given set of System Requirements to develop a software.
-
+- Learn the process of following a given set of system requirements to develop a software.
 - Learn to research and master the use of the MERN Stack.
-Learn how to work together as a team on GitHub.
-
-- Work under Project Manager and do feedback sessions to make more imporvments .
+- Learn how to work together as a team on GitHub.
+- Work under project manager and do feedback sessions to make more improvements.
+  
 ## Tech Stack
-
  React, Bootstrap, MUI, javaScript
  Node, Express, MongoDB, postman
 
