@@ -23,11 +23,9 @@ Some of the learning curves that we experienced through milestone 2 to milestone
 The project needs in the near future to be deployed through Google cloud or something similar to that.
 
 ## Code Styles
-- Prettier : it is a code formatter that runs automatically before each commit on the whole code so that the codes looks well formatted across the whole project
+This project follows a specific code style to ensure consistency and readability across the codebase. Adopting a consistent coding style is important for collaboration and maintenance.
 
-- This project follows a specific code style to ensure consistency and readability across the codebase. Adopting a consistent coding style is important for collaboration and maintenance.
-
-We adhere to the Standart Code Style Guide for this project. Please review the guide before contributing to ensure that your code aligns with our established conventions.
+We adhere to the [Standart Code Style Guide](https://standardjs.com/) for this project. Please review the guide before contributing to ensure that your code aligns with our established conventions.
 
 ## Screenshots
 TODO
