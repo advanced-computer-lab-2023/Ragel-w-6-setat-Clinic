@@ -122,3 +122,16 @@ These instructions will help you get a copy of the project up and running on you
 4- Next, navigate to the `client` folder in the terminal and run the following command:
 
      npm install
+
+## Credits
+- [@02omar](https://github.com/02omar)
+- [@Hauna9](https://github.com/Hauna9)
+- [@shahdamerr](https://github.com/shahdamerr)
+- [@LujainTa](https://github.com/LujainTa)
+- [@habibahilal](https://github.com/habibahilal)
+- [@mariamelgendy](https://github.com/mariamelgendy)
+- [@sara2413](https://github.com/sara2413)
+
+## License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
