@@ -6,6 +6,7 @@ import Appointments from "../models/Appointments.js";
 import Package from "../models/Package.js";
 import stripe from "stripe";
 import PDFDocument from "pdfkit";
+import e from "express";
 
 // Set your Stripe secret key
 const stripeInstance = stripe(process.env.STRIPE_SECRET_KEY);
@@ -257,7 +258,7 @@ const getWalletAmount = async (req, res) => {
     res.status(200).json(patient.wallet);
   } catch (err) {
     console.error("Error retrieving wallet amount:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -311,36 +312,6 @@ const removeDocument = async (req, res) => {
     await patient.save();
 
     res.status(200).json({ message: "Document removed successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// sprint 3
-const getFamilyMember = async (req, res) => {
-  const patientId = req.params.id;
-  const familyMemberEmail = req.query.familyMemberEmail;
-  try {
-    const patient = await Patient.findById(patientId);
-    const familyMember = patient.familyMembers.find(
-      (member) => member.email === familyMemberEmail
-    );
-    const familyMemberDoc = await Patient.findOne({
-      email: familyMemberEmail,
-    });
-
-    const familyMemberAppointments = await Appointments.find({
-      patient: familyMemberDoc._id,
-      acceptance: "accepted",
-    }).populate("doctor");
-
-    res.status(200).json({
-      status: "success",
-      familyMember: familyMemberDoc,
-      relationship: familyMember.relationship,
-      familyMemberAppointments: familyMemberAppointments,
-    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
@@ -449,6 +420,47 @@ const processPayment = async (req, res) => {
   }
 };
 
+// sprint 3
+const getFamilyMember = async (req, res) => {
+  const patientId = req.params.id;
+  const familyMemberEmail = req.query.familyMemberEmail;
+  try {
+    const patient = await Patient.findById(patientId);
+    const familyMember = patient.familyMembers.find(
+      (member) => member.email === familyMemberEmail
+    );
+    const familyMemberDoc = await Patient.findOne({
+      email: familyMemberEmail,
+    });
+
+    const familyMemberAppointments = await Appointments.find({
+      patient: familyMemberDoc._id,
+      acceptance: "accepted",
+    }).populate("doctor");
+
+    res.status(200).json({
+      status: "success",
+      familyMember: familyMemberDoc,
+      relationship: familyMember.relationship,
+      familyMemberAppointments: familyMemberAppointments,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const patientProfile = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    const patient = await Patient.findById(patientId);
+    res.status(200).json({
+      patient: patient,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 // LOJAINS REQS
 
 const addFamilyMember = async (req, res) => {
@@ -1391,4 +1403,5 @@ export {
   requestFollowUpAppointment,
   cancelAppointment,
   getFamilyMember,
+  patientProfile,
 };

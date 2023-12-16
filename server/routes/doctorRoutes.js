@@ -26,6 +26,9 @@ import {
   selectPrescription,
   rescheduleAppointment,
   cancelAppointmentforPatient,
+  pendingReq,
+  acceptRequest,
+  rejectRequest,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthDoctor } from "../middlewares/requireAuthDoctor.js";
@@ -96,6 +99,9 @@ router.patch(
   "/cancelAppointment/:doctorid/:appointmentid",
   cancelAppointmentforPatient
 );
+router.patch("/accept/:doctorid/:appointmentid", acceptRequest);
+router.patch("/reject/:doctorid/:appointmentid", rejectRequest);
+router.get("/pendingRequests/:id", pendingReq);
 
 //LOJAINS ROUTES
 

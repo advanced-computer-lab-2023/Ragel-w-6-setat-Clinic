@@ -100,6 +100,7 @@ const doctorDetails = async function (req, res) {
       "hourlyRate",
       "affiliation",
       "specialty",
+      "wallet",
     ]);
     res.status(200).json(doctor);
   } catch (err) {
@@ -511,6 +512,79 @@ const cancelAppointmentforPatient = async (req, res) => {
   }
 };
 
+const pendingReq = async (req, res) => {
+  const doctorID = req.params.id;
+  try {
+    const appointments = await Appointments.find({
+      doctor: doctorID,
+      acceptance: "pending",
+    }).populate("patient");
+
+    res.status(200).json({ appointments: appointments });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const acceptRequest = async (req, res) => {
+  const appointmentId = req.params.appointmentid;
+  const doctorID = req.params.doctorid;
+
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+
+    appointment.acceptance = "accepted";
+    await appointment.save();
+
+    const pendingappointments = await Appointments.find({
+      doctor: doctorID,
+      acceptance: "pending",
+    }).populate("patient");
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment acceptaed successfully.",
+      updatedAppointment: appointment,
+      pendingappointments: pendingappointments,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+const rejectRequest = async (req, res) => {
+  const appointmentId = req.params.appointmentid;
+  const doctorID = req.params.doctorid;
+
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+
+    appointment.acceptance = "rejected";
+    await appointment.save();
+
+    const pendingappointments = await Appointments.find({
+      doctor: doctorID,
+      acceptance: "pending",
+    }).populate("patient");
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment rejected successfully.",
+      updatedAppointment: appointment,
+      pendingappointments: pendingappointments,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
 // LOJAINS REQS
 
 const viewUpcomingAppointments = async (req, res) => {
@@ -746,4 +820,7 @@ export {
   selectPrescription,
   rescheduleAppointment,
   cancelAppointmentforPatient,
+  pendingReq,
+  acceptRequest,
+  rejectRequest,
 };

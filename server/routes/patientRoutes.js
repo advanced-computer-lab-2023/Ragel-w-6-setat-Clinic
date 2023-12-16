@@ -39,6 +39,7 @@ import {
   requestFollowUpAppointment,
   cancelAppointment,
   getFamilyMember,
+  patientProfile,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
@@ -92,6 +93,7 @@ router.patch("/removeDocument/:patientid/:documentid", removeDocument);
 router.post("/processPayment/:id", processPayment);
 router.get("/myDoctors/:id", getMyDoctors);
 router.get("/getFamilyMember/:id", getFamilyMember);
+router.get("/patientProfile/:id", patientProfile);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);

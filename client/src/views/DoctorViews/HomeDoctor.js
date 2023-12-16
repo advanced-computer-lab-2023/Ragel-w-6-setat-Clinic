@@ -46,6 +46,7 @@ const HomeDoctor = () => {
     hourlyRate: "",
     affiliation: "",
     specialty: "",
+    wallet: "",
   });
 
   useEffect(() => {
@@ -537,7 +538,7 @@ const HomeDoctor = () => {
                       className="h2 font-weight-bold mb-0"
                       style={{ color: "#ffffff" }}
                     >
-                      300
+                      {doctorDetails.wallet} EGP
                     </span>
                   </div>
                   <Col className="col-auto">

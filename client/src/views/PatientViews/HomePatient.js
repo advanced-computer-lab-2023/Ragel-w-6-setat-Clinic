@@ -1,5 +1,5 @@
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 //components
 
 import {
@@ -20,8 +20,51 @@ import {
   PaginationLink,
 } from "reactstrap";
 
+import { useAuthContext } from "../../hooks/useAuthContext";
+
 const HomePatient = () => {
   const navigate = useNavigate();
+
+  const { user } = useAuthContext();
+
+  const [patientDetails, setPatientDetails] = useState("");
+
+  useEffect(() => {
+    const fetchPatientDetails = async () => {
+      try {
+        const response = await fetch(
+          `/patients/patientProfile/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const json = await response.json();
+        if (response.ok) {
+          setPatientDetails(json.patient);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error.response.data.message);
+      }
+    };
+
+    fetchPatientDetails();
+  }, [user]);
+
+  const calculateAge = (dob) => {
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
 
   const handleFamilyMembersClick = () => {
     navigate("/patient/familyMembers");
@@ -79,8 +122,10 @@ const HomePatient = () => {
                 <div className="card-profile-stats d-flex justify-content-center mt-md-4"></div>
                 <div className="text-center">
                   <h3>
-                    Jessica Jones
-                    <span className="font-weight-light">, 27</span>
+                    {patientDetails.fName} {patientDetails.lName}
+                    <span className="font-weight-light">
+                      , {calculateAge(patientDetails.dateOfBirth)}
+                    </span>
                   </h3>
                   <div className="h5 mt-4">
                     <Button
@@ -204,7 +249,7 @@ const HomePatient = () => {
                       className="h2 font-weight-bold mb-0"
                       style={{ color: "#ffffff" }}
                     >
-                      300
+                      {patientDetails.wallet} EGP
                     </span>
                   </div>
                   <Col className="col-auto">

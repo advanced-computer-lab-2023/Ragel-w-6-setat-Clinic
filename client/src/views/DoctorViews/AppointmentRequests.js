@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import axois from "axios";
 import {
   Button,
   Card,
@@ -9,7 +11,66 @@ import {
   Table,
 } from "reactstrap";
 
+import { useAuthContext } from "../../hooks/useAuthContext";
+
 const AppointmentRequests = () => {
+  const { user } = useAuthContext();
+  const [allAppointments, setAllAppointments] = useState([]);
+
+  useEffect(() => {
+    const fetchPendingAppointment = async () => {
+      try {
+        const response = await fetch(
+          `/doctors/pendingRequests/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const json = await response.json(); // Parse response as JSON
+
+        setAllAppointments(json.appointments); // Set appointments in state
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    };
+    fetchPendingAppointment();
+  }, [user]);
+
+  const handleAccept = async (appointmentId) => {
+    try {
+      const response = await axois.patch(
+        `/doctors/accept/${user.user._id}/${appointmentId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setAllAppointments(response.data.pendingappointments);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.response.data.message);
+    }
+  };
+
+  const handleReject = async (appointmentId) => {
+    try {
+      const response = await axois.patch(
+        `/doctors/reject/${user.user._id}/${appointmentId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      if (response.status === 200) {
+        setAllAppointments(response.data.pendingappointments);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.response.data.message);
+    }
+  };
+
   return (
     <>
       <Container className="mt-5" fluid>
@@ -92,25 +153,54 @@ const AppointmentRequests = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td>noha ahmed</td>
-                            <td>20-12-2023</td>
-                            <td>Follow-up</td>
-                            <td>
-                              <Button
-                                className="mt-3"
-                                color="success"
-                                size="sm"
-                              >
-                                Accept
-                              </Button>
-                            </td>
-                            <td>
-                              <Button className="mt-3" color="danger" size="sm">
-                                Reject
-                              </Button>
-                            </td>
-                          </tr>
+                          {allAppointments.map((appointment, index) => (
+                            <tr key={index}>
+                              <td>
+                                {appointment.patient.fName}{" "}
+                                {appointment.patient.lName}
+                              </td>
+                              <td>
+                                {" "}
+                                {new Date(appointment.date).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  }
+                                )}{" "}
+                                {new Date(appointment.date).toLocaleTimeString(
+                                  "en-US",
+                                  {
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    hour12: true,
+                                  }
+                                )}
+                              </td>
+                              <td>{appointment.type}</td>
+                              <td>
+                                <Button
+                                  className="mt-3"
+                                  color="success"
+                                  size="sm"
+                                  onClick={() => handleAccept(appointment._id)}
+                                >
+                                  Accept
+                                </Button>
+                              </td>
+                              <td>
+                                <Button
+                                  className="mt-3"
+                                  color="danger"
+                                  size="sm"
+                                  onClick={() => handleReject(appointment._id)}
+                                >
+                                  Reject
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </Table>
                     </Card>

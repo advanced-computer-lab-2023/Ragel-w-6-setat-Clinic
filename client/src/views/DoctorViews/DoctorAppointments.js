@@ -72,7 +72,7 @@ const DoctorAppointments = () => {
     };
 
     fetchAllAppointments();
-  }, []);
+  }, [user]);
 
   const fetchUpAppointments = async () => {
     try {
@@ -232,6 +232,7 @@ const DoctorAppointments = () => {
                             <option value="rescheduled">Rescheduled</option>
                             <option value="cancelled">Cancelled</option>
                             <option value="completed">Completed</option>
+                            <option value="available">Available</option>
                           </Input>
                         </FormGroup>
                       </Col>
@@ -452,8 +453,8 @@ const DoctorAppointments = () => {
                           <Media className="align-items-center">
                             <Media>
                               <span className="mb-0 text-sm">
-                                {appointment.patient.fName}{" "}
-                                {appointment.patient.lName}{" "}
+                                {appointment.patient?.fName}{" "}
+                                {appointment.patient?.lName}{" "}
                               </span>
                             </Media>
                           </Media>
@@ -471,6 +472,8 @@ const DoctorAppointments = () => {
                                   ? "bg-info"
                                   : appointment.status === "cancelled"
                                   ? "bg-danger"
+                                  : appointment.status === "available"
+                                  ? "bg-secondary"
                                   : ""
                               }`}
                             />
