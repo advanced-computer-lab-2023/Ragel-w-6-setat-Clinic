@@ -46,7 +46,6 @@ const DoctorAppointments = () => {
   };
 
   const [appointmentDate, setAppointmentDate] = useState("");
-  const [appointmentPrice, setAppointmentPrice] = useState("");
   const [allAppointments, setAllAppointments] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [fromDate, setFromDate] = useState("");
@@ -194,6 +193,30 @@ const DoctorAppointments = () => {
     }
   };
 
+  const handleAddAppointment = async () => {
+    try {
+      const response = await fetch(
+        `/doctors/addAvailableAppointments/${user.user._id}?date=${appointmentDate}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      const json = await response.json();
+
+      if (response.ok) {
+        setAllAppointments(json.appointments);
+        toggleModal();
+      }
+      setAppointmentDate("");
+    } catch (error) {
+      console.error("An error occurred:", error.response.data.message);
+    }
+  };
+
   return (
     <>
       <Container className="mt-5" fluid>
@@ -329,7 +352,7 @@ const DoctorAppointments = () => {
                         </ModalHeader>
                         <ModalBody>
                           <Row>
-                            <Col lg="6">
+                            <Col lg="8">
                               <FormGroup>
                                 <label className="form-control-label">
                                   Appointment Date:
@@ -343,30 +366,26 @@ const DoctorAppointments = () => {
                                   </InputGroupAddon>
                                   <ReactDatetime
                                     inputProps={{
-                                      placeholder: "From Date",
+                                      placeholder: "Date",
                                     }}
                                     timeFormat={true}
+                                    value={appointmentDate}
+                                    onChange={(value) =>
+                                      setAppointmentDate(value)
+                                    }
                                   />
                                 </InputGroup>
                               </FormGroup>
                             </Col>
                           </Row>
-                          <Row>
-                            <Col lg="6">
-                              <FormGroup>
-                                <label className="form-control-label">
-                                  Price of Appointment
-                                </label>
-                                <Input
-                                  className="form-control-alternative"
-                                  type="number"
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
                         </ModalBody>
                         <ModalFooter>
-                          <Button color="default">Add Appointment</Button>{" "}
+                          <Button
+                            color="default"
+                            onClick={handleAddAppointment}
+                          >
+                            Add Appointment
+                          </Button>{" "}
                           <Button color="secondary" onClick={toggleModal}>
                             Cancel
                           </Button>

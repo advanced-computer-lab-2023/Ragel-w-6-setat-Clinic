@@ -187,7 +187,7 @@ const DoctorDetails = () => {
         forAppointments: true,
       };
 
-      const response2 = await axios.patch(
+      await axios.patch(
         `/patients/registerForAnAppointmentPatient/${user.user._id}/${appointmentId}`,
         {},
         {
@@ -255,7 +255,7 @@ const DoctorDetails = () => {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      const response2 = await axios.patch(
+      await axios.patch(
         `/patients/registerForAnAppointmentPatient/${user.user._id}/${appointmentId}`,
         {},
         {
@@ -327,7 +327,7 @@ const DoctorDetails = () => {
         }
       );
 
-      const response2 = await axios.patch(
+      await axios.patch(
         `/patients/registerForAnAppointmentFamilyMember/${user.user._id}/${appointment._id}`,
         {
           familyMemberEmail: memberEmail,
@@ -397,7 +397,7 @@ const DoctorDetails = () => {
         }
       );
 
-      const response2 = await axios.patch(
+      await axios.patch(
         `/patients/registerForAnAppointmentFamilyMember/${user.user._id}/${appointment._id}`,
         {
           familyMemberEmail: memberEmail,

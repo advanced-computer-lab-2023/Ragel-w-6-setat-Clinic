@@ -625,7 +625,7 @@ const viewPastAppointments = async (req, res) => {
 
 const addAvailableAppointments = async (req, res) => {
   try {
-    const { date, price } = req.query; // Extract date and type from the request body
+    const { date } = req.query; // Extract date and type from the request body
     const doctorId = req.params.id; // Assuming you have the doctorId in the route parameters
     const doctor = await Doctor.findById(doctorId);
 
@@ -635,23 +635,28 @@ const addAvailableAppointments = async (req, res) => {
       patient: null,
       date,
       isAvailable: true,
-      price,
+      price: doctor.sessionPrice,
       status: "available",
     });
 
     // Save the appointment to the database
     await appointment.save();
 
-    res.status(201).json({
+    const allDoctorsAppointments = await Appointments.find({
+      doctor: doctorId,
+    }).populate("patient");
+
+    res.status(200).json({
       status: "success",
       message: "Appointment created successfully",
       data: appointment,
+      appointments: allDoctorsAppointments,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       status: "error",
-      message: "Failed to create appointment",
+      message: "error.message",
     });
   }
 };
