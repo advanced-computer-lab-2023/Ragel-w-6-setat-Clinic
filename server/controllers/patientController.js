@@ -139,7 +139,7 @@ const cancelHealthPackageSubscription = async (req, res) => {
     const patient = await Patient.findById(patientId);
     if (patient.subscribedPackage.cancellationDate) {
       return res
-        .status(500)
+        .status(400)
         .json({ message: "Patient has already cancelled this health package" });
     }
 
@@ -149,12 +149,15 @@ const cancelHealthPackageSubscription = async (req, res) => {
     patient.subscribedPackage.subscriptionStatus = "cancelled";
     await patient.save();
 
+    const patientUpdated = await Patient.findById(patientId);
+
     res.status(200).json({
       status: "success",
-      message: "Health package subscription cancelled successfully.",
+      message: "Package cancelled successfully.",
+      patient: patientUpdated,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       status: "fail",
       message: err.message,
     });
@@ -182,16 +185,30 @@ const registerForAnAppointmentPatient = async (req, res) => {
   const patientId = req.params.patientid;
   const appointmentId = req.params.appointmentid;
   try {
-    const appointment = await Appointments.findById(appointmentId);
-    if (!appointment.isAvailable) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Appointment is not available",
+    const patient = await Patient.findById(patientId);
+    const appointment = await Appointments.findById(appointmentId).populate(
+      "doctor"
+    );
+
+    const patientPackage = patient.subscribedPackage;
+    let sessionDiscount = 0;
+    if (patientPackage) {
+      const packageOffered = await Package.findById({
+        _id: patientPackage.packageId,
       });
+      if (packageOffered) {
+        sessionDiscount = packageOffered.sessionDiscount || 0;
+      }
     }
+    const originalSessionPrice = appointment.doctor.sessionPrice;
+    const discountedPrice =
+      originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+
     appointment.patient = patientId;
     appointment.isAvailable = false;
     appointment.status = "upcoming";
+    appointment.price = discountedPrice;
+
     await appointment.save();
     res.status(200).json({
       status: "success",
@@ -208,34 +225,34 @@ const registerForAnAppointmentPatient = async (req, res) => {
 const registerForAnAppointmentFamilyMember = async (req, res) => {
   const patientId = req.params.patientid;
   const appointmentId = req.params.appointmentid;
-  const familyMemberEmail = req.body.familymemberEmail;
+  const familyMemberEmail = req.body.familyMemberEmail.value;
   try {
-    const appointment = await Appointments.findById(appointmentId);
-    if (!appointment.isAvailable) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Appointment is not available",
-      });
-    }
+    const appointment = await Appointments.findById(appointmentId).populate(
+      "doctor"
+    );
 
     const patient = await Patient.findById(patientId);
 
-    const familyMember = patient.familyMembers.find(
-      (member) => member.email === familyMemberEmail
-    );
-
-    if (!familyMember) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Family member not found with the specified email",
+    const patientPackage = patient.subscribedPackage;
+    let sessionDiscount = 0;
+    if (patientPackage) {
+      const packageOffered = await Package.findById({
+        _id: patientPackage.packageId,
       });
+      if (packageOffered) {
+        sessionDiscount = packageOffered.sessionDiscount || 0;
+      }
     }
+    const originalSessionPrice = appointment.doctor.sessionPrice;
+    const discountedPrice =
+      originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
 
     const familyMemberDoc = await Patient.findOne({ email: familyMemberEmail });
 
     appointment.patient = familyMemberDoc._id;
     appointment.isAvailable = false;
     appointment.status = "upcoming";
+    appointment.price = discountedPrice;
     await appointment.save();
     res.status(200).json({
       status: "success",
@@ -432,6 +449,22 @@ const getFamilyMember = async (req, res) => {
       email: familyMemberEmail,
     });
 
+    const subscribedPackage = familyMemberDoc.subscribedPackage;
+
+    if (subscribedPackage?.cancellationDate) {
+      const cancellationDate = subscribedPackage.cancellationDate;
+      const currentDate = new Date();
+      const isToday =
+        cancellationDate.getFullYear() === currentDate.getFullYear() &&
+        cancellationDate.getMonth() === currentDate.getMonth() &&
+        cancellationDate.getDate() === currentDate.getDate();
+      if (isToday) {
+        familyMemberDoc.subscribedPackage = null;
+        await familyMemberDoc.save();
+        subscribedPackage = null;
+      }
+    }
+
     const familyMemberAppointments = await Appointments.find({
       patient: familyMemberDoc._id,
       acceptance: "accepted",
@@ -451,8 +484,23 @@ const getFamilyMember = async (req, res) => {
 
 const patientProfile = async (req, res) => {
   const patientId = req.params.id;
+
   try {
     const patient = await Patient.findById(patientId);
+    const subscribedPackage = patient.subscribedPackage;
+    if (subscribedPackage?.cancellationDate) {
+      const cancellationDate = subscribedPackage.cancellationDate;
+      const currentDate = new Date();
+      const isToday =
+        cancellationDate.getFullYear() === currentDate.getFullYear() &&
+        cancellationDate.getMonth() === currentDate.getMonth() &&
+        cancellationDate.getDate() === currentDate.getDate();
+      if (isToday) {
+        patient.subscribedPackage = null;
+        await patient.save();
+        subscribedPackage = null;
+      }
+    }
     res.status(200).json({
       patient: patient,
     });
@@ -460,6 +508,31 @@ const patientProfile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+const getSubscribedPackage = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    const patient = await Patient.findById(patientId);
+    if (patient.subscribedPackage) {
+      const subscribedPackage = patient.subscribedPackage;
+      const packageOffered = await Package.findById({
+        _id: subscribedPackage.packageId,
+      });
+
+      return res.status(200).json({
+        status: "success",
+        subscribedPackage: packageOffered,
+      });
+    }
+    res.status(400).json({
+      status: "fail",
+      message: "Patient is not subscribed to any health package",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // LOJAINS REQS
 
 const addFamilyMember = async (req, res) => {
@@ -1407,4 +1480,5 @@ export {
   cancelAppointment,
   getFamilyMember,
   patientProfile,
+  getSubscribedPackage,
 };

@@ -20,6 +20,7 @@ import {
   ModalFooter,
   FormGroup,
   Media,
+  Alert,
 } from "reactstrap";
 
 import { useAuthContext } from "../../hooks/useAuthContext";
@@ -27,6 +28,11 @@ import { useAuthContext } from "../../hooks/useAuthContext";
 const FamilyMemberDetails = () => {
   const { user } = useAuthContext();
   const { familymemberemail } = useParams();
+
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("danger");
 
   const [modalStates, setModalStates] = useState([]);
   const toggleAppointmentModal = async (index) => {
@@ -192,7 +198,33 @@ const FamilyMemberDetails = () => {
       );
     }
   };
-
+  const cancelHealthPackage = async () => {
+    try {
+      const response = await axios.patch(
+        `/patients/cancelHealthPackage/${familyMember._id}/`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      if (response.status === 200) {
+        setAlertMessage(response.data.message);
+        setAlertColor("success");
+        setVisible(true);
+        setFamilyMember(response.data.patient);
+      }
+    } catch (error) {
+      if (error.response.status === 400) {
+        setAlertMessage(error.response.data.message);
+        setAlertColor("danger");
+        setVisible(true);
+      }
+      console.error(
+        "Error cancelling the package:",
+        error.response.data.message
+      );
+    }
+  };
   const calculateAge = (dob) => {
     const today = new Date();
     const birthDate = new Date(dob);
@@ -279,7 +311,11 @@ const FamilyMemberDetails = () => {
                 </CardHeader>
                 <CardBody>
                   <CardTitle tag="h5" style={{ color: "#ffffff" }}>
-                    Gold Package
+                    {familyMember?.subscribedPackage && (
+                      <CardTitle tag="h5" style={{ color: "#ffffff" }}>
+                        {familyMember.subscribedPackage.packageName} Package
+                      </CardTitle>
+                    )}{" "}
                   </CardTitle>
                   <CardText>
                     <p className="mt-3 mb-0 text-muted text-sm">
@@ -290,11 +326,38 @@ const FamilyMemberDetails = () => {
                         }}
                       >
                         <div>
-                          Status: Canceled
+                          Status:{" "}
+                          {familyMember?.subscribedPackage &&
+                            familyMember.subscribedPackage.subscriptionStatus}
                           <br />
-                          Renewal Date: Not determined
+                          Renewal Date:{" "}
+                          {familyMember?.subscribedPackage &&
+                            (familyMember.subscribedPackage.renewalDate === null
+                              ? "Not determined"
+                              : new Intl.DateTimeFormat("en-US", {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }).format(
+                                  new Date(
+                                    familyMember.subscribedPackage.renewalDate
+                                  )
+                                ))}
                           <br />
-                          Cancellation Date: 24-12-2023
+                          Cancellation Date:{" "}
+                          {familyMember?.subscribedPackage &&
+                            (familyMember.subscribedPackage.cancellationDate ===
+                            null
+                              ? "Not determined"
+                              : new Intl.DateTimeFormat("en-US", {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }).format(
+                                  new Date(
+                                    familyMember.subscribedPackage.cancellationDate
+                                  )
+                                ))}
                         </div>
                       </span>
                     </p>
@@ -303,10 +366,20 @@ const FamilyMemberDetails = () => {
                       className="mt-2"
                       type="button"
                       size="sm"
+                      disabled={
+                        (familyMember?.subscribedPackage &&
+                          familyMember.subscribedPackage.cancellationDate !==
+                            null) ||
+                        familyMember?.subscribedPackage === null
+                      }
+                      onClick={cancelHealthPackage}
                     >
                       Cancel
                     </Button>
                   </CardText>
+                  <Alert color={alertColor} isOpen={visible} toggle={onDismiss}>
+                    {alertMessage}
+                  </Alert>
                 </CardBody>
               </Card>
             </Col>

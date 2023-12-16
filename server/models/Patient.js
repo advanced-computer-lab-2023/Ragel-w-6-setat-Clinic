@@ -153,6 +153,7 @@ const patientSchema = new Schema({
   },
   subscribedPackage: {
     type: subscribedPackageSchema,
+    default: null,
   },
 });
 

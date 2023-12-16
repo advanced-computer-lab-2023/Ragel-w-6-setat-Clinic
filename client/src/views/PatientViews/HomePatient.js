@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 //components
-
 import {
   Button,
   Card,
@@ -18,6 +18,7 @@ import {
   Pagination,
   PaginationItem,
   PaginationLink,
+  Alert,
 } from "reactstrap";
 
 import { useAuthContext } from "../../hooks/useAuthContext";
@@ -28,6 +29,10 @@ const HomePatient = () => {
   const { user } = useAuthContext();
 
   const [patientDetails, setPatientDetails] = useState("");
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("danger");
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
@@ -49,6 +54,34 @@ const HomePatient = () => {
 
     fetchPatientDetails();
   }, [user]);
+
+  const cancelMyHealthPackage = async () => {
+    try {
+      const response = await axios.patch(
+        `/patients/cancelHealthPackage/${user.user._id}/`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      if (response.status === 200) {
+        setAlertMessage(response.data.message);
+        setAlertColor("success");
+        setVisible(true);
+        setPatientDetails(response.data.patient);
+      }
+    } catch (error) {
+      if (error.response.status === 400) {
+        setAlertMessage(error.response.data.message);
+        setAlertColor("danger");
+        setVisible(true);
+      }
+      console.error(
+        "Error cancelling the package:",
+        error.response.data.message
+      );
+    }
+  };
 
   const calculateAge = (dob) => {
     const today = new Date();
@@ -198,7 +231,11 @@ const HomePatient = () => {
               </CardHeader>
               <CardBody>
                 <CardTitle tag="h5" style={{ color: "#ffffff" }}>
-                  Gold Package
+                  {patientDetails?.subscribedPackage && (
+                    <CardTitle tag="h5" style={{ color: "#ffffff" }}>
+                      {patientDetails.subscribedPackage.packageName} Package
+                    </CardTitle>
+                  )}
                 </CardTitle>
                 <CardText>
                   <p className="mt-3 mb-0 text-muted text-sm">
@@ -209,11 +246,38 @@ const HomePatient = () => {
                       }}
                     >
                       <div>
-                        Status: Canceled
+                        Status:{" "}
+                        {patientDetails?.subscribedPackage &&
+                          patientDetails.subscribedPackage.subscriptionStatus}
                         <br />
-                        Renewal Date: Not determined
+                        Renewal Date:{" "}
+                        {patientDetails?.subscribedPackage &&
+                          (patientDetails.subscribedPackage.renewalDate === null
+                            ? "Not determined"
+                            : new Intl.DateTimeFormat("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }).format(
+                                new Date(
+                                  patientDetails.subscribedPackage.renewalDate
+                                )
+                              ))}
                         <br />
-                        Cancellation Date: 24-12-2023
+                        Cancellation Date:{" "}
+                        {patientDetails?.subscribedPackage &&
+                          (patientDetails.subscribedPackage.cancellationDate ===
+                          null
+                            ? "Not determined"
+                            : new Intl.DateTimeFormat("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }).format(
+                                new Date(
+                                  patientDetails.subscribedPackage.cancellationDate
+                                )
+                              ))}
                       </div>
                     </span>
                   </p>
@@ -222,10 +286,20 @@ const HomePatient = () => {
                     className="mt-2"
                     type="button"
                     size="sm"
+                    disabled={
+                      (patientDetails?.subscribedPackage &&
+                        patientDetails.subscribedPackage.cancellationDate !==
+                          null) ||
+                      patientDetails?.subscribedPackage === null
+                    }
+                    onClick={cancelMyHealthPackage}
                   >
                     Cancel
                   </Button>
                 </CardText>
+                <Alert color={alertColor} isOpen={visible} toggle={onDismiss}>
+                  {alertMessage}
+                </Alert>
               </CardBody>
             </Card>
             <Card

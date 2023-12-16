@@ -40,6 +40,7 @@ import {
   cancelAppointment,
   getFamilyMember,
   patientProfile,
+  getSubscribedPackage,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
@@ -94,6 +95,7 @@ router.post("/processPayment/:id", processPayment);
 router.get("/myDoctors/:id", getMyDoctors);
 router.get("/getFamilyMember/:id", getFamilyMember);
 router.get("/patientProfile/:id", patientProfile);
+router.get("/subscribedPackage/:id", getSubscribedPackage);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);

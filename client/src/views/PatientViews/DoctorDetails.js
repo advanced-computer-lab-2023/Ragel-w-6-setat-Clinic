@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
+import Select from "react-select";
 import {
   Button,
   Card,
@@ -16,17 +18,26 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Input,
+  Alert,
 } from "reactstrap";
 
 import { useAuthContext } from "../../hooks/useAuthContext";
 
 const DoctorDetails = () => {
-  const [modal, setModal] = useState(false);
-  const toggleModal = () => setModal(!modal);
+  const [modalStates, setModalStates] = useState([]);
+  const toggleAppointmentModal = async (index) => {
+    const updatedModalStates = [...modalStates];
+    updatedModalStates[index] = !updatedModalStates[index];
+    setModalStates(updatedModalStates);
+  };
 
   const { doctorid } = useParams();
   const { user } = useAuthContext();
+
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("danger");
 
   const [doctorDetails, setDoctorDetails] = useState({
     username: "",
@@ -44,6 +55,39 @@ const DoctorDetails = () => {
     wallet: 0,
   });
   const [availableAppointments, setAvailableAppointments] = useState([]);
+  const [familyMembers, setFamilyMembers] = useState([]);
+  const [memberEmail, setMemberEmail] = useState("");
+  const [subscribedPackage, setSubscribedPackage] = useState("");
+
+  useEffect(() => {
+    const fetchFamilyMembers = async () => {
+      try {
+        const response = await fetch(
+          `/patients/familyMembers/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const json = await response.json();
+        if (response.ok) {
+          const familyMembersWithEmail = json.patientFamily.filter(
+            (familyMember) => familyMember.email
+          );
+          setFamilyMembers(familyMembersWithEmail);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error.response.data.message);
+      }
+    };
+
+    fetchFamilyMembers();
+    // eslint-disable-next-line
+  }, []);
+
+  const registeredFamilyMembers = familyMembers.map((member) => ({
+    value: member.email,
+    label: member.fName + " " + member.lName,
+  }));
 
   useEffect(() => {
     const fetchDoctorDetails = async () => {
@@ -88,6 +132,291 @@ const DoctorDetails = () => {
     fetchAvailableAppointments();
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    const fetchSubscribedPackage = async () => {
+      try {
+        const response = await fetch(
+          `/patients/subscribedPackage/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const json = await response.json();
+        if (response.ok) {
+          setSubscribedPackage(json);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error.response.data.message);
+      }
+    };
+    fetchSubscribedPackage();
+    // eslint-disable-next-line
+  }, []);
+
+  const scheduleAppointmentMyselfCreditCard = async (appointmentId) => {
+    try {
+      // extracting relevant information
+
+      const { username, sessionPrice } = doctorDetails;
+      let finalPrice = sessionPrice;
+
+      if (subscribedPackage) {
+        let sessionDiscount = 0;
+        sessionDiscount = subscribedPackage.sessionDiscount || 0;
+
+        const originalSessionPrice = sessionPrice;
+        const discountedPrice =
+          originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+        finalPrice = discountedPrice;
+      }
+
+      const items = [
+        {
+          name: username,
+          price: finalPrice,
+          quantity: 1,
+          forAppointments: true,
+        },
+      ];
+
+      const paymentData = {
+        paymentType: "creditCard",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        forAppointments: true,
+      };
+
+      const response2 = await axios.patch(
+        `/patients/registerForAnAppointmentPatient/${user.user._id}/${appointmentId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      const response = await axios.post(
+        `/patients/processPayment/${user.user._id}`,
+        {
+          paymentData,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      if (response.data) {
+        window.location.href = response.data.url;
+      }
+    } catch (error) {
+      console.error(
+        "Error subscribing to the package:",
+        error.response.data.message
+      );
+    }
+  };
+
+  const scheduleAppointmentWallet = async (appointmentId) => {
+    try {
+      // extracting relevant information
+
+      const { username, sessionPrice } = doctorDetails;
+      let finalPrice = sessionPrice;
+
+      if (subscribedPackage) {
+        let sessionDiscount = 0;
+        sessionDiscount = subscribedPackage.sessionDiscount || 0;
+
+        const originalSessionPrice = sessionPrice;
+        const discountedPrice =
+          originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+        finalPrice = discountedPrice;
+      }
+
+      const items = {
+        name: username,
+        price: finalPrice,
+        quantity: 1,
+        forAppointments: true,
+      };
+
+      const paymentData = {
+        paymentType: "wallet",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        forAppointments: true,
+      };
+
+      const response = await axios.post(
+        `/patients/processPayment/${user.user._id}`,
+        {
+          paymentData,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      const response2 = await axios.patch(
+        `/patients/registerForAnAppointmentPatient/${user.user._id}/${appointmentId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setAvailableAppointments(
+          availableAppointments.filter(
+            (appointment) => appointment._id !== appointmentId
+          )
+        );
+        setAlertMessage(response.data.message);
+        setAlertColor("success");
+        setVisible(true);
+      }
+    } catch (error) {
+      if (error.response.status === 400) {
+        setAlertMessage(error.response.data.message);
+        setAlertColor("danger");
+        setVisible(true);
+      }
+      console.error(
+        "Error subscribing to the package:",
+        error.response.data.message
+      );
+    }
+  };
+
+  const scheduleAppointmentFamilyWallet = async (appointment) => {
+    try {
+      const { username, sessionPrice } = doctorDetails;
+
+      let finalPrice = sessionPrice;
+
+      if (subscribedPackage) {
+        let sessionDiscount = 0;
+        sessionDiscount = subscribedPackage.sessionDiscount || 0;
+
+        const originalSessionPrice = sessionPrice;
+        const discountedPrice =
+          originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+        finalPrice = discountedPrice;
+      }
+
+      const items = {
+        name: username,
+        price: finalPrice,
+        quantity: 1,
+        forAppointments: true,
+      };
+
+      const paymentData = {
+        paymentType: "wallet",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        familyMemberEmail: memberEmail,
+        forAppointments: true,
+      };
+
+      const response = await axios.post(
+        `/patients/processPayment/${user.user._id}`,
+        {
+          paymentData,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      const response2 = await axios.patch(
+        `/patients/registerForAnAppointmentFamilyMember/${user.user._id}/${appointment._id}`,
+        {
+          familyMemberEmail: memberEmail,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setAvailableAppointments(
+          availableAppointments.filter((app) => app._id !== appointment._id)
+        );
+        setAlertMessage(response.data.message);
+        setAlertColor("success");
+        setVisible(true);
+      }
+      toggleAppointmentModal(availableAppointments.indexOf(appointment));
+      setMemberEmail("");
+    } catch (error) {
+      console.error(
+        "Error subscribing to the package:",
+        error.response.data.message
+      );
+    }
+  };
+
+  const scheduleAppointmentFamilyCreditCard = async (appointment) => {
+    try {
+      const { username, sessionPrice } = doctorDetails;
+      let finalPrice = sessionPrice;
+
+      if (subscribedPackage) {
+        let sessionDiscount = 0;
+        sessionDiscount = subscribedPackage.sessionDiscount || 0;
+
+        const originalSessionPrice = sessionPrice;
+        const discountedPrice =
+          originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+        finalPrice = discountedPrice;
+      }
+
+      const items = [
+        {
+          name: username,
+          price: finalPrice,
+          quantity: 1,
+          forAppointments: true,
+        },
+      ];
+
+      const paymentData = {
+        paymentType: "creditCard",
+        item: items,
+        paymentMethodId: "pm_card_visa",
+        familyMemberEmail: memberEmail,
+        forAppointments: true,
+      };
+
+      const response = await axios.post(
+        `/patients/processPayment/${user.user._id}`,
+        {
+          paymentData,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      const response2 = await axios.patch(
+        `/patients/registerForAnAppointmentFamilyMember/${user.user._id}/${appointment._id}`,
+        {
+          familyMemberEmail: memberEmail,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      if (response.data) {
+        window.location.href = response.data.url;
+      }
+      setMemberEmail("");
+    } catch (error) {
+      console.error(
+        "Error subscribing to the package:",
+        error.response.data.message
+      );
+    }
+  };
 
   return (
     <>
@@ -140,7 +469,7 @@ const DoctorDetails = () => {
             </CardBody>
           </Card>
         </div>
-        <div className="d-flex justify-content-center mt-5">
+        <div className="d-flex justify-content-center mt-5 mb-5">
           <Card
             className="shadow"
             style={{
@@ -151,11 +480,22 @@ const DoctorDetails = () => {
               className="border-0"
               style={{
                 backgroundColor: "#0C356A",
+                display: "flex",
+                justifyContent: "space-between", // Align items horizontally
+                alignItems: "center", // Align items vertically
               }}
             >
               <h3 className="mb-0" style={{ color: "#f7fafc" }}>
                 Doctor's Available Appointments
               </h3>
+              <Alert
+                color={alertColor}
+                isOpen={visible}
+                toggle={onDismiss}
+                fade={false}
+              >
+                {alertMessage}
+              </Alert>
             </CardHeader>
             <Table className="align-items-center table-flush" responsive>
               <thead className="thead-light">
@@ -229,7 +569,7 @@ const DoctorDetails = () => {
                 </tr>
               </thead>
               <tbody>
-                {availableAppointments.map((appointment) => (
+                {availableAppointments.map((appointment, index) => (
                   <tr key={appointment._id} style={{ color: "#f7fafc" }}>
                     <th scope="row">
                       <Media className="align-items-center">
@@ -240,56 +580,107 @@ const DoctorDetails = () => {
                         </Media>
                       </Media>
                     </th>
-                    <td>{doctorDetails.sessionPrice} EGP </td>
+                    <td>{appointment.price} EGP </td>
                     <td>
                       <Badge color="" className="badge-dot mr-4">
                         <i className="bg-success" />
                         {appointment.status}
                       </Badge>
                     </td>
-                    <td> {appointment.date} </td>
+                    <td>
+                      {" "}
+                      {new Date(appointment.date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}{" "}
+                      {new Date(appointment.date).toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "numeric",
+                        hour12: true,
+                      })}{" "}
+                    </td>
                     <td>
                       <div className="d-flex align-items-center">
                         <span className="mr-2">{appointment.type}</span>
                       </div>
                     </td>
                     <td>
-                      <Button color="secondary" size="sm">
+                      <Button
+                        color="secondary"
+                        size="sm"
+                        onClick={() =>
+                          scheduleAppointmentWallet(appointment._id)
+                        }
+                      >
                         Schedule With Wallet
                       </Button>
                     </td>
                     <td>
-                      <Button color="secondary" size="sm">
+                      <Button
+                        color="secondary"
+                        size="sm"
+                        onClick={() =>
+                          scheduleAppointmentMyselfCreditCard(appointment._id)
+                        }
+                      >
                         Schedule With Credit Card
                       </Button>
                     </td>
                     <td>
-                      <Button color="secondary" size="sm" onClick={toggleModal}>
+                      <Button
+                        color="secondary"
+                        size="sm"
+                        onClick={() => toggleAppointmentModal(index)}
+                      >
                         Schedule For Family
                       </Button>
-                      <Modal isOpen={modal} toggle={toggleModal}>
-                        <ModalHeader toggle={toggleModal}>
-                          Schedule For Family Member
-                        </ModalHeader>
+                      <Modal
+                        isOpen={modalStates[index]}
+                        toggle={() => toggleAppointmentModal(index)}
+                      >
+                        <ModalHeader>Schedule For Family Member</ModalHeader>
                         <ModalBody>
                           <Row>
-                            <Col lg="6">
+                            <Col lg="8">
                               <FormGroup>
                                 <label className="form-control-label">
                                   Email of Family Member
                                 </label>
-                                <Input
-                                  className="form-control-alternative"
-                                  type="email"
+                                <Select
+                                  options={registeredFamilyMembers}
+                                  isSearchable={true}
+                                  placeholder="Select a family member"
+                                  value={memberEmail}
+                                  onChange={(selectedOption) =>
+                                    setMemberEmail(selectedOption)
+                                  }
                                 />
                               </FormGroup>
                             </Col>
                           </Row>
                         </ModalBody>
                         <ModalFooter>
-                          <Button color="default">Pay With Wallet</Button>
-                          <Button color="default">Pay With Credit Card</Button>
-                          <Button color="secondary" onClick={toggleModal}>
+                          <Button
+                            color="default"
+                            onClick={() =>
+                              scheduleAppointmentFamilyWallet(appointment)
+                            }
+                          >
+                            Pay With Wallet
+                          </Button>
+                          <Button
+                            color="default"
+                            onClick={() =>
+                              scheduleAppointmentFamilyCreditCard(appointment)
+                            }
+                          >
+                            Pay With Credit Card
+                          </Button>
+                          <Button
+                            color="secondary"
+                            onClick={() => toggleAppointmentModal(index)}
+                          >
                             Cancel
                           </Button>
                         </ModalFooter>
