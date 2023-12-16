@@ -111,14 +111,14 @@ etc..
 
 These instructions will help you get a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-1- Click on code -> Download ZIP
+1- Click on `code` -> `Download ZIP`
 
 2- Extract the zip file and open it in visual studio code.
 
-3- Navigate to the server folder using the terminal and run the  following command:
+3- Navigate to the `server` folder using the terminal and run the following command:
 
- npm install
+   npm install
  
-4- Next, navigate to the client folder in the terminal and run the following command:
+4- Next, navigate to the `client` folder in the terminal and run the following command:
 
- npm install
+   npm install
