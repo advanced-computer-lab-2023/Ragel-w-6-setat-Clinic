@@ -35,6 +35,10 @@ import {
   processPayment,
   getMyDoctors,
   downloadPrescriptionPDF,
+  rescheduleAppointmentforPatient,
+  requestFollowUpAppointment,
+  cancelAppointment,
+  getFamilyMember,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
@@ -87,6 +91,7 @@ router.patch("/removeDocument/:patientid/:documentid", removeDocument);
 // Pay with wallet/credit card
 router.post("/processPayment/:id", processPayment);
 router.get("/myDoctors/:id", getMyDoctors);
+router.get("/getFamilyMember/:id", getFamilyMember);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);
@@ -134,5 +139,13 @@ router.patch(
   "/subscribeHealthPackageForFamilyMember/:patientId/:packageId",
   subscribeHealthPackageForFamilyMember
 );
+
+//sprint 3
+router.patch(
+  "/rescheduleAppointmentforPatient/:patientid/:appointmentid",
+  rescheduleAppointmentforPatient
+);
+router.post("/requestFollowUp/:patientid", requestFollowUpAppointment);
+router.patch("/cancelAppointment/:id", cancelAppointment);
 
 export default router;

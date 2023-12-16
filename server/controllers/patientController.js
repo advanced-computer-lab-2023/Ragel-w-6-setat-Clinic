@@ -317,6 +317,36 @@ const removeDocument = async (req, res) => {
   }
 };
 
+// sprint 3
+const getFamilyMember = async (req, res) => {
+  const patientId = req.params.id;
+  const familyMemberEmail = req.query.familyMemberEmail;
+  try {
+    const patient = await Patient.findById(patientId);
+    const familyMember = patient.familyMembers.find(
+      (member) => member.email === familyMemberEmail
+    );
+    const familyMemberDoc = await Patient.findOne({
+      email: familyMemberEmail,
+    });
+
+    const familyMemberAppointments = await Appointments.find({
+      patient: familyMemberDoc._id,
+      acceptance: "accepted",
+    }).populate("doctor");
+
+    res.status(200).json({
+      status: "success",
+      familyMember: familyMemberDoc,
+      relationship: familyMember.relationship,
+      familyMemberAppointments: familyMemberAppointments,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Process payment
 const processCreditCardPayment = async (res, items) => {
   try {
@@ -566,7 +596,7 @@ const viewUpcomingAppointments = async (req, res) => {
       status: "upcoming",
     }).populate("doctor");
 
-    res.status(200).json(appointments);
+    res.status(200).json({ appointments: appointments });
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -584,7 +614,7 @@ const viewPastAppointments = async (req, res) => {
       status: "completed",
     }).populate("doctor");
 
-    res.status(200).json(appointments);
+    res.status(200).json({ appointments: appointments });
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -802,10 +832,10 @@ const filterMyAppointments = async (req, res) => {
 
     const appointments = await Appointments.find(filter).populate("doctor");
 
-    res.status(200).json(appointments);
+    res.status(200).json({ appointments: appointments });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -813,11 +843,9 @@ const viewAppointments = async (req, res) => {
   const patientId = req.params.id;
 
   try {
-    // Check if the patient exists
-    const patient = await Patient.findById(patientId);
-
     const appointments = await Appointments.find({
       patient: patientId,
+      acceptance: "accepted",
     }).populate("doctor");
 
     res.json({ appointments: appointments });
@@ -1179,7 +1207,152 @@ const subscribeHealthPackageForFamilyMember = async (req, res) => {
     });
   }
 };
+//sprint 3
 
+const rescheduleAppointmentforPatient = async (req, res) => {
+  const patientId = req.params.patientid;
+  const appointmentId = req.params.appointmentid;
+  const newAppointmentId = req.body.appointmentRechedueledTo;
+
+  try {
+    const oldAppointment = await Appointments.findById(appointmentId);
+    const newAppointment = await Appointments.findById(newAppointmentId.value);
+
+    newAppointment.status = "rescheduled";
+    newAppointment.isAvailable = false;
+    newAppointment.patient = patientId;
+    newAppointment.type = oldAppointment.type;
+
+    await newAppointment.save();
+
+    oldAppointment.status = "available";
+    oldAppointment.isAvailable = true;
+    oldAppointment.patient = null;
+    oldAppointment.type = "general";
+    await oldAppointment.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment rescheduled successfully.",
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+const requestFollowUpAppointment = async (req, res) => {
+  const patientId = req.params.patientid;
+  const newAppointment = req.body.followUpAppointment;
+
+  try {
+    const patient = await Patient.findById(patientId);
+    const newFollowUpAppointment = await Appointments.findById(
+      newAppointment.value
+    );
+
+    const patientPackage = patient.subscribedPackage;
+    let sessionDiscount = 0;
+    if (patientPackage) {
+      const packageOffered = await Package.findById({
+        _id: patientPackage.packageId,
+      });
+      if (packageOffered) {
+        sessionDiscount = packageOffered.sessionDiscount || 0;
+      }
+    }
+    const originalSessionPrice = newFollowUpAppointment.price;
+    const discountedPrice =
+      originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+
+    if (patient.wallet < discountedPrice) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Insufficient funds in the wallet",
+      });
+    }
+
+    patient.wallet -= discountedPrice;
+
+    // Update patient's wallet
+    await Patient.findOneAndUpdate(
+      { _id: patientId },
+      { $set: { wallet: patient.wallet } }
+    );
+
+    newFollowUpAppointment.status = "upcoming";
+    newFollowUpAppointment.isAvailable = false;
+    newFollowUpAppointment.patient = patientId;
+    newFollowUpAppointment.type = "follow-up";
+    newFollowUpAppointment.acceptance = "pending";
+    newFollowUpAppointment.price = discountedPrice;
+
+    // Save the follow-up appointment
+    await newFollowUpAppointment.save();
+
+    const patientAppointments = await Appointments.find({
+      patient: patientId,
+      acceptance: "accepted",
+    }).populate("doctor");
+
+    res.status(200).json({
+      status: "success",
+      message: "Follow-up appointment requested successfully.",
+      patientAppointments: patientAppointments,
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+const cancelAppointment = async (req, res) => {
+  const appointmentId = req.params.id;
+  try {
+    const appointment = await Appointments.findById(appointmentId);
+
+    const patientId = appointment.patient;
+    const patient = await Patient.findById(patientId);
+
+    const appointmentTime = appointment.date.getTime();
+    const currentTime = Date.now();
+    const timeDiffInHours = Math.abs(appointmentTime - currentTime) / 36e5; // Calculate time difference in hours
+
+    let refundAmount = 0;
+
+    if (timeDiffInHours < 24) {
+      appointment.status = "cancelled";
+    } else {
+      refundAmount = appointment.price;
+      appointment.status = "cancelled";
+      patient.wallet += refundAmount;
+    }
+
+    // Update patient's wallet
+    await Patient.findOneAndUpdate(
+      { _id: patientId },
+      { $inc: { wallet: refundAmount } }
+    );
+
+    await appointment.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment cancelled.",
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
 export {
   registerPatient,
   viewPrescription,
@@ -1214,4 +1387,8 @@ export {
   removeDocument,
   processPayment,
   downloadPrescriptionPDF,
+  rescheduleAppointmentforPatient,
+  requestFollowUpAppointment,
+  cancelAppointment,
+  getFamilyMember,
 };
