@@ -127,7 +127,7 @@ const getAllPackages = async (req, res) => {
     res.status(200).json(packages);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -338,11 +338,11 @@ const processCreditCardPayment = async (res, items) => {
       })),
       mode: "payment",
       success_url: forAppointments
-        ? `${process.env.CLIENT_URL}/patient/filterAppointments`
-        : `${process.env.CLIENT_URL}/patient/mySubscribedPackage`,
+        ? `${process.env.CLIENT_URL}/patient/myAppointments`
+        : `${process.env.CLIENT_URL}/patient/home`,
       cancel_url: forAppointments
-        ? `${process.env.CLIENT_URL}/patient/filterAppointments`
-        : `${process.env.CLIENT_URL}/patient/healthPackagesOptions`,
+        ? `${process.env.CLIENT_URL}/patient/myAppointments`
+        : `${process.env.CLIENT_URL}/patient/home`,
     });
 
     res.json({ url: session.url });
@@ -364,12 +364,12 @@ const processPayment = async (req, res) => {
 
     if (req.body.paymentData.familyMemberEmail) {
       const familyPatient = await Patient.findOne({
-        email: req.body.paymentData.familyMemberEmail,
+        email: req.body.paymentData.familyMemberEmail.value,
       });
 
       if (!familyPatient) {
         return res
-          .status(404)
+          .status(400)
           .json({ message: "Family member as patient not found" });
       }
 
@@ -388,7 +388,7 @@ const processPayment = async (req, res) => {
         familyPatient.subscribedPackage &&
         !req.body.paymentData.forAppointments
       ) {
-        return res.status(500).json({
+        return res.status(400).json({
           message: "Family Member is already subscribed to a health package",
         });
       }
@@ -403,8 +403,7 @@ const processPayment = async (req, res) => {
             .json({ message: "Payment with wallet balance successful" });
         } else {
           res.status(400).json({
-            message:
-              "Insufficient funds in wallet. Please add funds or choose a different payment method.",
+            message: "Insufficient funds in wallet.",
           });
         }
         break;
@@ -412,11 +411,11 @@ const processPayment = async (req, res) => {
         await processCreditCardPayment(res, item);
         break;
       default:
-        res.status(400).json({ message: "Invalid payment type" });
+        res.status(500).json({ message: "Invalid payment type" });
     }
   } catch (error) {
     console.error("Process payment error:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -1131,18 +1130,22 @@ const subscribeToHealthPackage = async (req, res) => {
   const packageId = req.params.packageId;
   try {
     const patient = await Patient.findById(patientId);
+    const packageToBeSubscribed = await Package.findById(packageId);
 
     if (patient.subscribedPackage) {
       return res
-        .status(500)
+        .status(400)
         .json({ message: "Patient is already subscribed to a health package" });
+    }
+
+    if (patient.wallet < packageToBeSubscribed.price) {
+      return res.status(400).json({ message: "Insufficient funds in wallet." });
     }
 
     const today = new Date();
     const oneYearFromToday = new Date(today);
     oneYearFromToday.setFullYear(oneYearFromToday.getFullYear() + 1);
 
-    const packageToBeSubscribed = await Package.findById(packageId);
     const newPackage = {
       packageId: packageToBeSubscribed._id,
       packageName: packageToBeSubscribed.name,
@@ -1166,14 +1169,15 @@ const subscribeHealthPackageForFamilyMember = async (req, res) => {
   const patientId = req.params.patientId;
   const packageId = req.params.packageId;
   try {
-    const { email } = req.body;
+    const email = req.body.email.value;
     const currentPatient = await Patient.findById(patientId);
+    const packageToBeSubscribed = await Package.findById(packageId);
 
     const familyPatient = await Patient.findOne({ email });
 
     if (!familyPatient) {
       return res
-        .status(404)
+        .status(400)
         .json({ message: "Family member as patient not found" });
     }
 
@@ -1189,7 +1193,7 @@ const subscribeHealthPackageForFamilyMember = async (req, res) => {
     }
 
     if (familyPatient.subscribedPackage) {
-      return res.status(500).json({
+      return res.status(400).json({
         message: "Family Member is already subscribed to a health package",
       });
     }
@@ -1198,7 +1202,6 @@ const subscribeHealthPackageForFamilyMember = async (req, res) => {
     const oneYearFromToday = new Date(today);
     oneYearFromToday.setFullYear(oneYearFromToday.getFullYear() + 1);
 
-    const packageToBeSubscribed = await Package.findById(packageId);
     const newPackage = {
       packageId: packageToBeSubscribed._id,
       packageName: packageToBeSubscribed.name,
