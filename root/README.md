@@ -15,10 +15,9 @@ with this project being a requirement for our ACL course in the GUC it was able 
 - Learn how to work together as a team on GitHub.
 - Work under project manager and do feedback sessions to make more improvements.
   
-## Tech Stack
- React, Bootstrap, MUI, javaScript
- Node, Express, MongoDB, postman
-
+## Tech/Framework used
+- MERN Stack (MongoDB, Express.js, React.js, Node.js)
+- JavaScript
 
 ## Backend
 
