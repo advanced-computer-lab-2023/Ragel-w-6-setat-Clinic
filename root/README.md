@@ -14,10 +14,30 @@ with this project being a requirement for our ACL course in the GUC it was able 
 - Learn to research and master the use of the MERN Stack.
 - Learn how to work together as a team on GitHub.
 - Work under project manager and do feedback sessions to make more improvements.
+
+## Build Status
+The project in its current state is in the development stage, going through the milestones the implement of the code and the execution of it vastly improved due to the learning curve.
+
+Some of the learning curves that we experienced through milestone 2 to milestone 3 where (authentication) and (user login)
+
+The project needs in the near future to be deployed through Google cloud or something similar to that.
+
+## Code Styles
+- Prettier : it is a code formatter that runs automatically before each commit on the whole code so that the codes looks well formatted across the whole project
+
+- This project follows a specific code style to ensure consistency and readability across the codebase. Adopting a consistent coding style is important for collaboration and maintenance.
+
+We adhere to the Standart Code Style Guide for this project. Please review the guide before contributing to ensure that your code aligns with our established conventions.
+
+## Screenshots
+TODO
   
 ## Tech/Framework used
 - MERN Stack (MongoDB, Express.js, React.js, Node.js)
 - JavaScript
+
+## Key Features
+TODO
 
 ## Backend
 
@@ -62,25 +82,25 @@ Patient: holds all the patient details needed to be immediately retreived by the
 Prescription: holds the Prescription id and the doctor assigning the medication as well as the patient receiving said medication also very useful in a lot of frontend linking and passing of information.
 {"_id":{"$oid":"657dfc5f62324f4a68c2873f"},"patient":{"$oid":"65671310baf3f1f1336f63ff"},"doctor":{"$oid":"6574d1c989b795ecb9246f72"},"medication":[{"name":"Medicine1","dosage":"1 tablet","price":{"$numberDouble":"10.5"}},{"name":"Medicine2","dosage":"2 tablets","price":{"$numberDouble":"15.75"}}],"isFilled":false,"date":{"$date":{"$numberLong":"1677672000000"}},"notes":"Take medications with meals."}
 
+## Code Examples
+TODO
 
+## Installation
 
+These instructions will help you get a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-## Code Styles
+1- Click on `code` -> `Download ZIP`
 
-- Prettier : it is a code formatter that runs automatically before each commit on the whole code so that the codes looks well formatted across the whole project
+2- Extract the zip file and open it in visual studio code.
 
-- This project follows a specific code style to ensure consistency and readability across the codebase. Adopting a consistent coding style is important for collaboration and maintenance.
+3- Navigate to the `server` folder using the terminal and run the following command:
 
-We adhere to the Standart Code Style Guide for this project. Please review the guide before contributing to ensure that your code aligns with our established conventions.
+     npm install
+ 
+4- Next, navigate to the `client` folder in the terminal and run the following command:
 
+     npm install
 
-## Build Status
-
-The project in its current state is in the development stage, going through the milestones the implement of the code and the execution of it vastly improved due to the learning curve.
-
-Some of the learning curves that we experienced through milestone 2 to milestone 3 where (authentication) and (user login)
-
-The project needs in the near future to be deployed through Google cloud or something similar to that.
 ## How to Use
 
 - Admin : 
@@ -106,22 +126,11 @@ The project needs in the near future to be deployed through Google cloud or some
 4- you are able to keep track of your prescriptions and order them off of the pharmacy. 
 etc..
 
+## API Reference
+TODO
 
-## Installation
-
-These instructions will help you get a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-1- Click on `code` -> `Download ZIP`
-
-2- Extract the zip file and open it in visual studio code.
-
-3- Navigate to the `server` folder using the terminal and run the following command:
-
-     npm install
- 
-4- Next, navigate to the `client` folder in the terminal and run the following command:
-
-     npm install
+## Tests
+TODO
 
 ## Credits
 - [@02omar](https://github.com/02omar)
