@@ -5,7 +5,11 @@ import morgan from "morgan";
 import patientRoutes from "./routes/patientRoutes.js";
 import doctorRoutes from "./routes/doctorRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import { login } from "./controllers/userController.js";
+import {
+  login,
+  registerDoctor,
+  registerPatient,
+} from "./controllers/userController.js";
 import multer from "multer";
 import path from "path";
 dotenv.config({ path: "./.env" });
@@ -27,6 +31,8 @@ app.use("/patients", patientRoutes);
 app.use("/doctors", doctorRoutes);
 app.use("/admins", adminRoutes);
 app.post("/login", login);
+app.post("/registerDoctor", registerDoctor);
+app.post("/registerPatient", registerPatient);
 
 // connect to mongodb & listen for requests
 

@@ -103,7 +103,7 @@ const RegisterDoctor = () => {
 
       formData.append("requestData", JSON.stringify(requestData));
 
-      await axios.post("/doctors/register", formData, {
+      await axios.post("/registerDoctor", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

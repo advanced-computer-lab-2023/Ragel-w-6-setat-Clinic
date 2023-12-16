@@ -101,7 +101,7 @@ const RegisterPatient = () => {
       //   return;
       // }
 
-      await axios.post("/patients/register", {
+      await axios.post("/registerPatient", {
         patientFields,
         emergencyContact,
       });

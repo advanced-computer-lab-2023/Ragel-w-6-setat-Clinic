@@ -46,4 +46,119 @@ const login = async (req, res) => {
   }
 };
 
-export { login };
+const registerPatient = async (req, res) => {
+  try {
+    const doctor = await Doctor.findOne({
+      username: req.body.patientFields.username,
+    });
+    const doctor2 = await Doctor.findOne({
+      email: req.body.patientFields.email,
+    });
+    const admin = await Admin.findOne({
+      username: req.body.patientFields.username,
+    });
+
+    if (doctor || admin) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this username" });
+    }
+
+    if (doctor2) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this email" });
+    }
+
+    const patient = await Patient.create({
+      ...req.body.patientFields,
+      emergencyContact: {
+        ...req.body.emergencyContact,
+      },
+    });
+
+    res.status(201).json({
+      status: "success",
+      message: "Patient successfully registered.",
+    });
+  } catch (error) {
+    console.error("Patient registration error:", error);
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      const message = `A user already exists with this ${duplicatedField}`;
+      res.status(500).json({ message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+};
+
+const registerDoctor = async (req, res) => {
+  try {
+    const {
+      username,
+      password,
+      email,
+      fName,
+      lName,
+      dateOfBirth,
+      educationalBackground,
+      hourlyRate,
+      sessionPrice,
+      affiliation,
+      specialty,
+    } = JSON.parse(req.body.requestData).doctorFields;
+    // Access file buffers from req.files
+    const documentID = req.files.fileID[0].filename;
+    const medicalLicense = req.files.fileMedicalLicense[0].filename;
+    const medicalDegree = req.files.fileMedicalDegree[0].filename;
+
+    const patient = await Patient.findOne({ username });
+    const patient2 = await Patient.findOne({ email });
+    const admin = await Admin.findOne({ username });
+
+    if (patient || admin) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this username" });
+    }
+
+    if (patient2) {
+      return res
+        .status(500)
+        .json({ message: "A user already exists with this email" });
+    }
+
+    const newDoctor = new Doctor({
+      username,
+      password,
+      email,
+      fName,
+      lName,
+      dateOfBirth,
+      educationalBackground,
+      hourlyRate,
+      sessionPrice,
+      affiliation,
+      specialty,
+      documentID,
+      medicalLicense,
+      medicalDegree,
+    });
+
+    await newDoctor.save();
+
+    res.status(201).json({ message: "Doctor registered successfully" });
+  } catch (error) {
+    console.error("Doctor registration error:", error);
+    if (error.code === 11000) {
+      const duplicatedField = Object.keys(error.keyPattern)[0];
+      const message = `A user already exists with this ${duplicatedField}`;
+      res.status(500).json({ message });
+    } else {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+};
+
+export { login, registerPatient, registerDoctor };
