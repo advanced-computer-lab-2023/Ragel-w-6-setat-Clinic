@@ -239,34 +239,31 @@ const searchForPatient = async (req, res) => {
 
 const filterMyAppointments = async (req, res) => {
   const doctorId = req.params.id; // Get doctotId from URL parameter
-
-  try {
-    const filter = {};
-
-    if (req.query.date) {
-      var min_date = new Date(req.query.date);
-      var max_date = new Date(req.query.date);
-      min_date.setHours(0, 0, 0, 0);
-      max_date.setHours(23, 59, 59, 999);
-      filter.date = {
-        $gte: min_date,
-        $lt: max_date,
-      };
-    }
-
-    if (req.query.status) {
-      filter.status = req.query.status;
-    }
-
-    filter.doctor = req.params.id;
-
-    const appointments = await Appointments.find(filter).populate("patient");
-    res.status(200).json({ appointments: appointments });
-  } catch (error) {
+try{
+  const { date, status } = req.query;
+  const filters = { doctor: doctorId };
+  
+  if (date) {
+    const minDate = new Date(date);
+    minDate.setHours(0, 0, 0, 0);
+    const maxDate = new Date(date);
+    maxDate.setHours(23, 59, 59, 999);
+    filters.date = { $gte: minDate, $lte: maxDate };
+  }
+  
+  if (status) {
+    filters.status = status;
+  }
+  
+  const appointments = await Appointments.find(filters).populate("patient");
+  res.status(200).json(appointments);
+}
+   catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 };
+
 
 const getMyAppointments = async (req, res) => {
   try {
@@ -274,12 +271,27 @@ const getMyAppointments = async (req, res) => {
     const appointments = await Appointments.find({
       doctor: doctorId,
     }).populate("patient");
-    res.status(200).json({ appointments: appointments });
+
+    const formattedAppointments = appointments.map(appointment => ({
+      _id: appointment._id,
+      date: appointment.date,
+      type: appointment.type,
+      status: appointment.status,
+      price: appointment.price,
+      patient: {
+        _id: appointment.patient._id,
+        name: appointment.patient.fName + " " + appointment.patient.lName,
+      },
+    }));
+// Modify the response to directly return the array of appointments
+res.status(200).json(formattedAppointments);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 };
+
+
 
 const upcomingAppointments = async (req, res) => {
   const doctorId = req.params.id;
@@ -288,24 +300,20 @@ const upcomingAppointments = async (req, res) => {
     const upcomingAppointments = await Appointments.find({
       doctor: doctorId,
       status: "upcoming",
-      //  date: { $gte: new Date() }, // Filter for appointments with dates in the future
     }).populate("patient");
-    const doctorPatientsWithUpcomingAppointments = [];
 
-    for (const appointment of upcomingAppointments) {
-      if (appointment.patient !== null) {
-        const patientId = appointment.patient;
-
-        const patient = await Patient.findById(patientId).exec();
-        const isPatientExists = doctorPatientsWithUpcomingAppointments.some(
-          (docPatient) => docPatient._id.equals(patient._id)
-        );
-        if (!isPatientExists) {
-          doctorPatientsWithUpcomingAppointments.push(patient);
-        }
-      }
-    }
-    res.status(200).json(doctorPatientsWithUpcomingAppointments);
+    const formattedAppointments = upcomingAppointments.map(appointment => ({
+      _id: appointment._id,
+      date: appointment.date,
+      type: appointment.type,
+      status: appointment.status,
+      patient: {
+        _id: appointment.patient._id,
+        name: appointment.patient.fName + " " + appointment.patient.lName,
+      },
+    }));
+// Modify the response to directly return the array of appointments
+res.status(200).json(formattedAppointments); 
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -612,7 +620,7 @@ const viewUpcomingAppointments = async (req, res) => {
       status: "upcoming",
     }).populate("patient");
 
-    res.json({ appointments: appointments });
+    res.json({ appointments });
   } catch (err) {
     res.status(500).json({
       status: "error",
@@ -630,7 +638,18 @@ const viewPastAppointments = async (req, res) => {
       status: "completed",
     }).populate("patient");
 
-    res.json({ appointments: appointments });
+    const formattedAppointments = appointments.map(appointment => ({
+      _id: appointment._id,
+      date: appointment.date,
+      type: appointment.type,
+      status: appointment.status,
+      patient: {
+        _id: appointment.patient._id,
+        name: appointment.patient.fName + " " + appointment.patient.lName,
+      },
+    }));
+// Modify the response to directly return the array of appointments
+res.status(200).json(formattedAppointments);
   } catch (err) {
     res.status(500).json({
       status: "error",

@@ -123,6 +123,7 @@ const PatientAppointments = () => {
 
       if (response.data) {      
         setAllAppointments(response.data);
+        console.log(response.data);
       }
       setStatusFilter("");
       setFromDate("");
