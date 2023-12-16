@@ -117,8 +117,8 @@ These instructions will help you get a copy of the project up and running on you
 
 3- Navigate to the `server` folder using the terminal and run the following command:
 
-   npm install
+     npm install
  
 4- Next, navigate to the `client` folder in the terminal and run the following command:
 
-   npm install
+     npm install
