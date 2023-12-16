@@ -16,6 +16,8 @@ import PatientPrescriptions from "views/PatientViews/PatientPrescriptions";
 import PrescriptionDetails from "views/PatientViews/PrescriptionDetails";
 import FamilyMemberDetails from "views/PatientViews/FamilyMemberDetails";
 import HealthPackages from "views/PatientViews/HealthPackages";
+import VideoCall from "views/PatientViews/VideoCall";
+import Room from "views/PatientViews/Room";
 
 // admin users
 
@@ -104,6 +106,20 @@ var routes = [
     name: "Health Packages",
     icon: "ni ni-circle-08 text-pink",
     component: <HealthPackages />,
+    layout: "/patient",
+  },
+  {
+    path: "/VideoCall",
+    name: "Video Call",
+    icon: "ni ni-circle-08 text-pink",
+    component: <VideoCall />,
+    layout: "/patient",
+  },
+  {
+    path: "/Room",
+    name: "Room",
+    icon: "ni ni-circle-08 text-pink",
+    component: <Room />,
     layout: "/patient",
   },
 

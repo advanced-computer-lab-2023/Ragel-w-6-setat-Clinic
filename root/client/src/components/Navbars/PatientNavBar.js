@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+
+
 import {
   Collapse,
   Navbar,
@@ -85,7 +88,7 @@ const PatientNavBar = () => {
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink className="rounded-circle">
+              <NavLink  href="/patient/VideoCall" className="rounded-circle" >
                 <span className="nav-link-icon d-block">
                   <i className="fa-solid fa-video"></i>
                 </span>
