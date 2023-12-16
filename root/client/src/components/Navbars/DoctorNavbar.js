@@ -96,7 +96,7 @@ const DoctorNavBar = () => {
               </NavLink>
             </NavItem>
             <NavItem>
-              <NavLink className="rounded-circle">
+              <NavLink href="/doctor/DoctorVideoCall" className="rounded-circle">
                 <span className="nav-link-icon d-block">
                   <i className="fa-solid fa-video"></i>
                 </span>

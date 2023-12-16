@@ -35,6 +35,8 @@ import PatientDetails from "views/DoctorViews/PatientDetails";
 import DoctorMedicalHistoryForPatient from "views/DoctorViews/DoctorMedicalHistoryForPatient";
 //import DoctorPrescriptionsForPatient from "views/DoctorViews/DoctorPrescriptionsForPatient";
 //import DoctorPrescriptionDetailsForPatient from "views/DoctorViews/DoctorPrescriptionDetailsForPatient";
+import DoctorVideoCall from "views/DoctorViews/DoctorVideoCall";
+import DoctorRoom from "views/DoctorViews/DoctorRoom";
 
 var routes = [
   // patient routes
@@ -187,6 +189,20 @@ var routes = [
       name: "Patient Medical History",
       icon: "ni ni-single-02 text-yellow",
       component: <DoctorMedicalHistoryForPatient />,
+      layout: "/doctor",
+    },
+    {
+      path: "/DoctorVideoCall",
+      name: "Doctor Video Call",
+      icon: "ni ni-circle-08 text-pink",
+      component: <DoctorVideoCall />,
+      layout: "/doctor",
+    },
+    {
+      path: "/DoctorRoom",
+      name: "Doctor Room",
+      icon: "ni ni-circle-08 text-pink",
+      component: <DoctorRoom />,
       layout: "/doctor",
     },
 
