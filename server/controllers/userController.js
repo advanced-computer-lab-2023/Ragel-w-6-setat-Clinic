@@ -1,6 +1,9 @@
 import Patient from "../models/Patient.js";
 import Doctor from "../models/Doctor.js";
 import Admin from "../models/Admin.js";
+import PatientPharmacy from "../models/PatientPharmacy.js";
+import Pharmacist from "../models/Pharmacist.js";
+import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
 const createToken = (username) => {
@@ -57,18 +60,41 @@ const registerPatient = async (req, res) => {
     const admin = await Admin.findOne({
       username: req.body.patientFields.username,
     });
+    const pharmacist = await Pharmacist.findOne({
+      username: req.body.patientFields.username,
+    });
+    const pharmacist2 = await Pharmacist.findOne({
+      email: req.body.patientFields.email,
+    });
+    const patientPharmacy2 = await PatientPharmacy.findOne({
+      username: req.body.patientFields.username,
+    });
+    const patientPharmacy3 = await PatientPharmacy.findOne({
+      email: req.body.patientFields.email,
+    });
 
-    if (doctor || admin) {
+    if (doctor || admin || pharmacist || patientPharmacy2) {
       return res
         .status(500)
         .json({ message: "A user already exists with this username" });
     }
 
-    if (doctor2) {
+    if (doctor2 || pharmacist2 || patientPharmacy3) {
       return res
         .status(500)
         .json({ message: "A user already exists with this email" });
     }
+
+    const {
+      fName,
+      lName,
+      username,
+      email,
+      dateOfBirth,
+      gender,
+      phoneNum,
+      password,
+    } = req.body.patientFields;
 
     const patient = await Patient.create({
       ...req.body.patientFields,
@@ -76,6 +102,30 @@ const registerPatient = async (req, res) => {
         ...req.body.emergencyContact,
       },
     });
+
+    const patientPharmacy = await PatientPharmacy.create({
+      name: `${fName} ${lName}`,
+      username,
+      email,
+      dateOfBirth,
+      gender,
+      mobileNumber: phoneNum,
+      emergencyContact: {
+        name: `${req.body.emergencyContact.fName} ${req.body.emergencyContact.lName}`,
+        mobileNumber: req.body.emergencyContact.phoneNum,
+        relationTo: "family Member",
+      },
+      password,
+      addresses: [],
+      payment: {
+        method: "cashOnDelivery",
+        walletBalance: 0,
+      },
+      orders: [],
+    });
+
+    const role = "patient";
+    const user = await User.create({ username, password, role });
 
     res.status(201).json({
       status: "success",

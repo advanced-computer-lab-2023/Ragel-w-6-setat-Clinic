@@ -90,16 +90,15 @@ const RegisterPatient = () => {
         return;
       }
 
-      // // ensure password is at least 8 characters, with one uppercase letter, and one symbol
-      // const passwordRegex =
-      //   /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+,\-./:;<=>?@[\\\]^_`{|}~])[a-zA-Z0-9!@#$%^&*()_+,\-./:;<=>?@[\\\]^_`{|}~]{8,}$/;
-      // if (!passwordRegex.test(patientFields.password)) {
-      //   setVisible(true);
-      //   setAlertMessage(
-      //     "Password should be at least 8 characters, with one uppercase letter, and one symbol"
-      //   );
-      //   return;
-      // }
+      // ensure password is at least 8 characters, with one uppercase letter, and one symbol
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(patientFields.password)) {
+        setVisible(true);
+        setAlertMessage(
+          "Password should be at least 8 characters, with one uppercase letter, and one digit"
+        );
+        return;
+      }
 
       await axios.post("/registerPatient", {
         patientFields,

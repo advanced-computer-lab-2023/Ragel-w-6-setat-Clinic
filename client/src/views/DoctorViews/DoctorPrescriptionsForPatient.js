@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 import Select from "react-select";
 import {
   Button,
@@ -23,6 +24,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Alert,
 } from "reactstrap";
 import ReactDatetime from "react-datetime";
 
@@ -34,11 +36,24 @@ const DoctorPrescriptionsForPatient = () => {
   const { user } = useAuthContext();
 
   const [modal, setModal] = useState(false);
-  const toggleModal = () => setModal(!modal);
+  const toggleModal = () => {
+    setAddedMedicines([]);
+    setModal(!modal);
+  };
+
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("danger");
 
   const [prescriptions, setPrescriptions] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [isFilled, setIsFilled] = useState("");
+  const [medicines, setMedicines] = useState([]);
+  const [addedMedicines, setAddedMedicines] = useState([]);
+  const [selectedMedicine, setSelectedMedicine] = useState("");
+  const [dosage, setDosage] = useState("");
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     const fetchPrescriptions = async () => {
@@ -58,6 +73,21 @@ const DoctorPrescriptionsForPatient = () => {
 
     fetchPrescriptions();
   }, [user, patientid]);
+
+  useEffect(() => {
+    const fetchMedicines = async () => {
+      try {
+        const response = await fetch(`/doctors/getAllMedicines`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const data = await response.json();
+        setMedicines(data);
+      } catch (error) {
+        console.error("Error fetching medicines:", error.response.data.message);
+      }
+    };
+    fetchMedicines();
+  }, [user]);
 
   const handleFilterPrescriptions = async () => {
     try {
@@ -118,14 +148,63 @@ const DoctorPrescriptionsForPatient = () => {
     }
   };
 
-  const options = [
-    { value: "Medicine1", label: "Medicine1" },
-    { value: "Medicine2", label: "Medicine2" },
-  ];
+  const options = medicines.map((medicine) => ({
+    value: medicine._id,
+    label: medicine.name,
+  }));
 
   const handleViewDetailsClick = (prescriptionId) => {
     const url = `/doctor/patientPrescriptionDetails/${prescriptionId}`;
     navigate(url);
+  };
+
+  const handleAddMedicine = () => {
+    if (!selectedMedicine) {
+      setAlertMessage("Please select a medicine");
+      setAlertColor("danger");
+      setVisible(true);
+      return;
+    }
+    if (!dosage) {
+      setAlertMessage("Please enter a dosage");
+      setAlertColor("danger");
+      setVisible(true);
+      return;
+    }
+
+    const medicine = {
+      medicineID: selectedMedicine.value,
+      medicineName: selectedMedicine.label,
+      medicinePrice: medicines.find(
+        (medicine) => medicine._id === selectedMedicine.value
+      ).price,
+      dosage,
+    };
+    setAddedMedicines([...addedMedicines, medicine]);
+    setSelectedMedicine("");
+    setDosage("");
+  };
+
+  const handleAddPrescription = async () => {
+    try {
+      const response = await axios.post(
+        `/doctors/createPrescription/${user.user._id}/${patientid}`,
+        {
+          addedMedicines: addedMedicines,
+          notes,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      if (response.status === 200) {
+        setPrescriptions(response.data.prescriptions);
+        toggleModal();
+        setNotes("");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.response.data.message);
+    }
   };
 
   return (
@@ -250,7 +329,11 @@ const DoctorPrescriptionsForPatient = () => {
                         <Row>
                           <Col className="mt--4" lg="12">
                             <Label className="form-control-label">
-                              Medicines Added:
+                              Medicines Added: {"["}{" "}
+                              {addedMedicines.map(
+                                (medicine) => medicine.medicineName + ", "
+                              )}{" "}
+                              {"]"}
                             </Label>
                           </Col>
                         </Row>
@@ -264,6 +347,10 @@ const DoctorPrescriptionsForPatient = () => {
                                 options={options}
                                 isSearchable={true}
                                 placeholder="Select Medicine"
+                                value={selectedMedicine}
+                                onChange={(selectedOption) =>
+                                  setSelectedMedicine(selectedOption)
+                                }
                               />
                             </FormGroup>
                           </Col>
@@ -274,15 +361,37 @@ const DoctorPrescriptionsForPatient = () => {
                               <Label className="form-control-label">
                                 Dosage:
                               </Label>
-                              <Input type="text" placeholder="Dosage" />
+                              <Input
+                                type="text"
+                                placeholder="Dosage"
+                                value={dosage}
+                                onChange={(e) => setDosage(e.target.value)}
+                              />
                             </FormGroup>
                           </Col>
                         </Row>
                         <Row>
-                          <Col className="mb-3" lg="12">
-                            <Button color="default" size="sm">
+                          <Col className="mb-3" lg="4">
+                            <Button
+                              color="default"
+                              size="sm"
+                              onClick={handleAddMedicine}
+                            >
                               Add Medicine
                             </Button>
+                          </Col>
+                          <Col className="mb-3" lg="8">
+                            <Alert
+                              color={alertColor}
+                              isOpen={visible}
+                              toggle={onDismiss}
+                              style={{
+                                fontSize: "12px",
+                                padding: "8px 15px",
+                              }}
+                            >
+                              {alertMessage}
+                            </Alert>
                           </Col>
                         </Row>
                         <Row>
@@ -295,13 +404,17 @@ const DoctorPrescriptionsForPatient = () => {
                                 id="exampleText"
                                 name="text"
                                 type="textarea"
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
                               />
                             </FormGroup>
                           </Col>
                         </Row>
                       </ModalBody>
                       <ModalFooter>
-                        <Button color="default">Add Prescription</Button>{" "}
+                        <Button color="default" onClick={handleAddPrescription}>
+                          Add Prescription
+                        </Button>{" "}
                         <Button color="secondary" onClick={toggleModal}>
                           Cancel
                         </Button>

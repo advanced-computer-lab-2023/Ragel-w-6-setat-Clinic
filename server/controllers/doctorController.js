@@ -3,6 +3,7 @@ import Patient from "../models/Patient.js";
 import Appointments from "../models/Appointments.js";
 import Admin from "../models/Admin.js";
 import Prescription from "../models/Prescription.js";
+import Medicine from "../models/Medicine.js";
 import nodemailer from "nodemailer";
 import PDFDocument from "pdfkit";
 
@@ -800,6 +801,60 @@ const selectPrescription = async (req, res) => {
   }
 };
 
+const createPrescription = async (req, res) => {
+  try {
+    const { addedMedicines, notes } = req.body;
+    const doctorId = req.params.doctorid;
+    const patientId = req.params.patientid;
+
+    const medication = addedMedicines.map((med) => {
+      return {
+        medicineId: med.medicineID,
+        name: med.medicineName,
+        dosage: med.dosage,
+        price: med.medicinePrice,
+      };
+    });
+
+    // Create a new prescription
+    const prescription = new Prescription({
+      patient: patientId,
+      doctor: doctorId,
+      medication,
+      date: new Date(),
+      notes,
+    });
+
+    // Save the prescription
+    await prescription.save();
+
+    const prescriptions = await Prescription.find({
+      doctor: doctorId,
+      patient: patientId,
+    }).populate("patient doctor");
+
+    res.status(200).json({ status: "success", prescriptions });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// MERGINGG
+
+const getAllMedicines = async (req, res) => {
+  try {
+    const medicine = await Medicine.find(
+      { archived: false },
+      "name image price description medicinalUse"
+    ).sort({ createdAt: -1 });
+
+    res.status(200).json(medicine);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export {
   createDoctor,
   updateDoctorProfile,
@@ -828,4 +883,6 @@ export {
   pendingReq,
   acceptRequest,
   rejectRequest,
+  getAllMedicines,
+  createPrescription,
 };

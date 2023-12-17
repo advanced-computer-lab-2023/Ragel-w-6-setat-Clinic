@@ -13,6 +13,10 @@ const prescriptionSchema = new Schema({
   },
   medication: [
     {
+      medicineId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Medicine",
+      },
       name: {
         type: String,
         required: true,
