@@ -1,9 +1,10 @@
 
-Health  Space
+HEALTH SPACE 
 
 ![App Screenshot](https://media.discordapp.net/attachments/1157430089181577291/1159866558227693578/acl_clinic_6.png?ex=658edde8&is=657c68e8&hm=0cc036be1a1d14a84bf64aed1a7287c39bd700488a84e6a29f3b483e6d61aebc&=&format=webp&quality=lossless&width=625&height=625)
 
-A complete Online Learning System for the CSEN704 Course (Advanced Programming Lab) in GUC (German University in Cairo). An Online Health Clinic System as a web application through which clinical services are exchanged.
+
+A complete Online Learning System for the CSEN704 Course (Advanced Programming Lab) in GUC (German University in Cairo). An Online Health Clinic System as a web application where people can have a wider access to healthcare in addition to remote healthcare. By creating this Health Space clinic patients are able to log on and receive the best healthcare in a simple way.
 
 ## Motivation
 The motivation behind this project stems from a deep commitment to enhancing healthcare accessibility. By creating a centralized platform, the goal is to make healthcare services readily available to a wider audience, ensuring patients can easily connect with pharmacists and access vital medical information.
@@ -25,7 +26,7 @@ Learn how to work together as a team on GitHub.
 
 ## Backend
 
-clone the project git clone https://github.com/advanced-computer-lab-2023/Ragel-w-6-setat-Clinic/tree/main
+clone the project git clonehttps://github.com/advanced-computer-lab-2023/Ragel-w-6-setat-Clinic/tree/main
 
 go to root : cd root
 
@@ -38,7 +39,7 @@ to run the backend : nodemon app.js
 
 Admin: The Admin model is the user holds all the general information and personal information regarding that model like the name email password(hashed) and whether they are active or not and whether email is verfied or not  
 
-{"_id":{"$oid":"657dfb3b121ad4a90829e841"},"username":"john_doe","password":"B8WIB6TR","email":"john.doe@example.com"}
+![App Screenshot](https://github.com/advanced-computer-lab-2023/Ragel-w-6-setat-Clinic/blob/sara/Screenshot%202023-12-17%20021927.png)
 
 Appointment: Holds all the appointment information and is helps us link both the patient and the doctor with each other in an effecient way 
 {"_id":{"$oid":"657dfb2262324f4a68c2873b"},"patient":{"$oid":"65671310baf3f1f1336f63ff"},"doctor":{"$oid":"6525f12c2508c41d493c9876"},"date":{"$date":{"$numberLong":"1702504800000"}},"isAvailable":false,"type":"follow-up","status":"cancelled","price":{"$numberInt":"34"},"__v":{"$numberInt":"0"},"acceptance":"accepted"}
