@@ -263,7 +263,10 @@ Thank you for contributing to our project! 🚀
 
 - [Youtube Tutorial](https://www.youtube.com/watch?v=yXEesONd_54&list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&index=7): Used as a valuable source for online guidance and assistance.
 
-- [Youtube Toturial](https://youtube.com/playlist?list=PL4cUxeGkcC9hNokByJilPg5g9m2APUePI&si=8n2xVADjHNtWnFbP):Used as a valuable source for online guidance and assistance.## License
+- [Youtube Toturial](https://youtube.com/playlist?list=PL4cUxeGkcC9hNokByJilPg5g9m2APUePI&si=8n2xVADjHNtWnFbP):Used as a valuable source for online guidance and assistance.
+
+
+## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).# Features
 
