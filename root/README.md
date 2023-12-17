@@ -40,7 +40,7 @@ These instructions will help you get a copy of the project up and running on you
 
 Clone the project repository:
 
-```bash
+
 git clone https://github.com/advanced-computer-lab-2023/Ragel-w-6-setat-Clinic/tree/main
 
 *cd root*
@@ -57,11 +57,11 @@ to run the backend : nodemon app.js
 
 Clone the project repository:
 
-```bash
+bash
 git clone https://github.com/advanced-computer-lab-2023/Ragel-w-6-setat-Clinic/tree/main
 
-*cd root*
-*cd client*
+cd root
+cd client
 
 to run the backend : npm start
 ### How To Use
@@ -90,72 +90,64 @@ Next, navigate to the `client` folder in the terminal and run the following comm
 * **Description:** Library for hashing and salting passwords, fortifying the project's password security.
 * **Documentation:** [Bcrypt Documentation](https://www.npmjs.com/package/bcrypt)
 
-**5. Cors(`cors`)**
-* **Description:** Middleware for Express.js enabling Cross-Origin Resource Sharing (CORS), granting controlled access to server resources.
-* **Documentation:** [Cors Documentation](https://www.npmjs.com/package/cors/)
+## Dependencies
 
-**6. Dotenv(`dotenv`)**
-* **Description:** Zero-dependency module seamlessly loading environment variables from a `.env` file into `process.env`.
-* **Documentation:** [Dotenv Documentation](https://www.npmjs.com/package/dotenv)
+### 5. Cors (`cors`)
+- **Description:** Middleware for Express.js enabling Cross-Origin Resource Sharing (CORS), granting controlled access to server resources.
+- **Documentation:** [Cors Documentation](https://www.npmjs.com/package/cors/)
 
-**7. Jsonwebtokens(`jsonwebtoken`)**
-* **Description:** Robust library for creating and verifying JSON Web Tokens (JWT), a cornerstone for user authentication.
-* **Documentation:** [Jsonwebtoken Documentation](https://www.npmjs.com/package/jsonwebtoken)
+### 6. Dotenv (`dotenv`)
+- **Description:** Zero-dependency module seamlessly loading environment variables from a `.env` file into `process.env`.
+- **Documentation:** [Dotenv Documentation](https://www.npmjs.com/package/dotenv)
 
-**8. Morgan(`morgan`)**
-* **Description:** Express.js middleware providing an HTTP request logger, capturing essential information about incoming requests.
-* **Documentation:** [Morgan Documentation](https://www.npmjs.com/package/morgan)
+### 7. Jsonwebtokens (`jsonwebtoken`)
+- **Description:** Robust library for creating and verifying JSON Web Tokens (JWT), a cornerstone for user authentication.
+- **Documentation:** [Jsonwebtoken Documentation](https://www.npmjs.com/package/jsonwebtoken)
 
-**9. Multer(`multer`)**
-* **Description:** Middleware tailored for handling multipart/form-data, an essential tool for efficient file uploads.
-* **Documentation:** [Multer Documentation](https://www.npmjs.com/package/multer)
+### 8. Morgan (`morgan`)
+- **Description:** Express.js middleware providing an HTTP request logger, capturing essential information about incoming requests.
+- **Documentation:** [Morgan Documentation](https://www.npmjs.com/package/morgan)
 
-**10. Nodemailer(`nodemailer`)**
-* **Description:** Powerful module for sending emails, often utilized for tasks like dispatching confirmation emails.
-* **Documentation:** [Nodemailer Documentation](https://nodemailer.com/about/)
+### 9. Multer (`multer`)
+- **Description:** Middleware tailored for handling multipart/form-data, an essential tool for efficient file uploads.
+- **Documentation:** [Multer Documentation](https://www.npmjs.com/package/multer)
 
-**11. Nodemon(`nodemon`)**
-* **Description:** Intelligent utility monitoring changes in source code and autonomously restarting the server.
-* **Documentation:** [Nodemon Documentation](https://nodemon.io/)
+### 10. Nodemailer (`nodemailer`)
+- **Description:** Powerful module for sending emails, often utilized for tasks like dispatching confirmation emails.
+- **Documentation:** [Nodemailer Documentation](https://nodemailer.com/about/)
 
-**12. Socket.io(`^4.7.2`)**
-* **Description:** Real-time bidirectional event-based communication library for Node.js. Facilitates real-time communication between web clients and servers.
-* **Documentation:** [Socket.IO Documentation](https://socket.io/docs/v4/)
+### 11. Nodemon (`nodemon`)
+- **Description:** Intelligent utility monitoring changes in source code and autonomously restarting the server.
+- **Documentation:** [Nodemon Documentation](https://nodemon.io/)
 
-**13. Stripe(`@stripe/stripe-js` and `stripe`)**
-* **Description:** Libraries dedicated to handling Stripe payments, a leading payment processing platform.
-* **Documentation:** 
+### 12. Socket.io (`^4.7.2`)
+- **Description:** Real-time bidirectional event-based communication library for Node.js. Facilitates real-time communication between web clients and servers.
+- **Documentation:** [Socket.IO Documentation](https://socket.io/docs/v4/)
+
+### 13. Stripe (`@stripe/stripe-js` and `stripe`)
+- **Description:** Libraries dedicated to handling Stripe payments, a leading payment processing platform.
+- **Documentation:** 
   - [Stripe.js Documentation](https://stripe.com/docs/payments/elements)
   - [Stripe Node.js Documentation](https://stripe.com/docs/payments/elements)
 
+For detailed information and usage instructions, refer to the official documentation linked above for each API.
 
-***For detailed information and usage instructions, refer to the official documentation linked above for each API.***## Code Styles
+## Code Styles
 
 - **Prettier**: Automatic code formatter that ensures uniform formatting across the entire project before each commit.
-
-- **Consistent Coding Style**: The project maintains a specific code style for readability and consistency, essential for collaboration and maintenance.
-
+- **Consistent Coding Style**: Maintains a specific code style for readability and consistency, essential for collaboration and maintenance.
 - **Standart Code Style Guide**: Adherence to the Standart Code Style Guide ensures uniformity across the codebase. Contributors are encouraged to review the guide for code alignment.
-
 - **Consistent Formatting**: Proper indentation and consistent formatting enhance code readability and comprehension.
-
 - **Descriptive Variable Names**: Variables like `fromDateReschedule`, `followUpDate`, `linkedFamilyMembers`, `toggleAppointmentModal`, etc., use descriptive names to convey their purpose.
-
 - **Destructuring**: Utilization of destructuring for props like `user` from `UserContext` enhances code readability.
-
 - **Async/Await**: The use of async/await syntax for handling asynchronous operations improves code readability and manages promises effectively.
-
 - **React Component Structure**: Functional components with React hooks (`useState`, `useEffect`) manage state and side effects efficiently.
-
 - **Conditional Rendering**: Modals (`Modal isOpen={modalStates[index]}`) and button disabling/enabling based on appointment status use conditional rendering.
-
 - **Consistent Styling**: Consistency in inline styling and class names throughout the component simplifies maintenance and styling.
-
 - **Error Handling**: Error handling blocks (`try...catch`) manage potential errors during API requests (axios calls).
-
 - **Comments**: Code includes comments to explain certain blocks or functionalities, aiding future reference and understanding.
-
 - **Event Handling**: Consistent event handling, such as `onClick` events on buttons invoking corresponding functions (`handleReschedule`, `handleFollowUp`, `handleCancel`).
+
 ## Build Status
 
 The project is currently in the development stage, progressing through milestones with continuous improvements in code implementation and execution. Notable learning curves were experienced during milestones 2 and 3, particularly in the areas of authentication and user login.
@@ -167,7 +159,39 @@ One prominent issue encountered was the slowness in fetching data from the backe
 ### Future Considerations
 
 Looking ahead, the project will require deployment, likely through platforms such as Google Cloud or similar services, to ensure accessibility and scalability in the near future.
+
+## Contribute
+
+We welcome contributions from the community! If you'd like to contribute to the development of this project, follow these guidelines:
+
+1. **Fork the Repository**: Click on the "Fork" button on the top right corner of this repository's page.
+2. **Clone the Repository**: Clone the forked repository to your local machine using the following terminal command:
+
+        git clone https://github.com/your-username/your-forked-repo.git
+
+3. **Create a Branch:** Create a new branch for your contributions:
+
+        git checkout -b feature/your-feature-name
+
+4. **Make Changes:** Make your desired changes to the codebase.
+5. **Commit Changes:** Commit your changes with a meaningful commit message:
+
+        git commit -m "Add your meaningful commit message here"
+
+6. **Push Changes:** Push your changes to your forked repository:
+
+        git push origin feature/your-feature-name
+
+7. **Create a Pull Request (PR):** Open a Pull Request against the main branch of the original repository. Provide a clear title and description for your changes.
+
+8. **Code Review:** Participate in the code review process. Make any requested changes if needed.
+
+9. **Merge:** Once your changes are approved, they will be merged into the main branch.
+
+Thank you for contributing to our project! 🚀
+
 ## Credits
+
 - [@02omar](https://github.com/02omar)
 - [@Hauna9](https://github.com/Hauna9)
 - [@shahdamerr](https://github.com/shahdamerr)
@@ -176,13 +200,6 @@ Looking ahead, the project will require deployment, likely through platforms suc
 - [@mariamelgendy](https://github.com/mariamelgendy)
 - [@sara2413](https://github.com/sara2413)
 
-
-- [YouTube Tutorial](https://www.youtube.com/watch?v=ENakkm58Uyw&t=354s): Used as a valuable source for online guidance and assistance.
-
-- [Youtube Tutorial](https://m.youtube.com/playlist?list=PLillGF-RfqbbQeVSccR9PGKHzPJSWqcsm)
-
-- [Youtube Tutorial](https://www.youtube.com/watch?v=yXEesONd_54&list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&index=7)
-
-- [Youtube Toturial](https://youtube.com/playlist?list=PL4cUxeGkcC9hNokByJilPg5g9m2APUePI&si=8n2xVADjHNtWnFbP)## License
-
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+- [YouTube Tutorial 1](https://www.youtube.com/watch?v=ENakkm58Uyw&t=354s): Valuable source for online guidance and assistance.
+- [YouTube Tutorial 2](https://m.youtube.com/playlist?list=PLillGF-RfqbbQeVSccR9PGKHzPJSWqcsm)
+- [YouTube Tutorial 3](https://www.youtube.com/watch?v=yXEesONd_54&list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&index=7)
