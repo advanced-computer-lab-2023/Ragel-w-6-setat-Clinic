@@ -220,6 +220,47 @@ as a patient (linkFamilyMember) route testing
 
 ![Ss](https://media.discordapp.net/attachments/1157430089181577294/1185790757060222976/291024131-d15d22ee-0eb0-4b23-9847-c1b129376a2d.png?ex=6590e4b3&is=657e6fb3&hm=10daca3b26d0d133ba61e88ae9585484b9d11d315ce2492fea72ca344db3068e&=&format=webp&quality=lossless&width=1050&height=591)
 
+# Features
+
+## 1. User Authentication
+- **Secure Authentication:** Ensures secure login for both doctors and patients.
+- **Separate Login Portals:** Dedicated login portals designed for doctors and patients.
+
+## 2. Doctor Profiles
+- **Detailed Information:** Includes comprehensive details like name, specialty, qualifications, and contact information.
+- **Profile Picture Upload:** Provides an option for doctors to upload their profile pictures.
+
+## 3. Patient Profiles
+- **Basic Information:** Stores basic patient information along with their medical history.
+- **Secure Health Record Storage:** Safely stores and manages patient health records.
+
+## 4. Appointment Scheduling
+- **User-Friendly System:** Easy-to-use appointment scheduling system, primarily designed for patients.
+- **Doctor Availability Calendar:** Shows doctors' availability with convenient time slots for appointments.
+- **Confirmation and Reminder Notifications:** Sends notifications for both doctors and patients for appointment updates.
+
+## 5. Prescription Management
+- **Electronic Prescriptions:** Enables doctors to generate and manage electronic prescriptions.
+- **Prescription History:** Patients have access to their prescription history through their profiles.
+- **Direct Prescription Sending:** Option for doctors to send prescriptions directly to pharmacies.
+
+## 6. Medical Records and History
+- **Centralized Storage:** Stores patient medical records and treatment history centrally.
+- **Secure Access Control:** Implements secure access control to protect patient confidentiality.
+
+## 7. Notifications and Reminders
+- **Automated Appointment Reminders:** Sends automated appointment reminders to patients.
+- **Doctor Notifications:** Notifies doctors about upcoming appointments.
+
+## 8. Search and Filter Options
+- **Patient Search Functionality:** Enables patients to search for doctors based on specialty, location, etc.
+- **Doctor Filters:** Allows doctors to manage appointment types and availability through filters.
+
+## 9. Real-Time Video Consultations
+- **Integration of Video Call Feature:** Enables real-time video calls for virtual consultations between patients and doctors.
+
+## 10. Real-Time Chat System
+- **Implementation of Messaging System:** Enables instant communication between patients and doctors through a real-time messaging system.
 
 
 ## Contribute
@@ -274,44 +315,3 @@ Thank you for contributing to our project! 🚀
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) & [Apache License](http://www.apache.org/licenses/)
 
-# Features
-
-## 1. User Authentication
-- **Secure Authentication:** Ensures secure login for both doctors and patients.
-- **Separate Login Portals:** Dedicated login portals designed for doctors and patients.
-
-## 2. Doctor Profiles
-- **Detailed Information:** Includes comprehensive details like name, specialty, qualifications, and contact information.
-- **Profile Picture Upload:** Provides an option for doctors to upload their profile pictures.
-
-## 3. Patient Profiles
-- **Basic Information:** Stores basic patient information along with their medical history.
-- **Secure Health Record Storage:** Safely stores and manages patient health records.
-
-## 4. Appointment Scheduling
-- **User-Friendly System:** Easy-to-use appointment scheduling system, primarily designed for patients.
-- **Doctor Availability Calendar:** Shows doctors' availability with convenient time slots for appointments.
-- **Confirmation and Reminder Notifications:** Sends notifications for both doctors and patients for appointment updates.
-
-## 5. Prescription Management
-- **Electronic Prescriptions:** Enables doctors to generate and manage electronic prescriptions.
-- **Prescription History:** Patients have access to their prescription history through their profiles.
-- **Direct Prescription Sending:** Option for doctors to send prescriptions directly to pharmacies.
-
-## 6. Medical Records and History
-- **Centralized Storage:** Stores patient medical records and treatment history centrally.
-- **Secure Access Control:** Implements secure access control to protect patient confidentiality.
-
-## 7. Notifications and Reminders
-- **Automated Appointment Reminders:** Sends automated appointment reminders to patients.
-- **Doctor Notifications:** Notifies doctors about upcoming appointments.
-
-## 8. Search and Filter Options
-- **Patient Search Functionality:** Enables patients to search for doctors based on specialty, location, etc.
-- **Doctor Filters:** Allows doctors to manage appointment types and availability through filters.
-
-## 9. Real-Time Video Consultations
-- **Integration of Video Call Feature:** Enables real-time video calls for virtual consultations between patients and doctors.
-
-## 10. Real-Time Chat System
-- **Implementation of Messaging System:** Enables instant communication between patients and doctors through a real-time messaging system.
