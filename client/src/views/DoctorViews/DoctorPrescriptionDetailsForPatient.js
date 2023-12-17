@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 import Select from "react-select";
-
 //components
 
 import {
@@ -19,7 +19,10 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Alert,
 } from "reactstrap";
+
+import { Tooltip, IconButton } from "@mui/material";
 
 import { useAuthContext } from "../../hooks/useAuthContext";
 
@@ -27,28 +30,44 @@ const DoctorPrescriptionDetailsForPatient = () => {
   const { prescriptionid } = useParams();
   const { user } = useAuthContext();
 
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("danger");
+
   const [modal, setModal] = useState(false);
-  const toggleModal = () => setModal(!modal);
+  const toggleModal = () => {
+    setAddedMedicines([]);
+    setModal(!modal);
+  };
   const [editMode, setEditMode] = useState(false);
 
   const [prescription, setPrescription] = useState("");
+  const [medicines, setMedicines] = useState([]);
+  const [addedMedicines, setAddedMedicines] = useState([]);
+  const [selectedMedicine, setSelectedMedicine] = useState("");
+  const [dosage, setDosage] = useState("");
+  const [deletedMedicines, setDeletedMedicines] = useState([]);
+  const [updatedMedications, setUpdatedMedications] = useState([]);
+  const [updatedDosages, setUpdatedDosages] = useState([]);
+  const [initialDosages, setInitialDosages] = useState([]);
 
-  const options = [
-    { value: "Medicine1", label: "Medicine1" },
-    { value: "Medicine2", label: "Medicine2" },
-  ];
-
-  const handleDone = () => {
-    setEditMode(false);
-  };
-
-  const handleCancel = () => {
-    setEditMode(false);
-  };
-
-  const handleEdit = () => {
-    setEditMode(true);
-  };
+  useEffect(() => {
+    const fetchMedicines = async () => {
+      try {
+        const response = await fetch(`/doctors/getAllMedicines`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setMedicines(data);
+        }
+      } catch (error) {
+        console.error("Error fetching medicines:", error.response.data.message);
+      }
+    };
+    fetchMedicines();
+  }, [user]);
 
   useEffect(() => {
     const fetchPrescription = async () => {
@@ -60,7 +79,13 @@ const DoctorPrescriptionDetailsForPatient = () => {
           }
         );
         const data = await response.json();
-        setPrescription(data.prescription);
+        if (response.ok) {
+          setPrescription(data.prescription);
+          setUpdatedMedications(data.prescription.medication);
+          setInitialDosages(
+            data.prescription.medication.map((med) => med.dosage)
+          );
+        }
       } catch (error) {
         console.error(
           "Error fetching prescription:",
@@ -71,8 +96,112 @@ const DoctorPrescriptionDetailsForPatient = () => {
     fetchPrescription();
   }, [user, prescriptionid]);
 
+  const options = medicines.map((medicine) => ({
+    value: medicine._id,
+    label: medicine.name,
+  }));
+
+  useEffect(() => {
+    if (editMode) {
+      setUpdatedDosages([...initialDosages]);
+    }
+  }, [editMode, initialDosages]);
+
+  const handleDone = async () => {
+    setEditMode(false);
+    const newMedications = updatedMedications.map((med, index) => ({
+      ...med,
+      dosage: updatedDosages[index],
+    }));
+    setUpdatedMedications(newMedications);
+
+    try {
+      const response = await axios.patch(
+        `/doctors/updatePrescription/${user.user._id}/${prescriptionid}`,
+        { medication: newMedications },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+      if (response.status === 200) {
+        setPrescription(response.data.prescription);
+        setUpdatedMedications(response.data.prescription.medication);
+        setInitialDosages(
+          response.data.prescription.medication.map((med) => med.dosage)
+        );
+      }
+      setDeletedMedicines([]);
+    } catch (error) {
+      console.error(
+        "Error updating prescription:",
+        error.response.data.message
+      );
+    }
+  };
+
+  const handleDeleteMedicine = (index) => {
+    const deletedMedicine = updatedMedications[index];
+    setDeletedMedicines((prevDeleted) => [...prevDeleted, deletedMedicine]);
+
+    const newUpdatedMedication = updatedMedications.filter(
+      (medicine, i) => i !== index
+    );
+    const newUpdatedDosages = updatedDosages.filter((item, i) => i !== index);
+    setUpdatedMedications(newUpdatedMedication);
+    setUpdatedDosages(newUpdatedDosages);
+  };
+
+  const handleCancel = () => {
+    setEditMode(false);
+    setUpdatedMedications(prescription.medication);
+    setUpdatedDosages([...initialDosages]);
+  };
+
+  const handleEdit = () => {
+    setEditMode(true);
+  };
+
+  const handleAddMedicine = () => {
+    if (!selectedMedicine) {
+      setAlertMessage("Please select a medicine");
+      setAlertColor("danger");
+      setVisible(true);
+      return;
+    }
+    if (!dosage) {
+      setAlertMessage("Please enter a dosage");
+      setAlertColor("danger");
+      setVisible(true);
+      return;
+    }
+
+    const medicine = {
+      medicineId: selectedMedicine.value,
+      name: selectedMedicine.label,
+      price: medicines.find(
+        (medicine) => medicine._id === selectedMedicine.value
+      ).price,
+      dosage: dosage,
+    };
+
+    setAddedMedicines([...addedMedicines, medicine]);
+    setSelectedMedicine("");
+    setDosage("");
+  };
+
+  const handleConfirmNewMedicines = async () => {
+    const newMedications = [...updatedMedications, ...addedMedicines];
+
+    setUpdatedDosages([
+      ...updatedDosages,
+      ...addedMedicines.map((med) => med.dosage),
+    ]);
+    setUpdatedMedications(newMedications);
+    toggleModal();
+  };
+
   if (!prescription) {
-    return <div>Loading...</div>; // Add a loading state or component
+    return <div>Loading...</div>;
   }
 
   return (
@@ -99,7 +228,11 @@ const DoctorPrescriptionDetailsForPatient = () => {
                           <Row>
                             <Col className="mt--4" lg="12">
                               <Label className="form-control-label">
-                                Medicines Added:
+                                Medicines Added: {"["}{" "}
+                                {addedMedicines.map(
+                                  (medicine) => medicine.name + ", "
+                                )}{" "}
+                                {"]"}
                               </Label>
                             </Col>
                           </Row>
@@ -113,6 +246,10 @@ const DoctorPrescriptionDetailsForPatient = () => {
                                   options={options}
                                   isSearchable={true}
                                   placeholder="Select Medicine"
+                                  value={selectedMedicine}
+                                  onChange={(selectedOption) =>
+                                    setSelectedMedicine(selectedOption)
+                                  }
                                 />
                               </FormGroup>
                             </Col>
@@ -123,20 +260,45 @@ const DoctorPrescriptionDetailsForPatient = () => {
                                 <Label className="form-control-label">
                                   Dosage:
                                 </Label>
-                                <Input type="text" placeholder="Dosage" />
+                                <Input
+                                  type="text"
+                                  placeholder="Dosage"
+                                  value={dosage}
+                                  onChange={(e) => setDosage(e.target.value)}
+                                />
                               </FormGroup>
                             </Col>
                           </Row>
                           <Row>
-                            <Col className="mb-3" lg="12">
-                              <Button color="default" size="sm">
+                            <Col className="mb-3" lg="4">
+                              <Button
+                                color="default"
+                                size="sm"
+                                onClick={handleAddMedicine}
+                              >
                                 Add Medicine
                               </Button>
+                            </Col>
+                            <Col className="mb-3" lg="8">
+                              <Alert
+                                color={alertColor}
+                                isOpen={visible}
+                                toggle={onDismiss}
+                                style={{
+                                  fontSize: "12px",
+                                  padding: "8px 15px",
+                                }}
+                              >
+                                {alertMessage}
+                              </Alert>
                             </Col>
                           </Row>
                         </ModalBody>
                         <ModalFooter>
-                          <Button color="default">
+                          <Button
+                            color="default"
+                            onClick={handleConfirmNewMedicines}
+                          >
                             Confirm New Medicines to Prescription
                           </Button>{" "}
                           <Button color="secondary" onClick={toggleModal}>
@@ -152,7 +314,12 @@ const DoctorPrescriptionDetailsForPatient = () => {
                       </Button>{" "}
                     </>
                   ) : (
-                    <Button color="secondary" size="sm" onClick={handleEdit}>
+                    <Button
+                      color="secondary"
+                      size="sm"
+                      onClick={handleEdit}
+                      disabled={prescription.isFilled}
+                    >
                       Edit Prescription
                     </Button>
                   )}
@@ -172,7 +339,7 @@ const DoctorPrescriptionDetailsForPatient = () => {
                   <div className="h5 mt-4">
                     Medication: <br />
                     <Row>
-                      {prescription.medication.map((med, index) => (
+                      {updatedMedications.map((med, index) => (
                         <Col xl="4" key={index}>
                           <Card
                             className="card-stats mb-4"
@@ -186,7 +353,19 @@ const DoctorPrescriptionDetailsForPatient = () => {
                                   </CardTitle>
                                   <span className="h4 text-muted mb-0">
                                     {editMode ? (
-                                      <Input type="text" placeholder="Dosage" />
+                                      <Input
+                                        type="text"
+                                        value={updatedDosages[index]}
+                                        onChange={(e) =>
+                                          setUpdatedDosages(
+                                            updatedDosages.map((item, i) =>
+                                              i === index
+                                                ? e.target.value
+                                                : item
+                                            )
+                                          )
+                                        }
+                                      />
                                     ) : (
                                       `Dosage: ${med.dosage}`
                                     )}
@@ -199,9 +378,16 @@ const DoctorPrescriptionDetailsForPatient = () => {
                                 </span>
                               </p>
                               {editMode && (
-                                <Button color="danger" size="sm">
-                                  Delete Medicine
-                                </Button>
+                                <Tooltip title="Delete">
+                                  <IconButton
+                                    onClick={() => handleDeleteMedicine(index)}
+                                  >
+                                    <i
+                                      class="fa-solid fa-trash"
+                                      style={{ color: " #f5365c" }}
+                                    ></i>
+                                  </IconButton>
+                                </Tooltip>
                               )}
                             </CardBody>
                           </Card>

@@ -31,6 +31,7 @@ import {
   rejectRequest,
   getAllMedicines,
   createPrescription,
+  updatePrescription,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthDoctor } from "../middlewares/requireAuthDoctor.js";
@@ -117,6 +118,10 @@ router.get(
 );
 router.get("/downloadPrescriptionPDF/:prescriptionid", downloadPrescriptionPDF);
 router.get("/selectPrescription/:doctorid/:prescriptionid", selectPrescription);
+router.patch(
+  "/updatePrescription/:doctorid/:prescriptionid",
+  updatePrescription
+);
 
 // merging routes
 router.get("/getAllMedicines", getAllMedicines);

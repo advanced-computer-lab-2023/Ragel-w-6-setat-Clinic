@@ -840,6 +840,28 @@ const createPrescription = async (req, res) => {
   }
 };
 
+const updatePrescription = async (req, res) => {
+  try {
+    const prescriptionId = req.params.prescriptionid;
+    const { medication } = req.body;
+
+    const existingPrescription = await Prescription.findById(
+      prescriptionId
+    ).populate("patient doctor");
+
+    existingPrescription.medication = medication;
+
+    const updatedPrescription = await existingPrescription.save();
+
+    res
+      .status(200)
+      .json({ status: "success", prescription: updatedPrescription });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // MERGINGG
 
 const getAllMedicines = async (req, res) => {
@@ -885,4 +907,5 @@ export {
   rejectRequest,
   getAllMedicines,
   createPrescription,
+  updatePrescription,
 };
