@@ -218,29 +218,27 @@ as a patient (linkFamilyMember) route testing
 
 ![App Screenhot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024131-d15d22ee-0eb0-4b23-9847-c1b129376a2d.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T030028Z&X-Amz-Expires=300&X-Amz-Signature=f1af7471c9f091f0e481bb99477fffc3ba1b6bab2ebe386bc668f9c67fb6831f&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
 
-
- 
-
- ## Contribute
+## Contribute
 We welcome contributions from the community! If you'd like to contribute to the development of this project, follow these guidelines:
 
 1. **Fork the Repository**: Click on the "Fork" button on the top right corner of this repository's page.
 
 2. **Clone the Repository**: Clone the forked repository to your local machine using the following terminal command:
-   
-git clone https://github.com/your-username/your-forked-repo.git
+
+        git clone https://github.com/your-username/your-forked-repo.git
 
 3. **Create a Branch:** Create a new branch for your contributions:
-
+        
+        git checkout -b feature/your-feature-name
 
 4. **Make Changes:** Make your desired changes to the codebase.
-
 5. **Commit Changes:** Commit your changes with a meaningful commit message:
 
+        git commit -m "Add your meaningful commit message here"
 
 6. **Push Changes:** Push your changes to your forked repository:
 
-
+        git push origin feature/your-feature-name
 7. **Create a Pull Request (PR):** Open a Pull Request against the main branch of the original repository. Provide a clear title and description for your changes.
 
 8. **Code Review:** Participate in the code review process. Make any requested changes if needed.
@@ -248,6 +246,7 @@ git clone https://github.com/your-username/your-forked-repo.git
 9. **Merge:** Once your changes are approved, they will be merged into the main branch.
 
 Thank you for contributing to our project! 🚀
+
 ## Credits
 - [@02omar](https://github.com/02omar)
 - [@Hauna9](https://github.com/Hauna9)
