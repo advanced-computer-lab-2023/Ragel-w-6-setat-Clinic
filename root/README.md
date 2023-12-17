@@ -268,7 +268,9 @@ Thank you for contributing to our project! 🚀
 
 ## License
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).# Features
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) & [Apache License](http://www.apache.org/licenses/)
+
+# Features
 
 ## 1. User Authentication
 - **Secure Authentication:** Ensures secure login for both doctors and patients.
