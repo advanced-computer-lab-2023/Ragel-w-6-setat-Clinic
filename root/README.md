@@ -177,10 +177,10 @@ Looking ahead, the project will require deployment, likely through platforms suc
 
 Video chat Api between doctor and patient, doctor is waiting in the room for patient 
 
-![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025092-c50bc4d3-98aa-4f6f-b505-cd71fa49be08.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T031127Z&X-Amz-Expires=300&X-Amz-Signature=32403de51e9b280e93e78e4b5ac81c0e9cf4d4392c1705a530c8e6104b202028&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025092-c50bc4d3-98aa-4f6f-b505-cd71fa49be08.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T031127Z&X-Amz-Expires=300&X-Amz-Signature=32403de51e9b280e93e78e4b5ac81c0e9cf4d4392c1705a530c8e6104b202028&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
 
 The patient uses a family member through their email to link with them 
-![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025060-4ee4761c-7300-4daf-b5c4-b7e6b582beff.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T031340Z&X-Amz-Expires=300&X-Amz-Signature=a9c54d044fa5962879ab1742158f2905b91f3546f4925a15865952803e6f584b&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025060-4ee4761c-7300-4daf-b5c4-b7e6b582beff.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T031340Z&X-Amz-Expires=300&X-Amz-Signature=a9c54d044fa5962879ab1742158f2905b91f3546f4925a15865952803e6f584b&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
 
 
 
@@ -195,7 +195,7 @@ doctor is able to view all his appointment and filter through in addition to can
 
 
 As a doctor i can view my patients and search through them by name and filter by upcoming appointments
-![ss](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025909-9941ab53-9120-47e0-8301-efdde95d22a4.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T032529Z&X-Amz-Expires=300&X-Amz-Signature=98f0d2760fd960c2c89506124b3635194e4d8901b0d770f29ab6553ef5144926&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025909-9941ab53-9120-47e0-8301-efdde95d22a4.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T032529Z&X-Amz-Expires=300&X-Amz-Signature=98f0d2760fd960c2c89506124b3635194e4d8901b0d770f29ab6553ef5144926&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
 
 
 # further documentation : 
@@ -205,18 +205,18 @@ As a doctor i can view my patients and search through them by name and filter by
 delete medicine route testing 
 
 
-![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024763-521ad3c4-33b4-4342-88bb-510d1d9d51af.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T025514Z&X-Amz-Expires=300&X-Amz-Signature=28da5597dd372961b54b3c23a5a44145e5a1eaf73b86b397aee34782ee1c1759&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024763-521ad3c4-33b4-4342-88bb-510d1d9d51af.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T025514Z&X-Amz-Expires=300&X-Amz-Signature=28da5597dd372961b54b3c23a5a44145e5a1eaf73b86b397aee34782ee1c1759&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
 
 
 
 doctor (getMyPatients) route testing
 
-![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024122-83776f1f-75a2-4125-92ea-45b4496e578f.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T025732Z&X-Amz-Expires=300&X-Amz-Signature=e1ce053dc5fbfc40eba81e1cc98532d5113bd356172358069a816fa9c7523cce&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024122-83776f1f-75a2-4125-92ea-45b4496e578f.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T025732Z&X-Amz-Expires=300&X-Amz-Signature=e1ce053dc5fbfc40eba81e1cc98532d5113bd356172358069a816fa9c7523cce&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
 
 
 as a patient (linkFamilyMember) route testing
 
-![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024131-d15d22ee-0eb0-4b23-9847-c1b129376a2d.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T030028Z&X-Amz-Expires=300&X-Amz-Signature=f1af7471c9f091f0e481bb99477fffc3ba1b6bab2ebe386bc668f9c67fb6831f&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![App Screenhot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024131-d15d22ee-0eb0-4b23-9847-c1b129376a2d.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T030028Z&X-Amz-Expires=300&X-Amz-Signature=f1af7471c9f091f0e481bb99477fffc3ba1b6bab2ebe386bc668f9c67fb6831f&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
 
 
  
