@@ -4,11 +4,6 @@
 
 Health Space is an Online Health Clinic System, designed as a web application, providing wider access to healthcare and remote healthcare services. This platform serves as a complete online learning system for the CSEN704 Course (Advanced Programming Lab) at GUC (German University in Cairo). Patients can easily log in and access quality healthcare services in a convenient manner.
 
-## Motivation
-
-The motivation behind this project is rooted in a strong commitment to improving healthcare accessibility. This platform aims to provide a centralized hub for accessing healthcare services, enabling easy connections between patients and pharmacists while facilitating access to crucial medical information.
-
-As a requirement for our ACL course at GUC, this project allowed us to delve into and implement the MERN Stack. It provided a valuable opportunity to critically think about and execute a fully functional website, offering insights into our future career paths.
 ## Objectives
 
 - **Agile Methodology:** Utilize Agile methodology effectively for project planning and software development.
@@ -20,6 +15,11 @@ As a requirement for our ACL course at GUC, this project allowed us to delve int
 - **Collaboration via GitHub:** Develop teamwork skills by collaborating on GitHub, ensuring effective version control and collaborative development.
 
 - **Project Management & Feedback:** Engage with project management practices and feedback sessions to iteratively improve the project.
+## Motivation
+
+The motivation behind this project is rooted in a strong commitment to improving healthcare accessibility. This platform aims to provide a centralized hub for accessing healthcare services, enabling easy connections between patients and pharmacists while facilitating access to crucial medical information.
+
+As a requirement for our ACL course at GUC, this project allowed us to delve into and implement the MERN Stack. It provided a valuable opportunity to critically think about and execute a fully functional website, offering insights into our future career paths.
 ## Tech/Framework used
 - MERN Stack (MongoDB, Express.js, React.js, Node.js)
 - JavaScript
@@ -43,8 +43,8 @@ Clone the project repository:
 
 git clone https://github.com/advanced-computer-lab-2023/Ragel-w-6-setat-Clinic/tree/main
 
-*cd root*
-*cd server*
+- cd root
+- cd server
 
 
 
@@ -57,11 +57,11 @@ to run the backend : nodemon app.js
 
 Clone the project repository:
 
-bash
+
 git clone https://github.com/advanced-computer-lab-2023/Ragel-w-6-setat-Clinic/tree/main
 
-cd root
-cd client
+- cd root
+- cd client
 
 to run the backend : npm start
 ### How To Use
@@ -90,64 +90,74 @@ Next, navigate to the `client` folder in the terminal and run the following comm
 * **Description:** Library for hashing and salting passwords, fortifying the project's password security.
 * **Documentation:** [Bcrypt Documentation](https://www.npmjs.com/package/bcrypt)
 
-## Dependencies
+**5. Cors(`cors`)**
+* **Description:** Middleware for Express.js enabling Cross-Origin Resource Sharing (CORS), granting controlled access to server resources.
+* **Documentation:** [Cors Documentation](https://www.npmjs.com/package/cors/)
 
-### 5. Cors (`cors`)
-- **Description:** Middleware for Express.js enabling Cross-Origin Resource Sharing (CORS), granting controlled access to server resources.
-- **Documentation:** [Cors Documentation](https://www.npmjs.com/package/cors/)
+**6. Dotenv(`dotenv`)**
+* **Description:** Zero-dependency module seamlessly loading environment variables from a `.env` file into `process.env`.
+* **Documentation:** [Dotenv Documentation](https://www.npmjs.com/package/dotenv)
 
-### 6. Dotenv (`dotenv`)
-- **Description:** Zero-dependency module seamlessly loading environment variables from a `.env` file into `process.env`.
-- **Documentation:** [Dotenv Documentation](https://www.npmjs.com/package/dotenv)
+**7. Jsonwebtokens(`jsonwebtoken`)**
+* **Description:** Robust library for creating and verifying JSON Web Tokens (JWT), a cornerstone for user authentication.
+* **Documentation:** [Jsonwebtoken Documentation](https://www.npmjs.com/package/jsonwebtoken)
 
-### 7. Jsonwebtokens (`jsonwebtoken`)
-- **Description:** Robust library for creating and verifying JSON Web Tokens (JWT), a cornerstone for user authentication.
-- **Documentation:** [Jsonwebtoken Documentation](https://www.npmjs.com/package/jsonwebtoken)
+**8. Morgan(`morgan`)**
+* **Description:** Express.js middleware providing an HTTP request logger, capturing essential information about incoming requests.
+* **Documentation:** [Morgan Documentation](https://www.npmjs.com/package/morgan)
 
-### 8. Morgan (`morgan`)
-- **Description:** Express.js middleware providing an HTTP request logger, capturing essential information about incoming requests.
-- **Documentation:** [Morgan Documentation](https://www.npmjs.com/package/morgan)
+**9. Multer(`multer`)**
+* **Description:** Middleware tailored for handling multipart/form-data, an essential tool for efficient file uploads.
+* **Documentation:** [Multer Documentation](https://www.npmjs.com/package/multer)
 
-### 9. Multer (`multer`)
-- **Description:** Middleware tailored for handling multipart/form-data, an essential tool for efficient file uploads.
-- **Documentation:** [Multer Documentation](https://www.npmjs.com/package/multer)
+**10. Nodemailer(`nodemailer`)**
+* **Description:** Powerful module for sending emails, often utilized for tasks like dispatching confirmation emails.
+* **Documentation:** [Nodemailer Documentation](https://nodemailer.com/about/)
 
-### 10. Nodemailer (`nodemailer`)
-- **Description:** Powerful module for sending emails, often utilized for tasks like dispatching confirmation emails.
-- **Documentation:** [Nodemailer Documentation](https://nodemailer.com/about/)
+**11. Nodemon(`nodemon`)**
+* **Description:** Intelligent utility monitoring changes in source code and autonomously restarting the server.
+* **Documentation:** [Nodemon Documentation](https://nodemon.io/)
 
-### 11. Nodemon (`nodemon`)
-- **Description:** Intelligent utility monitoring changes in source code and autonomously restarting the server.
-- **Documentation:** [Nodemon Documentation](https://nodemon.io/)
+**12. Socket.io(`^4.7.2`)**
+* **Description:** Real-time bidirectional event-based communication library for Node.js. Facilitates real-time communication between web clients and servers.
+* **Documentation:** [Socket.IO Documentation](https://socket.io/docs/v4/)
 
-### 12. Socket.io (`^4.7.2`)
-- **Description:** Real-time bidirectional event-based communication library for Node.js. Facilitates real-time communication between web clients and servers.
-- **Documentation:** [Socket.IO Documentation](https://socket.io/docs/v4/)
-
-### 13. Stripe (`@stripe/stripe-js` and `stripe`)
-- **Description:** Libraries dedicated to handling Stripe payments, a leading payment processing platform.
-- **Documentation:** 
+**13. Stripe(`@stripe/stripe-js` and `stripe`)**
+* **Description:** Libraries dedicated to handling Stripe payments, a leading payment processing platform.
+* **Documentation:** 
   - [Stripe.js Documentation](https://stripe.com/docs/payments/elements)
   - [Stripe Node.js Documentation](https://stripe.com/docs/payments/elements)
 
-For detailed information and usage instructions, refer to the official documentation linked above for each API.
 
-## Code Styles
+***For detailed information and usage instructions, refer to the official documentation linked above for each API.***
+
+## Code Styles:
 
 - **Prettier**: Automatic code formatter that ensures uniform formatting across the entire project before each commit.
-- **Consistent Coding Style**: Maintains a specific code style for readability and consistency, essential for collaboration and maintenance.
-- **Standart Code Style Guide**: Adherence to the Standart Code Style Guide ensures uniformity across the codebase. Contributors are encouraged to review the guide for code alignment.
-- **Consistent Formatting**: Proper indentation and consistent formatting enhance code readability and comprehension.
-- **Descriptive Variable Names**: Variables like `fromDateReschedule`, `followUpDate`, `linkedFamilyMembers`, `toggleAppointmentModal`, etc., use descriptive names to convey their purpose.
-- **Destructuring**: Utilization of destructuring for props like `user` from `UserContext` enhances code readability.
-- **Async/Await**: The use of async/await syntax for handling asynchronous operations improves code readability and manages promises effectively.
-- **React Component Structure**: Functional components with React hooks (`useState`, `useEffect`) manage state and side effects efficiently.
-- **Conditional Rendering**: Modals (`Modal isOpen={modalStates[index]}`) and button disabling/enabling based on appointment status use conditional rendering.
-- **Consistent Styling**: Consistency in inline styling and class names throughout the component simplifies maintenance and styling.
-- **Error Handling**: Error handling blocks (`try...catch`) manage potential errors during API requests (axios calls).
-- **Comments**: Code includes comments to explain certain blocks or functionalities, aiding future reference and understanding.
-- **Event Handling**: Consistent event handling, such as `onClick` events on buttons invoking corresponding functions (`handleReschedule`, `handleFollowUp`, `handleCancel`).
 
+- **Consistent Coding Style**: The project maintains a specific code style for readability and consistency, essential for collaboration and maintenance.
+
+- **Standart Code Style Guide**: Adherence to the Standart Code Style Guide ensures uniformity across the codebase. Contributors are encouraged to review the guide for code alignment.
+
+- **Consistent Formatting**: Proper indentation and consistent formatting enhance code readability and comprehension.
+
+- **Descriptive Variable Names**: Variables like `fromDateReschedule`, `followUpDate`, `linkedFamilyMembers`, `toggleAppointmentModal`, etc., use descriptive names to convey their purpose.
+
+- **Destructuring**: Utilization of destructuring for props like `user` from `UserContext` enhances code readability.
+
+- **Async/Await**: The use of async/await syntax for handling asynchronous operations improves code readability and manages promises effectively.
+
+- **React Component Structure**: Functional components with React hooks (`useState`, `useEffect`) manage state and side effects efficiently.
+
+- **Conditional Rendering**: Modals (`Modal isOpen={modalStates[index]}`) and button disabling/enabling based on appointment status use conditional rendering.
+
+- **Consistent Styling**: Consistency in inline styling and class names throughout the component simplifies maintenance and styling.
+
+- **Error Handling**: Error handling blocks (`try...catch`) manage potential errors during API requests (axios calls).
+
+- **Comments**: Code includes comments to explain certain blocks or functionalities, aiding future reference and understanding.
+
+- **Event Handling**: Consistent event handling, such as `onClick` events on buttons invoking corresponding functions (`handleReschedule`, `handleFollowUp`, `handleCancel`).
 ## Build Status
 
 The project is currently in the development stage, progressing through milestones with continuous improvements in code implementation and execution. Notable learning curves were experienced during milestones 2 and 3, particularly in the areas of authentication and user login.
@@ -160,27 +170,76 @@ One prominent issue encountered was the slowness in fetching data from the backe
 
 Looking ahead, the project will require deployment, likely through platforms such as Google Cloud or similar services, to ensure accessibility and scalability in the near future.
 
-## Contribute
+## Code Examples
 
+
+
+
+Video chat Api between doctor and patient, doctor is waiting in the room for patient 
+
+![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025092-c50bc4d3-98aa-4f6f-b505-cd71fa49be08.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T031127Z&X-Amz-Expires=300&X-Amz-Signature=32403de51e9b280e93e78e4b5ac81c0e9cf4d4392c1705a530c8e6104b202028&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+
+The patient uses a family member through their email to link with them 
+![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025060-4ee4761c-7300-4daf-b5c4-b7e6b582beff.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T031340Z&X-Amz-Expires=300&X-Amz-Signature=a9c54d044fa5962879ab1742158f2905b91f3546f4925a15865952803e6f584b&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+
+
+
+# further documentation
+ (https://drive.google.com/drive/folders/1HfreTuMMeXtqHv4OUfgK04wQMY8--XyO?usp=drive_link)
+
+## Screenshots
+
+doctor is able to view all his appointment and filter through in addition to cancelling or rescheduling appointments for patients
+![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025852-776ac070-49e7-49c4-a902-5675fdad892a.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T032510Z&X-Amz-Expires=300&X-Amz-Signature=79c0987da0adabcabf270dbc79dfa4ab1e9b51c44d65818bc2e2d468cd2e37bd&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+
+
+
+As a doctor i can view my patients and search through them by name and filter by upcoming appointments
+![ss](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025909-9941ab53-9120-47e0-8301-efdde95d22a4.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T032529Z&X-Amz-Expires=300&X-Amz-Signature=98f0d2760fd960c2c89506124b3635194e4d8901b0d770f29ab6553ef5144926&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+
+
+# further documentation : 
+(https://drive.google.com/drive/folders/1HfreTuMMeXtqHv4OUfgK04wQMY8--XyO?usp=drive_link))
+## Tests/Postman 
+
+delete medicine route testing 
+
+
+![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024763-521ad3c4-33b4-4342-88bb-510d1d9d51af.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T025514Z&X-Amz-Expires=300&X-Amz-Signature=28da5597dd372961b54b3c23a5a44145e5a1eaf73b86b397aee34782ee1c1759&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+
+
+
+doctor (getMyPatients) route testing
+
+![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024122-83776f1f-75a2-4125-92ea-45b4496e578f.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T025732Z&X-Amz-Expires=300&X-Amz-Signature=e1ce053dc5fbfc40eba81e1cc98532d5113bd356172358069a816fa9c7523cce&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+
+
+as a patient (linkFamilyMember) route testing
+
+![ScreenShot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024131-d15d22ee-0eb0-4b23-9847-c1b129376a2d.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T030028Z&X-Amz-Expires=300&X-Amz-Signature=f1af7471c9f091f0e481bb99477fffc3ba1b6bab2ebe386bc668f9c67fb6831f&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+
+
+ 
+
+ ## Contribute
 We welcome contributions from the community! If you'd like to contribute to the development of this project, follow these guidelines:
 
 1. **Fork the Repository**: Click on the "Fork" button on the top right corner of this repository's page.
-2. **Clone the Repository**: Clone the forked repository to your local machine using the following terminal command:
 
-        git clone https://github.com/your-username/your-forked-repo.git
+2. **Clone the Repository**: Clone the forked repository to your local machine using the following terminal command:
+   
+git clone https://github.com/your-username/your-forked-repo.git
 
 3. **Create a Branch:** Create a new branch for your contributions:
 
-        git checkout -b feature/your-feature-name
 
 4. **Make Changes:** Make your desired changes to the codebase.
+
 5. **Commit Changes:** Commit your changes with a meaningful commit message:
 
-        git commit -m "Add your meaningful commit message here"
 
 6. **Push Changes:** Push your changes to your forked repository:
 
-        git push origin feature/your-feature-name
 
 7. **Create a Pull Request (PR):** Open a Pull Request against the main branch of the original repository. Provide a clear title and description for your changes.
 
@@ -189,9 +248,7 @@ We welcome contributions from the community! If you'd like to contribute to the 
 9. **Merge:** Once your changes are approved, they will be merged into the main branch.
 
 Thank you for contributing to our project! 🚀
-
 ## Credits
-
 - [@02omar](https://github.com/02omar)
 - [@Hauna9](https://github.com/Hauna9)
 - [@shahdamerr](https://github.com/shahdamerr)
@@ -200,6 +257,53 @@ Thank you for contributing to our project! 🚀
 - [@mariamelgendy](https://github.com/mariamelgendy)
 - [@sara2413](https://github.com/sara2413)
 
-- [YouTube Tutorial 1](https://www.youtube.com/watch?v=ENakkm58Uyw&t=354s): Valuable source for online guidance and assistance.
-- [YouTube Tutorial 2](https://m.youtube.com/playlist?list=PLillGF-RfqbbQeVSccR9PGKHzPJSWqcsm)
-- [YouTube Tutorial 3](https://www.youtube.com/watch?v=yXEesONd_54&list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&index=7)
+
+- [YouTube Tutorial](https://www.youtube.com/watch?v=ENakkm58Uyw&t=354s): Used as a valuable source for online guidance and assistance.
+
+- [Youtube Tutorial](https://m.youtube.com/playlist?list=PLillGF-RfqbbQeVSccR9PGKHzPJSWqcsm): Used as a valuable source for online guidance and assistance.
+
+- [Youtube Tutorial](https://www.youtube.com/watch?v=yXEesONd_54&list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&index=7): Used as a valuable source for online guidance and assistance.
+
+- [Youtube Toturial](https://youtube.com/playlist?list=PL4cUxeGkcC9hNokByJilPg5g9m2APUePI&si=8n2xVADjHNtWnFbP):Used as a valuable source for online guidance and assistance.## License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).# Features
+
+## 1. User Authentication
+- **Secure Authentication:** Ensures secure login for both doctors and patients.
+- **Separate Login Portals:** Dedicated login portals designed for doctors and patients.
+
+## 2. Doctor Profiles
+- **Detailed Information:** Includes comprehensive details like name, specialty, qualifications, and contact information.
+- **Profile Picture Upload:** Provides an option for doctors to upload their profile pictures.
+
+## 3. Patient Profiles
+- **Basic Information:** Stores basic patient information along with their medical history.
+- **Secure Health Record Storage:** Safely stores and manages patient health records.
+
+## 4. Appointment Scheduling
+- **User-Friendly System:** Easy-to-use appointment scheduling system, primarily designed for patients.
+- **Doctor Availability Calendar:** Shows doctors' availability with convenient time slots for appointments.
+- **Confirmation and Reminder Notifications:** Sends notifications for both doctors and patients for appointment updates.
+
+## 5. Prescription Management
+- **Electronic Prescriptions:** Enables doctors to generate and manage electronic prescriptions.
+- **Prescription History:** Patients have access to their prescription history through their profiles.
+- **Direct Prescription Sending:** Option for doctors to send prescriptions directly to pharmacies.
+
+## 6. Medical Records and History
+- **Centralized Storage:** Stores patient medical records and treatment history centrally.
+- **Secure Access Control:** Implements secure access control to protect patient confidentiality.
+
+## 7. Notifications and Reminders
+- **Automated Appointment Reminders:** Sends automated appointment reminders to patients.
+- **Doctor Notifications:** Notifies doctors about upcoming appointments.
+
+## 8. Search and Filter Options
+- **Patient Search Functionality:** Enables patients to search for doctors based on specialty, location, etc.
+- **Doctor Filters:** Allows doctors to manage appointment types and availability through filters.
+
+## 9. Real-Time Video Consultations
+- **Integration of Video Call Feature:** Enables real-time video calls for virtual consultations between patients and doctors.
+
+## 10. Real-Time Chat System
+- **Implementation of Messaging System:** Enables instant communication between patients and doctors through a real-time messaging system.
