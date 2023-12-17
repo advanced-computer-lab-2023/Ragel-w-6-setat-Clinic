@@ -177,10 +177,10 @@ Looking ahead, the project will require deployment, likely through platforms suc
 
 Video chat Api between doctor and patient, doctor is waiting in the room for patient 
 
-![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025092-c50bc4d3-98aa-4f6f-b505-cd71fa49be08.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T031127Z&X-Amz-Expires=300&X-Amz-Signature=32403de51e9b280e93e78e4b5ac81c0e9cf4d4392c1705a530c8e6104b202028&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![Ss](https://media.discordapp.net/attachments/1157430089181577294/1185790713787596840/291025092-c50bc4d3-98aa-4f6f-b505-cd71fa49be08.png?ex=6590e4a9&is=657e6fa9&hm=6a74cc79317bedc445c65dc25e517b349c1a49066cda340cec4038bb4bc7d43d&=&format=webp&quality=lossless&width=935&height=591)
 
 The patient uses a family member through their email to link with them 
-![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025060-4ee4761c-7300-4daf-b5c4-b7e6b582beff.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T031340Z&X-Amz-Expires=300&X-Amz-Signature=a9c54d044fa5962879ab1742158f2905b91f3546f4925a15865952803e6f584b&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![Ss](https://media.discordapp.net/attachments/1157430089181577294/1185790637962969138/291025060-4ee4761c-7300-4daf-b5c4-b7e6b582beff.png?ex=6590e497&is=657e6f97&hm=6ecace2e8a0ba4b9c0cd7787f8e32708dbd9ee92efb93e3010788f70a6ee54c7&=&format=webp&quality=lossless&width=980&height=591)
 
 
 
@@ -190,12 +190,12 @@ The patient uses a family member through their email to link with them
 ## Screenshots
 
 doctor is able to view all his appointment and filter through in addition to cancelling or rescheduling appointments for patients
-![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025852-776ac070-49e7-49c4-a902-5675fdad892a.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T032510Z&X-Amz-Expires=300&X-Amz-Signature=79c0987da0adabcabf270dbc79dfa4ab1e9b51c44d65818bc2e2d468cd2e37bd&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
-
+![Ss](https://media.discordapp.net/attachments/1157430089181577294/1185790492907147294/291025852-776ac070-49e7-49c4-a902-5675fdad892a.png?ex=6590e474&is=657e6f74&hm=44148d95a9b5c993a3b44d0361c6a9ded96125846910e506d24739b8a9e98e2f&=&format=webp&quality=lossless&width=1155&height=591)
 
 
 As a doctor i can view my patients and search through them by name and filter by upcoming appointments
-![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291025909-9941ab53-9120-47e0-8301-efdde95d22a4.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T032529Z&X-Amz-Expires=300&X-Amz-Signature=98f0d2760fd960c2c89506124b3635194e4d8901b0d770f29ab6553ef5144926&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![Ss](https://media.discordapp.net/attachments/1157430089181577294/1185790441891831838/291025909-9941ab53-9120-47e0-8301-efdde95d22a4.png?ex=6590e468&is=657e6f68&hm=dc9eb2715fc13eea014e2560357a8dae7efdff1df6468af6db3573b8b3ad6f85&=&format=webp&quality=lossless&width=1082&height=591)
+
 
 
 # further documentation : 
@@ -205,18 +205,22 @@ As a doctor i can view my patients and search through them by name and filter by
 delete medicine route testing 
 
 
-![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024763-521ad3c4-33b4-4342-88bb-510d1d9d51af.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T025514Z&X-Amz-Expires=300&X-Amz-Signature=28da5597dd372961b54b3c23a5a44145e5a1eaf73b86b397aee34782ee1c1759&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![Ss](https://media.discordapp.net/attachments/1157430089181577294/1185790821623148564/291024763-521ad3c4-33b4-4342-88bb-510d1d9d51af.png?ex=6590e4c2&is=657e6fc2&hm=f0d68ab5d31b80bfbd880e7fc7a954a235c58ee41fcf5af4aa787c4962368db4&=&format=webp&quality=lossless&width=1050&height=591)
+
 
 
 
 doctor (getMyPatients) route testing
 
-![App Screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024122-83776f1f-75a2-4125-92ea-45b4496e578f.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T025732Z&X-Amz-Expires=300&X-Amz-Signature=e1ce053dc5fbfc40eba81e1cc98532d5113bd356172358069a816fa9c7523cce&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![Ss](https://media.discordapp.net/attachments/1157430089181577294/1185790791206064146/291024122-83776f1f-75a2-4125-92ea-45b4496e578f.png?ex=6590e4bb&is=657e6fbb&hm=facdfa92e51d646da1d856414adb1a755eab50bd3030461514d165e4ccb6233c&=&format=webp&quality=lossless&width=1052&height=591)
+
 
 
 as a patient (linkFamilyMember) route testing
 
-![App Screenhot](https://github-production-user-asset-6210df.s3.amazonaws.com/119898577/291024131-d15d22ee-0eb0-4b23-9847-c1b129376a2d.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231217%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231217T030028Z&X-Amz-Expires=300&X-Amz-Signature=f1af7471c9f091f0e481bb99477fffc3ba1b6bab2ebe386bc668f9c67fb6831f&X-Amz-SignedHeaders=host&actor_id=128222412&key_id=0&repo_id=700732626)
+![Ss](https://media.discordapp.net/attachments/1157430089181577294/1185790757060222976/291024131-d15d22ee-0eb0-4b23-9847-c1b129376a2d.png?ex=6590e4b3&is=657e6fb3&hm=10daca3b26d0d133ba61e88ae9585484b9d11d315ce2492fea72ca344db3068e&=&format=webp&quality=lossless&width=1050&height=591)
+
+
 
 ## Contribute
 We welcome contributions from the community! If you'd like to contribute to the development of this project, follow these guidelines:
