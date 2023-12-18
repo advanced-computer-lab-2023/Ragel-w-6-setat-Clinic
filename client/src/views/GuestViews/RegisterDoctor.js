@@ -92,6 +92,16 @@ const RegisterDoctor = () => {
         return;
       }
 
+      // ensure password is at least 8 characters, with one uppercase letter, and one symbol
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(doctorFields.password)) {
+        setVisible(true);
+        setAlertMessage(
+          "Password should be at least 8 characters, with one uppercase letter, and one digit"
+        );
+        return;
+      }
+
       const formData = new FormData();
       formData.append("fileID", fileID);
       formData.append("fileMedicalLicense", fileMedicalLicense);

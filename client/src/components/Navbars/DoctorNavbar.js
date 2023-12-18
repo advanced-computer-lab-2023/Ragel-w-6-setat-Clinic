@@ -133,12 +133,12 @@ const DoctorNavBar = () => {
         <Collapse isOpen={isOpen} navbar>
           <Container fluid>
             <Nav navbar>
-              <NavItem>
+              {/* <NavItem>
                 <NavLink href="/components/" className="mb-sm-1 mb-md-0">
                   <i className="fa-solid fa-hospital"></i>
                   About Us
                 </NavLink>
-              </NavItem>
+              </NavItem> */}
               <NavItem>
                 <NavLink href="/doctor/home" className="mb-sm-1 mb-md-0">
                   {hasNewNotifications ? (

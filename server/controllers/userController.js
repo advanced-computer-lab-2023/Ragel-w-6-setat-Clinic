@@ -40,12 +40,9 @@ const login = async (req, res) => {
       const token = createToken(admin.username);
       return res.status(200).json({ userType: "admin", user: admin, token });
     }
-
-    // If no user is found
-    return res.status(500).json({ message: "Invalid credentials" });
   } catch (error) {
     // Handle any errors
-    console.error("Error during login:", error.message);
+    console.log("Error during login:", error.message);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -207,6 +204,7 @@ const registerDoctor = async (req, res) => {
       const message = `A user already exists with this ${duplicatedField}`;
       res.status(500).json({ message });
     } else {
+      console.log(error.message);
       res.status(500).json({ message: "Internal Server Error" });
     }
   }

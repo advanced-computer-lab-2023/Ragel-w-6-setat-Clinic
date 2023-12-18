@@ -20,6 +20,21 @@ dotenv.config({ path: "./.env" });
 let uri = process.env.MONGODB_URI;
 let port = process.env.PORT;
 
+// multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./public/uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+    ); //Appending extension
+  },
+});
+
+const upload = multer({ storage: storage });
+
 // express app
 const app = express();
 
@@ -36,7 +51,15 @@ app.use("/admins", adminRoutes);
 app.use("/conversation", conversationRoutes);
 app.use("/message", messageRoutes);
 app.post("/login", login);
-app.post("/registerDoctor", registerDoctor);
+app.post(
+  "/registerDoctor",
+  upload.fields([
+    { name: "fileID", maxCount: 1 },
+    { name: "fileMedicalLicense", maxCount: 1 },
+    { name: "fileMedicalDegree", maxCount: 1 },
+  ]),
+  registerDoctor
+);
 app.post("/registerPatient", registerPatient);
 app.post("/resetPasswordOTP", resetPasswordOTP);
 

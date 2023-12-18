@@ -135,12 +135,12 @@ const PatientNavBar = () => {
         <Collapse isOpen={isOpen} navbar>
           <Container fluid>
             <Nav navbar>
-              <NavItem>
+              {/* <NavItem>
                 <NavLink href="/components/" className="mb-sm-1 mb-md-0">
                   <i className="fa-solid fa-hospital"></i>
                   About Us
                 </NavLink>
-              </NavItem>
+              </NavItem> */}
               <NavItem>
                 <NavLink href="/patient/home" className="mb-sm-1 mb-md-0">
                   {hasNewNotifications ? (
@@ -162,12 +162,12 @@ const PatientNavBar = () => {
                   </NavLink>
                 </Link>
               </NavItem>
-              <NavItem>
+              {/* <NavItem>
                 <NavLink href="/components/" className="mb-sm-1 mb-md-0">
                   <i className="fa-solid fa-calendar-check"></i>
                   Available Appointments
                 </NavLink>
-              </NavItem>
+              </NavItem> */}
               <NavItem>
                 <NavLink
                   href="/patient/healthPackages"
