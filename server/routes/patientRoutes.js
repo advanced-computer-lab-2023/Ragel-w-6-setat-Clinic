@@ -41,6 +41,11 @@ import {
   getFamilyMember,
   patientProfile,
   getSubscribedPackage,
+  getSubscribedPackageForFamilyMember,
+  changePatientPassword,
+  getUserById,
+  createAppointmentNotifications,
+  getPatientNotifications,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
@@ -96,6 +101,10 @@ router.get("/myDoctors/:id", getMyDoctors);
 router.get("/getFamilyMember/:id", getFamilyMember);
 router.get("/patientProfile/:id", patientProfile);
 router.get("/subscribedPackage/:id", getSubscribedPackage);
+router.get(
+  "/subscribedPackageOfFamilyMember/:id",
+  getSubscribedPackageForFamilyMember
+);
 
 // LOJAINS ROUTES
 router.post("/addFamilyMember/:id", addFamilyMember);
@@ -113,6 +122,8 @@ router.get("/viewAppointments/:id", viewAppointments);
 
 // sprint 3
 router.get("/downloadPrescriptionPDF/:id", downloadPrescriptionPDF);
+router.get("/getPatientNotifications/:id", getPatientNotifications);
+router.get("/getAppNotifications/:id", createAppointmentNotifications);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);
@@ -151,5 +162,9 @@ router.patch(
 );
 router.post("/requestFollowUp/:patientid", requestFollowUpAppointment);
 router.patch("/cancelAppointment/:id", cancelAppointment);
+router.post("/changePatientPassword", changePatientPassword);
+
+// hanas stuff
+router.get("/getUserById/:id", getUserById);
 
 export default router;

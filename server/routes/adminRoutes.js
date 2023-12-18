@@ -15,6 +15,7 @@ import {
   setToRegistered,
   rejectDoctor,
   getAdmin,
+  getUserById,
 } from "../controllers/adminController.js";
 import { body, validationResult } from "express-validator";
 
@@ -42,5 +43,8 @@ router.get("/allDoctors/:id", getAllDoctors);
 router.get("/allPatients/:id", getAllPatients);
 router.patch("/setToRegistered/:id", setToRegistered);
 router.delete("/rejectDoctor/:id", rejectDoctor);
+
+//hanas stuff
+router.get("/getUserById/:id", getUserById);
 
 export default router;

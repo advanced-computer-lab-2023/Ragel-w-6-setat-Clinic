@@ -349,6 +349,31 @@ const rejectDoctor = async (req, res) => {
   }
 };
 
+const getUserById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Try to find the user in each collection
+    const patient = await Patient.findById(id);
+    if (patient) {
+      return res.status(200).json(patient);
+    }
+    const doctor = await Doctor.findById(id);
+    if (doctor) {
+      return res.status(200).json(doctor);
+    }
+    const admin = await Admin.findById(id);
+    if (admin) {
+      return res.status(200).json(admin);
+    }
+
+    // If none of the above, user not found
+    res.status(404).json({ error: "User not found" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 export {
   createAdmin,
   createPackage,
@@ -365,4 +390,5 @@ export {
   setToRegistered,
   rejectDoctor,
   getAdmin,
+  getUserById,
 };

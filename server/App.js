@@ -5,10 +5,13 @@ import morgan from "morgan";
 import patientRoutes from "./routes/patientRoutes.js";
 import doctorRoutes from "./routes/doctorRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import conversationRoutes from "./routes/Conversation.js";
+import messageRoutes from "./routes/Message.js";
 import {
   login,
   registerDoctor,
   registerPatient,
+  resetPasswordOTP,
 } from "./controllers/userController.js";
 import multer from "multer";
 import path from "path";
@@ -30,9 +33,12 @@ app.use(morgan("dev"));
 app.use("/patients", patientRoutes);
 app.use("/doctors", doctorRoutes);
 app.use("/admins", adminRoutes);
+app.use("/conversation", conversationRoutes);
+app.use("/message", messageRoutes);
 app.post("/login", login);
 app.post("/registerDoctor", registerDoctor);
 app.post("/registerPatient", registerPatient);
+app.post("/resetPasswordOTP", resetPasswordOTP);
 
 // connect to mongodb & listen for requests
 

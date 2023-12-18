@@ -32,6 +32,10 @@ import {
   getAllMedicines,
   createPrescription,
   updatePrescription,
+  changeDoctorPassword,
+  getUserById,
+  getDoctorNotifications,
+  createAppointmentNotifications,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthDoctor } from "../middlewares/requireAuthDoctor.js";
@@ -122,9 +126,18 @@ router.patch(
   "/updatePrescription/:doctorid/:prescriptionid",
   updatePrescription
 );
+router.post("/changeDoctorPassword", changeDoctorPassword);
+router.get("/getDoctorNotifications/:id", getDoctorNotifications);
+router.get(
+  "/getAppNotifications/:doctorid/:patientid",
+  createAppointmentNotifications
+);
 
 // merging routes
 router.get("/getAllMedicines", getAllMedicines);
 router.post("/createPrescription/:doctorid/:patientid", createPrescription);
+
+//hanas stuff
+router.get("/getUserById/:id", getUserById);
 
 export default router;

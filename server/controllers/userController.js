@@ -5,6 +5,7 @@ import PatientPharmacy from "../models/PatientPharmacy.js";
 import Pharmacist from "../models/Pharmacist.js";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 const createToken = (username) => {
   return jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: "1d" });
@@ -211,4 +212,91 @@ const registerDoctor = async (req, res) => {
   }
 };
 
-export { login, registerPatient, registerDoctor };
+const sendPasswordResetEmail = async (email, newPassword) => {
+  const mailOptions = {
+    from: "3projectalpha3@gmail.com",
+    to: email,
+    subject: "Password Reset",
+    text: `Your password has been reset. Your new password is: ${newPassword}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully");
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "3projectalpha3@gmail.com",
+    pass: "ncgo dehg lebs zazh",
+  },
+});
+
+const resetPasswordOTP = async (req, res) => {
+  try {
+    const { username, email } = req.body; //CHECKME sends random otp
+    const capitalLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+    const specialCharacters = "*";
+
+    const getRandomChar = (charSet) => {
+      const randomIndex = Math.floor(Math.random() * charSet.length);
+      return charSet[randomIndex];
+    };
+
+    const password =
+      getRandomChar(capitalLetters) +
+      getRandomChar(numbers) +
+      Array.from({ length: 6 }, () =>
+        getRandomChar(capitalLetters + numbers + specialCharacters)
+      ).join("");
+
+    // Check Doctor database
+    const doctor = await Doctor.findOne({ username, email });
+    if (doctor) {
+      doctor.password = password;
+      await doctor.save();
+
+      await sendPasswordResetEmail(email, password);
+      return res.json({ success: true });
+    }
+
+    // Check Patient database
+    const patient = await Patient.findOne({ username, email });
+    if (patient) {
+      patient.password = password;
+      await patient.save();
+
+      await sendPasswordResetEmail(email, password);
+      return res.json({ success: true });
+    }
+
+    // Check Admin database
+    const admin = await Admin.findOne({ username, email }).exec();
+    if (admin) {
+      admin.password = password;
+      const check = admin.password;
+
+      await sendPasswordResetEmail(email, password);
+      await admin.save();
+      return res.json({ success: true });
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: "Invalid credentials; does not exist in Patient/Admin/doctor",
+    });
+  } catch (error) {
+    // Handle any errors
+    console.error("Error during login:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+export { login, registerPatient, registerDoctor, resetPasswordOTP };

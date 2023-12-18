@@ -533,6 +533,41 @@ const getSubscribedPackage = async (req, res) => {
   }
 };
 
+const getSubscribedPackageForFamilyMember = async (req, res) => {
+  const patientId = req.params.id;
+  try {
+    const patient = await Patient.findById(patientId);
+    const registeredFamilyMembersEmails = patient.familyMembers.map(
+      (member) => member.email
+    );
+
+    // check if at least one family member is subscribed to a health package
+    const subscribedFamilyMember = await Patient.findOne({
+      email: { $in: registeredFamilyMembersEmails },
+      // his subscribedPackage is not null
+      subscribedPackage: { $ne: null },
+    });
+
+    if (subscribedFamilyMember) {
+      const subscribedPackage = subscribedFamilyMember.subscribedPackage;
+      const packageOffered = await Package.findById({
+        _id: subscribedPackage.packageId,
+      });
+
+      return res.status(200).json({
+        status: "success",
+        subscribedPackage: packageOffered,
+      });
+    }
+    res.status(400).json({
+      status: "fail",
+      message: "No family member is subscribed to any health package",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // LOJAINS REQS
 
 const addFamilyMember = async (req, res) => {
@@ -755,6 +790,135 @@ const downloadPrescriptionPDF = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
+};
+
+const getPatientNotifications = async (req, res) => {
+  try {
+    const patientId = req.params.id;
+
+    // Check if the patient exists
+    const patient = await Patient.findById(patientId);
+
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    // Retrieve all notifications for the specific patient
+    const notifications = await Notification.find({ patient: patientId });
+
+    res.status(200).json({ status: "success", notifications: notifications });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const createAppointmentNotifications = async (req, res) => {
+  try {
+    const patientId = req.params.patientid;
+    const appointmentId = req.params.appointmentid;
+
+    const patient = await Patient.findById(patientId);
+    const appointment = await Appointments.findById(appointmentId);
+    const doctor = await Doctor.findById(appointment.doctor);
+
+    let notificationMessagePatient = "";
+    let notificationMessageDoctor = "";
+    const appointmentDate = new Date(appointment.date);
+    const localDate = appointmentDate.toLocaleString("en-US", {
+      timeZone: "Africa/Cairo",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: true,
+    });
+
+    const doctorName = `${doctor.fName} ${doctor.lName}`;
+    const patientName = `${patient.fName} ${patient.lName}`;
+
+    if (appointment.status === "upcoming") {
+      notificationMessagePatient = `Your appointment with Dr. ${doctorName} is scheduled for ${localDate}`;
+      notificationMessageDoctor = `Your appointment with ${patientName} is scheduled for ${localDate}`;
+    } else if (appointment.status === "cancelled") {
+      notificationMessagePatient = `Your appointment with Dr. ${doctorName} on ${localDate} has been cancelled`;
+      notificationMessageDoctor = `Your appointment with ${patientName} on ${localDate} has been cancelled`;
+    } else if (appointment.status === "rescheduled") {
+      notificationMessagePatient = `Your appointment with Dr. ${doctorName} on ${localDate} has been rescheduled`;
+      notificationMessageDoctor = `Your appointment with ${patientName} on ${localDate} has been rescheduled`;
+    } else if (appointment.status === "follow-up") {
+      notificationMessagePatient = `Your follow-up appointment with Dr. ${doctorName} on ${localDate} has been scheduled`;
+      notificationMessageDoctor = `Your follow-up appointment with ${patientName} on ${localDate} has been scheduled`;
+    }
+
+    // Create a new notification
+    const newNotificationDoctor = await Notification.create({
+      doctor: doctor._id,
+      title: "Appointment Update",
+      message: notificationMessageDoctor,
+      date: new Date(),
+      read: false,
+    });
+
+    // Create a new notification
+    const newNotificationPatient = await Notification.create({
+      patient: patient._id,
+      title: "Appointment Update",
+      message: notificationMessagePatient,
+      date: new Date(),
+      read: false,
+    });
+
+    await sendNotificationsByEmail(doctor.email, [newNotificationDoctor]);
+    await sendNotificationsByEmail(patient.email, [newNotificationPatient]);
+
+    res.status(200).json({
+      status: "success",
+      message: "Notification created successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const sendNotificationsByEmail = async (patientEmail, notifications) => {
+  try {
+    // Create a nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      // configure your email provider here
+      service: "gmail",
+      auth: {
+        user: "3projectalpha3@gmail.com",
+        pass: "ncgo dehg lebs zazh",
+      },
+    });
+
+    // Compose email message
+    const mailOptions = {
+      from: "3projectalpha3@gmail.com",
+      to: patientEmail,
+      subject: "New Notifications",
+      text: `You have new notifications:\n\n${formatNotifications(
+        notifications
+      )}`,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
+
+// Helper function to format notifications for email
+const formatNotifications = (notifications) => {
+  // Customize the formatting based on your needs
+  return notifications
+    .map((notification) => `${notification.title}: ${notification.message}`)
+    .join("\n");
 };
 
 // MARIAMS REQS
@@ -1441,6 +1605,67 @@ const cancelAppointment = async (req, res) => {
     });
   }
 };
+
+const changePatientPassword = async (req, res) => {
+  const { username, oldPassword, newPassword } = req.body;
+
+  try {
+    const patient = await Patient.findOne({ username });
+
+    if (oldPassword != patient.password) {
+      return res.status(400).json({ message: "Incorrect old password" });
+    }
+
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordPattern.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters long and contain an uppercase letter and a digit.",
+      });
+    }
+
+    patient.password = newPassword;
+    await patient.save();
+
+    // Update the associated user's password
+    // const user = await User.findOne({ username });
+    // user.password = await bcrypt.hash(newPassword, 10);
+    //await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// hana's stuff
+
+const getUserById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Try to find the user in each collection
+    const patient = await Patient.findById(id);
+    if (patient) {
+      return res.status(200).json(patient);
+    }
+    const doctor = await Doctor.findById(id);
+    if (doctor) {
+      return res.status(200).json(doctor);
+    }
+    const admin = await Admin.findById(id);
+    if (admin) {
+      return res.status(200).json(admin);
+    }
+
+    // If none of the above, user not found
+    res.status(404).json({ error: "User not found" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 export {
   registerPatient,
   viewPrescription,
@@ -1481,4 +1706,9 @@ export {
   getFamilyMember,
   patientProfile,
   getSubscribedPackage,
+  getSubscribedPackageForFamilyMember,
+  changePatientPassword,
+  getUserById,
+  createAppointmentNotifications,
+  getPatientNotifications,
 };

@@ -862,6 +862,169 @@ const updatePrescription = async (req, res) => {
   }
 };
 
+const changeDoctorPassword = async (req, res) => {
+  const { username, oldPassword, newPassword } = req.body;
+
+  try {
+    const doctor = await Doctor.findOne({ username });
+
+    if (oldPassword != doctor.password) {
+      return res.status(400).json({ message: "Incorrect old password" });
+    }
+
+    const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordPattern.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters long and contain an uppercase letter and a digit.",
+      });
+    }
+
+    doctor.password = newPassword;
+    await doctor.save();
+
+    // Update the associated user's password
+    // const user = await User.findOne({ username });
+    // user.password = await bcrypt.hash(newPassword, 10);
+    //await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getDoctorNotifications = async (req, res) => {
+  try {
+    const doctorId = req.params.id;
+    // Check if the patient exists
+    const doctor = await Doctor.findById(doctorId);
+
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+
+    // Retrieve all notifications for the specific patient
+    const notifications = await Notification.find({ doctor: doctorId });
+
+    res.status(200).json({ status: "success", notifications: notifications });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const createAppointmentNotifications = async (req, res) => {
+  try {
+    const doctorId = req.params.doctorid;
+    const appointmentId = req.params.appointmentid;
+
+    const doctor = await Doctor.findById(doctorId);
+
+    const appointment = await Appointments.findById(appointmentId);
+
+    const patient = await Patient.findById(appointment.patient);
+
+    let notificationMessagePatient = "";
+    let notificationMessageDoctor = "";
+    const appointmentDate = new Date(appointment.date);
+    const localDate = appointmentDate.toLocaleString("en-US", {
+      timeZone: "Africa/Cairo",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: true,
+    });
+    const doctorName = `${doctor.fName} ${doctor.lName}`;
+    const patientName = `${patient.fName} ${patient.lName}`;
+
+    if (appointment.status === "upcoming") {
+      notificationMessagePatient = `Your appointment with Dr. ${doctorName} is scheduled for ${localDate}`;
+      notificationMessageDoctor = `Your appointment with ${patientName} is scheduled for ${localDate}`;
+    } else if (appointment.status === "cancelled") {
+      notificationMessagePatient = `Your appointment with Dr. ${doctorName} on ${localDate} has been cancelled`;
+      notificationMessageDoctor = `Your appointment with ${patientName} on ${localDate} has been cancelled`;
+    } else if (appointment.status === "rescheduled") {
+      notificationMessagePatient = `Your appointment with Dr. ${doctorName} on ${localDate} has been rescheduled`;
+      notificationMessageDoctor = `Your appointment with ${patientName} on ${localDate} has been rescheduled`;
+    } else if (appointment.status === "follow-up") {
+      notificationMessagePatient = `Your follow-up appointment with Dr. ${doctorName} on ${localDate} has been scheduled`;
+      notificationMessageDoctor = `Your follow-up appointment with ${patientName} on ${localDate} has been scheduled`;
+    }
+
+    // Create a new notification
+    const newNotificationDoctor = await Notification.create({
+      doctor: doctorId,
+      title: "Appointment Update",
+      message: notificationMessageDoctor,
+      date: new Date(),
+      read: false,
+    });
+
+    // Create a new notification
+    const newNotificationPatient = await Notification.create({
+      patient: patient._id,
+      title: "Appointment Update",
+      message: notificationMessagePatient,
+      date: new Date(),
+      read: false,
+    });
+
+    // Send the new notification to the doctor's email
+    await sendNotificationsByEmail(doctor.email, [newNotificationDoctor]);
+    await sendNotificationsByEmail(patient.email, [newNotificationPatient]);
+
+    res.status(200).json({
+      status: "success",
+      message: "Notification created successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const sendNotificationsByEmail = async (patientEmail, notifications) => {
+  try {
+    // Create a nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      // configure your email provider here
+      service: "gmail",
+      auth: {
+        user: "3projectalpha3@gmail.com",
+        pass: "ncgo dehg lebs zazh",
+      },
+    });
+
+    // Compose email message
+    const mailOptions = {
+      from: "3projectalpha3@gmail.com",
+      to: patientEmail,
+      subject: "New Notifications",
+      text: `You have new notifications:\n\n${formatNotifications(
+        notifications
+      )}`,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
+
+// Helper function to format notifications for email
+const formatNotifications = (notifications) => {
+  // Customize the formatting based on your needs
+  return notifications
+    .map((notification) => `${notification.title}: ${notification.message}`)
+    .join("\n");
+};
+
 // MERGINGG
 
 const getAllMedicines = async (req, res) => {
@@ -874,6 +1037,32 @@ const getAllMedicines = async (req, res) => {
     res.status(200).json(medicine);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+//hanas stuff
+const getUserById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Try to find the user in each collection
+    const patient = await Patient.findById(id);
+    if (patient) {
+      return res.status(200).json(patient);
+    }
+    const doctor = await Doctor.findById(id);
+    if (doctor) {
+      return res.status(200).json(doctor);
+    }
+    const admin = await Admin.findById(id);
+    if (admin) {
+      return res.status(200).json(admin);
+    }
+
+    // If none of the above, user not found
+    res.status(404).json({ error: "User not found" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -908,4 +1097,8 @@ export {
   getAllMedicines,
   createPrescription,
   updatePrescription,
+  changeDoctorPassword,
+  getUserById,
+  getDoctorNotifications,
+  createAppointmentNotifications,
 };
