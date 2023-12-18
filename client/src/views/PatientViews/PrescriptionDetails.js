@@ -79,6 +79,27 @@ const PrescriptionDetails = () => {
     }
   };
 
+  const markPrescriptionAsExported = async () => {
+    try {
+      const response = await fetch(
+        `/patients/markPrescriptionAsExported/${prescription._id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      console.log(data); // Log the response from the backend
+
+      // You can also update the local state or perform any other necessary actions
+    } catch (error) {
+      console.error("Error marking prescription as exported:", error);
+    }
+  };
+
   return (
     <>
       <Container className="mt-5 mb-5" fluid>
@@ -98,14 +119,14 @@ const PrescriptionDetails = () => {
                     Download as PDF
                   </Button>
                 </Col>
+                <Col className="mt-3" xl="2"></Col>
                 <Col className="mt-3 ml-5 mr--5" xl="4">
-                  <Button color="secondary" size="sm">
-                    Pay with Credit Card
-                  </Button>
-                </Col>
-                <Col className="mt-3" xl="3">
-                  <Button color="secondary" size="sm">
-                    Pay with Wallet
+                  <Button
+                    color="secondary"
+                    size="sm"
+                    onClick={markPrescriptionAsExported}
+                  >
+                    Mark as Exported
                   </Button>
                 </Col>
               </Row>

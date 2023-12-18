@@ -47,6 +47,7 @@ import {
   createAppointmentNotifications,
   getPatientNotifications,
   markAllNotificationsAsRead,
+  markPrescriptionAsExported,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
@@ -72,7 +73,10 @@ const router = express.Router();
 router.use(requireAuthPatient);
 
 // HABIBAS ROUTES
-
+router.put(
+  "/markPrescriptionAsExported/:prescriptionId",
+  markPrescriptionAsExported
+);
 router.post("/register", registerPatient);
 router.get("/allPatients", getAllPatients);
 router.get("/allHealthPackages/:id", getAllPackages);

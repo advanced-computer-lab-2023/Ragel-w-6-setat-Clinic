@@ -1683,6 +1683,39 @@ const getUserById = async (req, res) => {
   }
 };
 
+// merging functions
+const markPrescriptionAsExported = async (req, res) => {
+  const prescriptionId = req.params.prescriptionId; // Assuming you get the prescription ID from the request parameters
+
+  try {
+    // Check if the prescription exists
+    const prescription = await Prescription.findById(prescriptionId);
+
+    if (!prescription) {
+      return res.status(404).json({
+        status: "error",
+        message: "Prescription not found",
+      });
+    }
+
+    // Update the 'exported' field to true
+    prescription.exported = true;
+
+    // Save the updated prescription
+    await prescription.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Prescription marked as exported",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+};
+
 export {
   registerPatient,
   viewPrescription,
@@ -1729,4 +1762,5 @@ export {
   createAppointmentNotifications,
   getPatientNotifications,
   markAllNotificationsAsRead,
+  markPrescriptionAsExported,
 };

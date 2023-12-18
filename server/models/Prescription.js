@@ -43,6 +43,10 @@ const prescriptionSchema = new Schema({
     type: String,
     required: true,
   },
+  exported: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Prescription = mongoose.model("Prescription", prescriptionSchema);
