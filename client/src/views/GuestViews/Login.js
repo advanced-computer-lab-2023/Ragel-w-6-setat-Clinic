@@ -1,6 +1,6 @@
 // reactstrap components
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../hooks/useAuthContext.js";
 
@@ -17,12 +17,18 @@ import {
   Row,
   Col,
   Alert,
+  Modal,
+  ModalHeader,
+  ModalBody,
 } from "reactstrap";
 
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(""); // Added state for email
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
+    useState(false);
   const [visible, setVisible] = useState(false);
   const onDismiss = () => setVisible(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -64,6 +70,36 @@ const Login = () => {
       console.error("Error during login:", error.message);
       setVisible(true);
       setAlertMessage(error.message);
+    }
+  };
+
+  const toggleForgotPasswordModal = () => {
+    setIsForgotPasswordModalOpen(!isForgotPasswordModalOpen);
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      const response = await fetch("/resetPasswordOTP", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email }), // Pass both username and email
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Implement logic for successful password reset
+        // For now, let's just close the modal
+        toggleForgotPasswordModal();
+      } else {
+        // Handle errors from the backend (data.message)
+        console.error("Error resetting password:", data.message);
+      }
+    } catch (error) {
+      // Handle network or other errors
+      console.error("Error resetting password:", error.message);
     }
   };
 
@@ -145,12 +181,65 @@ const Login = () => {
             <a
               className="text-light"
               href="#pablo"
-              onClick={(e) => e.preventDefault()}
+              onClick={toggleForgotPasswordModal}
             >
               <small>Forgot password?</small>
             </a>
           </Col>
         </Row>
+        {/* Forgot Password Modal */}
+        <Modal
+          isOpen={isForgotPasswordModalOpen}
+          toggle={toggleForgotPasswordModal}
+        >
+          <ModalHeader toggle={toggleForgotPasswordModal}>
+            Forgot Password
+          </ModalHeader>
+          <ModalBody>
+            <p>Log in with the password sent to you on email</p>
+            <Form>
+              <FormGroup>
+                <InputGroup className="input-group-alternative">
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
+                      <i className="ni ni-email-83" />
+                    </InputGroupText>
+                  </InputGroupAddon>
+                  <Input
+                    placeholder="Username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                </InputGroup>
+              </FormGroup>
+              <FormGroup>
+                <InputGroup className="input-group-alternative">
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
+                      <i className="ni ni-lock-circle-open" />
+                    </InputGroupText>
+                  </InputGroupAddon>
+                  <Input
+                    placeholder="Email"
+                    type="text"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </InputGroup>
+              </FormGroup>
+              <div className="text-center">
+                <Button
+                  color="primary"
+                  type="button"
+                  onClick={handleForgotPassword}
+                >
+                  Submit
+                </Button>
+              </div>
+            </Form>
+          </ModalBody>
+        </Modal>
       </Col>
     </>
   );

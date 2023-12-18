@@ -57,6 +57,7 @@ const DoctorDetails = () => {
   const [availableAppointments, setAvailableAppointments] = useState([]);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [memberEmail, setMemberEmail] = useState("");
+  // eslint-disable-next-line
   const [subscribedPackage, setSubscribedPackage] = useState("");
 
   useEffect(() => {
@@ -143,6 +144,7 @@ const DoctorDetails = () => {
           }
         );
         const json = await response.json();
+        console.log(json);
         if (response.ok) {
           setSubscribedPackage(json);
         }
@@ -160,16 +162,6 @@ const DoctorDetails = () => {
 
       const { username, sessionPrice } = doctorDetails;
       let finalPrice = sessionPrice;
-
-      if (subscribedPackage) {
-        let sessionDiscount = 0;
-        sessionDiscount = subscribedPackage.sessionDiscount || 0;
-
-        const originalSessionPrice = sessionPrice;
-        const discountedPrice =
-          originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
-        finalPrice = discountedPrice;
-      }
 
       const items = [
         {
@@ -221,16 +213,6 @@ const DoctorDetails = () => {
 
       const { username, sessionPrice } = doctorDetails;
       let finalPrice = sessionPrice;
-
-      if (subscribedPackage) {
-        let sessionDiscount = 0;
-        sessionDiscount = subscribedPackage.sessionDiscount || 0;
-
-        const originalSessionPrice = sessionPrice;
-        const discountedPrice =
-          originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
-        finalPrice = discountedPrice;
-      }
 
       const items = {
         name: username,
@@ -289,18 +271,7 @@ const DoctorDetails = () => {
   const scheduleAppointmentFamilyWallet = async (appointment) => {
     try {
       const { username, sessionPrice } = doctorDetails;
-
       let finalPrice = sessionPrice;
-
-      if (subscribedPackage) {
-        let sessionDiscount = 0;
-        sessionDiscount = subscribedPackage.sessionDiscount || 0;
-
-        const originalSessionPrice = sessionPrice;
-        const discountedPrice =
-          originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
-        finalPrice = discountedPrice;
-      }
 
       const items = {
         name: username,
@@ -360,15 +331,15 @@ const DoctorDetails = () => {
       const { username, sessionPrice } = doctorDetails;
       let finalPrice = sessionPrice;
 
-      if (subscribedPackage) {
-        let sessionDiscount = 0;
-        sessionDiscount = subscribedPackage.sessionDiscount || 0;
+      // if (subscribedPackage) {
+      //   let sessionDiscount = 0;
+      //   sessionDiscount = subscribedPackage.sessionDiscount || 0;
 
-        const originalSessionPrice = sessionPrice;
-        const discountedPrice =
-          originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
-        finalPrice = discountedPrice;
-      }
+      //   const originalSessionPrice = sessionPrice;
+      //   const discountedPrice =
+      //     originalSessionPrice - originalSessionPrice * (sessionDiscount / 100);
+      //   finalPrice = discountedPrice;
+      // }
 
       const items = [
         {

@@ -47,6 +47,7 @@ const DoctorPrescriptionDetailsForPatient = () => {
   const [addedMedicines, setAddedMedicines] = useState([]);
   const [selectedMedicine, setSelectedMedicine] = useState("");
   const [dosage, setDosage] = useState("");
+  // eslint-disable-next-line
   const [deletedMedicines, setDeletedMedicines] = useState([]);
   const [updatedMedications, setUpdatedMedications] = useState([]);
   const [updatedDosages, setUpdatedDosages] = useState([]);

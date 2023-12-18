@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Collapse,
   Navbar,
@@ -12,21 +13,94 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  FormGroup,
+  Label,
+  Input,
+  Button,
+  Alert,
 } from "reactstrap";
-
 import { useAuthContext } from "../../hooks/useAuthContext.js";
 
 const DoctorNavBar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggle = () => setIsOpen(!isOpen);
+  const [visible, setVisible] = useState(false);
+  const onDismiss = () => setVisible(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertColor, setAlertColor] = useState("danger");
 
-  const { dispatch } = useAuthContext();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [username, setUsername] = useState(""); // Add username state
+
+  const toggle = () => setIsOpen(!isOpen);
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+    setOldPassword("");
+    setNewPassword("");
+    setUsername("");
+  };
+
+  const { user, dispatch } = useAuthContext();
 
   const handleLogOut = async (e) => {
     localStorage.removeItem("user");
     dispatch({ type: "LOGOUT" });
 
     window.location.href = "http://localhost:3000/auth/login";
+  };
+
+  const handleChangePassword = () => {
+    toggleModal(); // Open the modal
+  };
+
+  const handlePasswordChangeSubmit = async () => {
+    try {
+      if (!username || !oldPassword || !newPassword) {
+        setAlertMessage("Please fill in all the fields");
+        setAlertColor("danger");
+        setVisible(true);
+        return;
+      }
+
+      const response = await axios.post(
+        `/doctors/changeDoctorPassword`,
+        {
+          username,
+          oldPassword,
+          newPassword,
+        },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        setAlertMessage(response.data.message);
+        setAlertColor("success");
+        setVisible(true);
+        setUsername("");
+        setOldPassword("");
+        setNewPassword("");
+        setTimeout(() => {
+          toggleModal();
+        }, 3000);
+      }
+    } catch (error) {
+      if (error.response.status === 400) {
+        setAlertMessage(error.response.data.message);
+        setAlertColor("danger");
+        setVisible(true);
+      }
+      setUsername("");
+      setOldPassword("");
+      setNewPassword("");
+      console.error(error.response.data.message);
+    }
   };
 
   return (
@@ -87,7 +161,7 @@ const DoctorNavBar = () => {
                   href="/doctor/appointmentRequests"
                   className="mb-sm-1 mb-md-0"
                 >
-                  <i class="fa-solid fa-person-circle-question"></i>
+                  <i className="fa-solid fa-person-circle-question"></i>
                   Appointments Requests
                 </NavLink>
               </NavItem>
@@ -95,11 +169,23 @@ const DoctorNavBar = () => {
           </Container>
           <Nav className="ml-auto" style={{ marginRight: "5px" }} navbar>
             <NavItem className="ml-auto">
-              <NavLink className="rounded-circle">
-                <span className="nav-link-icon d-block">
-                  <i className="ni ni-chat-round" />
-                </span>
-              </NavLink>
+              <UncontrolledDropdown nav>
+                <DropdownToggle className="pr-0" nav>
+                  <span className="nav-link-icon d-block text-white">
+                    <i className="ni ni-chat-round" />
+                  </span>
+                </DropdownToggle>
+                <DropdownMenu className="dropdown-menu-arrow" right>
+                  <DropdownItem href="/doctor/chatWithPatient">
+                    <i className="ni ni-user-run" />
+                    <span>Chat with Patients </span>
+                  </DropdownItem>
+                  <DropdownItem href="#pablo">
+                    <i className="ni ni-key-25" />
+                    <span>Chat with Pharmacists</span>
+                  </DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
             </NavItem>
             <NavItem>
               <NavLink className="rounded-circle">
@@ -120,12 +206,63 @@ const DoctorNavBar = () => {
                     <i className="ni ni-user-run" />
                     <span>Logout</span>
                   </DropdownItem>
+                  <DropdownItem href="#pablo" onClick={handleChangePassword}>
+                    <i className="ni ni-key-25" />
+                    <span>Change Password</span>
+                  </DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
             </NavItem>
           </Nav>
         </Collapse>
       </Navbar>
+
+      <Modal isOpen={isModalOpen} toggle={toggleModal}>
+        <ModalHeader toggle={toggleModal}>Change Password</ModalHeader>
+        <ModalBody>
+          <FormGroup>
+            <Label for="username">Username</Label>
+            <Input
+              type="text"
+              name="username"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label for="oldPassword">Old Password</Label>
+            <Input
+              type="password"
+              name="oldPassword"
+              id="oldPassword"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label for="newPassword">New Password</Label>
+            <Input
+              type="password"
+              name="newPassword"
+              id="newPassword"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </FormGroup>
+          <Alert color={alertColor} isOpen={visible} toggle={onDismiss}>
+            {alertMessage}
+          </Alert>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={handlePasswordChangeSubmit}>
+            Change Password
+          </Button>{" "}
+          <Button color="secondary" onClick={toggleModal}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
     </>
   );
 };

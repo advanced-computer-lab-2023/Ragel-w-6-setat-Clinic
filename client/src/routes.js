@@ -16,6 +16,7 @@ import PatientPrescriptions from "views/PatientViews/PatientPrescriptions";
 import PrescriptionDetails from "views/PatientViews/PrescriptionDetails";
 import FamilyMemberDetails from "views/PatientViews/FamilyMemberDetails";
 import HealthPackages from "views/PatientViews/HealthPackages";
+import ChatWithDoctor from "views/PatientViews/ChatWithDoctor";
 
 // admin users
 
@@ -34,6 +35,7 @@ import PatientDetails from "views/DoctorViews/PatientDetails";
 import DoctorMedicalHistoryForPatient from "views/DoctorViews/DoctorMedicalHistoryForPatient";
 import DoctorPrescriptionsForPatient from "views/DoctorViews/DoctorPrescriptionsForPatient";
 import DoctorPrescriptionDetailsForPatient from "views/DoctorViews/DoctorPrescriptionDetailsForPatient";
+import ChatWithPatient from "views/DoctorViews/ChatWithPatient";
 
 var routes = [
   // patient routes
@@ -107,6 +109,13 @@ var routes = [
     component: <HealthPackages />,
     layout: "/patient",
   },
+  {
+    path: "/chatWithDoctor",
+    name: "Chat With Doctor",
+    icon: "ni ni-circle-08 text-pink",
+    component: <ChatWithDoctor />,
+    layout: "/patient",
+  },
 
   // doctor routes
   {
@@ -163,6 +172,13 @@ var routes = [
     name: "Patient Prescription Details",
     icon: "ni ni-single-02 text-yellow",
     component: <DoctorPrescriptionDetailsForPatient />,
+    layout: "/doctor",
+  },
+  {
+    path: "/chatWithPatient",
+    name: "Chat With Patient",
+    icon: "ni ni-circle-08 text-pink",
+    component: <ChatWithPatient />,
     layout: "/doctor",
   },
 

@@ -35,6 +35,7 @@ const HealthPackages = () => {
   const [familyMembers, setFamilyMembers] = useState([]);
   const [memberEmail, setMemberEmail] = useState("");
   const [healthPackages, setHealthPackages] = useState([]);
+  const [memberSubscribedPackages, setMemberSubscribedPackages] = useState("");
 
   useEffect(() => {
     const fetchFamilyMembers = async () => {
@@ -82,6 +83,27 @@ const HealthPackages = () => {
     fetchHealthPackages();
   }, [user]);
 
+  useEffect(() => {
+    const fetchSubscribedPackageOfFamilyMember = async () => {
+      try {
+        const response = await fetch(
+          `/patients/subscribedPackageOfFamilyMember/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        const json = await response.json();
+        if (response.ok) {
+          setMemberSubscribedPackages(json.subscribedPackage);
+        }
+      } catch (error) {
+        console.error("An error occurred:", error.response.data.message);
+      }
+    };
+    fetchSubscribedPackageOfFamilyMember();
+    // eslint-disable-next-line
+  }, []);
+
   const registeredFamilyMembers = familyMembers.map((member) => ({
     value: member.email,
     label: member.fName + " " + member.lName,
@@ -121,11 +143,24 @@ const HealthPackages = () => {
       if (healthPackages.length === 0) return;
       const selectedPackage = healthPackages[currentSlide];
       const { name, price } = selectedPackage;
+      let finalPrice = price;
+
+      if (memberSubscribedPackages) {
+        let subscriptionDiscount = 0;
+        subscriptionDiscount =
+          memberSubscribedPackages.subscriptionDiscount || 0;
+
+        const originalSessionPrice = price;
+        const discountedPrice =
+          originalSessionPrice -
+          originalSessionPrice * (subscriptionDiscount / 100);
+        finalPrice = discountedPrice;
+      }
 
       const items = [
         {
           name: name,
-          price: price,
+          price: finalPrice,
           quantity: 1,
           forAppointments: false,
         },
@@ -177,10 +212,23 @@ const HealthPackages = () => {
 
       const selectedPackage = healthPackages[currentSlide];
       const { name, price } = selectedPackage;
+      let finalPrice = price;
+
+      if (memberSubscribedPackages) {
+        let subscriptionDiscount = 0;
+        subscriptionDiscount =
+          memberSubscribedPackages.subscriptionDiscount || 0;
+
+        const originalSessionPrice = price;
+        const discountedPrice =
+          originalSessionPrice -
+          originalSessionPrice * (subscriptionDiscount / 100);
+        finalPrice = discountedPrice;
+      }
 
       const items = {
         name: name,
-        price: price,
+        price: finalPrice,
         quantity: 1,
         forAppointments: false,
       };
