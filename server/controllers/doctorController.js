@@ -5,6 +5,7 @@ import Admin from "../models/Admin.js";
 import Prescription from "../models/Prescription.js";
 import Medicine from "../models/Medicine.js";
 import nodemailer from "nodemailer";
+import Notification from "../models/Notifications.js";
 import PDFDocument from "pdfkit";
 
 // HABIBAS REQS
@@ -102,6 +103,7 @@ const doctorDetails = async function (req, res) {
       "affiliation",
       "specialty",
       "wallet",
+      "employmentContractAccepted",
     ]);
     res.status(200).json(doctor);
   } catch (err) {
@@ -895,18 +897,35 @@ const changeDoctorPassword = async (req, res) => {
   }
 };
 
+// make a function that changes every doctors read in notification to true
+const markAllNotificationsAsRead = async (req, res) => {
+  const doctorId = req.params.id;
+
+  try {
+    const doctor = await Doctor.findById(doctorId);
+
+    const notifications = await Notification.find({ doctor: doctorId });
+
+    notifications.forEach((notification) => {
+      notification.read = true;
+      notification.save();
+    });
+
+    res.status(200).json({ message: "All notifications marked as read" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getDoctorNotifications = async (req, res) => {
   try {
     const doctorId = req.params.id;
-    // Check if the patient exists
     const doctor = await Doctor.findById(doctorId);
 
-    if (!doctor) {
-      return res.status(404).json({ message: "Doctor not found" });
-    }
-
-    // Retrieve all notifications for the specific patient
-    const notifications = await Notification.find({ doctor: doctorId });
+    const notifications = await Notification.find({ doctor: doctorId })
+      .sort({ date: -1 }) // Sort by creation date in descending order
+      .limit(15); // Limit the result to 15 notifications
 
     res.status(200).json({ status: "success", notifications: notifications });
   } catch (error) {
@@ -949,8 +968,8 @@ const createAppointmentNotifications = async (req, res) => {
       notificationMessagePatient = `Your appointment with Dr. ${doctorName} on ${localDate} has been cancelled`;
       notificationMessageDoctor = `Your appointment with ${patientName} on ${localDate} has been cancelled`;
     } else if (appointment.status === "rescheduled") {
-      notificationMessagePatient = `Your appointment with Dr. ${doctorName} on ${localDate} has been rescheduled`;
-      notificationMessageDoctor = `Your appointment with ${patientName} on ${localDate} has been rescheduled`;
+      notificationMessagePatient = `Your appointment with Dr. ${doctorName} has been rescheduled to ${localDate}`;
+      notificationMessageDoctor = `Your appointment with ${patientName} has been rescheduled to ${localDate}`;
     } else if (appointment.status === "follow-up") {
       notificationMessagePatient = `Your follow-up appointment with Dr. ${doctorName} on ${localDate} has been scheduled`;
       notificationMessageDoctor = `Your follow-up appointment with ${patientName} on ${localDate} has been scheduled`;
@@ -1023,6 +1042,28 @@ const formatNotifications = (notifications) => {
   return notifications
     .map((notification) => `${notification.title}: ${notification.message}`)
     .join("\n");
+};
+
+const setEmploymentContract = async (req, res) => {
+  const doctorId = req.params.id;
+
+  try {
+    // Find the doctor by ID
+    const doctor = await Doctor.findById(doctorId);
+
+    // Set employmentContract to true
+    doctor.employmentContractAccepted = true;
+
+    // Save the updated doctor object
+    await doctor.save();
+
+    return res
+      .status(200)
+      .json({ message: "Employment contract set to true successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
 };
 
 // MERGINGG
@@ -1101,4 +1142,6 @@ export {
   getUserById,
   getDoctorNotifications,
   createAppointmentNotifications,
+  setEmploymentContract,
+  markAllNotificationsAsRead,
 };

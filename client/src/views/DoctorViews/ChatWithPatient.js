@@ -29,7 +29,6 @@ const ChatWithDoctor = () => {
   useEffect(() => {
     socket.current = io("ws://localhost:8900");
 
-    // eslint-disable-next-line
     const interval = setInterval(() => {
       setForceRerender((prev) => prev + 1);
     }, 50);
@@ -69,7 +68,6 @@ const ChatWithDoctor = () => {
     };
 
     getMessages();
-    // eslint-disable-next-line
   }, [currentChat, forceRerender]);
 
   useEffect(() => {
@@ -82,7 +80,6 @@ const ChatWithDoctor = () => {
     socket.current.emit("addUser", userID);
     console.log("userID", userID);
     socket.current.on("getUsers", (users) => {});
-    // eslint-disable-next-line
   }, [user.user]);
 
   const forceUpdate = useCallback(() => {
@@ -111,7 +108,6 @@ const ChatWithDoctor = () => {
   useEffect(() => {
     getConversations();
     forceUpdate();
-    // eslint-disable-next-line
   }, [userID]);
 
   useEffect(() => {

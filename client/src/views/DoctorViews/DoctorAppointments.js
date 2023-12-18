@@ -25,6 +25,7 @@ import {
 import ReactDatetime from "react-datetime";
 
 import { useAuthContext } from "../../hooks/useAuthContext";
+import { useNotificationContext } from "../../contexts/NotificationContext.js";
 
 const DoctorAppointments = () => {
   const { user } = useAuthContext();
@@ -164,6 +165,13 @@ const DoctorAppointments = () => {
       if (response.status === 200) {
         setAllAppointments(response.data.appointments);
         toggleAppointmentModal(allAppointments.indexOf(appointment));
+
+        await axios.get(
+          `/doctors/getAppNotifications/${user.user._id}/${appointment._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
       }
     } catch (error) {
       console.error(

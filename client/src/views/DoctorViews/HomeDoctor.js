@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 //components
 import {
@@ -10,7 +11,6 @@ import {
   Row,
   Col,
   CardTitle,
-  CardText,
   ListGroup,
   ListGroupItem,
   Badge,
@@ -20,21 +20,22 @@ import {
   Form,
   FormGroup,
   Input,
-  Label,
 } from "reactstrap";
+import { Modal } from "react-bootstrap";
 
 // contexts
 import { useAuthContext } from "../../hooks/useAuthContext";
 
 const HomeDoctor = () => {
   const { user } = useAuthContext();
+  const location = useLocation();
 
-  const [agree, setAgree] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [notificationsPerPage] = useState(5); // Adjust the number of notifications per page as needed
 
-  const showEmploymentContract = async (path) => {
-    window.open(
-      "https://napr.memberclicks.net/assets/docs/OldSite/PhysicianHospitalContract3.pdf"
-    );
+  const [showPopup, setShowPopup] = useState(false);
+  const handleClosePopup = () => {
+    setShowPopup(false);
   };
 
   const [doctorDetails, setDoctorDetails] = useState({
@@ -47,7 +48,9 @@ const HomeDoctor = () => {
     affiliation: "",
     specialty: "",
     wallet: "",
+    employmentContractAccepted: "",
   });
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     const fetchDoctorDetails = async () => {
@@ -61,6 +64,9 @@ const HomeDoctor = () => {
         const json = await response.json();
         if (response.ok) {
           setDoctorDetails(json);
+          if (!json.employmentContractAccepted) {
+            setShowPopup(true);
+          }
         }
       } catch (error) {
         console.error("An error occurred:", error);
@@ -70,6 +76,35 @@ const HomeDoctor = () => {
     fetchDoctorDetails();
     // eslint-disable-next-line
   }, []);
+
+  const handleAccept = async () => {
+    try {
+      const response = await fetch(
+        `/doctors/setEmploymentContract/${user.user._id.toString()}`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Error: ${response.status} - ${response.statusText}`);
+      } else {
+        const data = await response.json();
+        console.log("Employment contract response:", data);
+      }
+      handleClosePopup();
+      setDoctorDetails((prevDetails) => ({
+        ...prevDetails,
+        employmentContractAccepted: true,
+      }));
+    } catch (error) {
+      console.error(
+        "An error occurred during employment contract acceptance:",
+        error
+      );
+    }
+  };
 
   const [editMode, setEditMode] = useState(false);
   const [editedValues, setEditedValues] = useState({
@@ -119,6 +154,86 @@ const HomeDoctor = () => {
       [name]: value,
     }));
   };
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(
+          `/doctors/getDoctorNotifications/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+
+        if (response.data.status === "success") {
+          setNotifications(response.data.notifications);
+        } else {
+          console.error("Failed to fetch notifications");
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, [user.user._id, user.token]);
+
+  useEffect(() => {
+    const changeNotificationsToRead = async () => {
+      await axios.patch(
+        `/doctors/markNotificationsAsRead/${user.user._id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+    };
+    changeNotificationsToRead();
+  }, [location.pathname]);
+
+  const indexOfLastNotification = currentPage * notificationsPerPage;
+  const indexOfFirstNotification =
+    indexOfLastNotification - notificationsPerPage;
+  const currentNotifications = notifications.slice(
+    indexOfFirstNotification,
+    indexOfLastNotification
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const pdfLink =
+    "https://napr.memberclicks.net/assets/docs/OldSite/PhysicianHospitalContract3.pdf";
+
+  if (!doctorDetails.employmentContractAccepted) {
+    return (
+      <>
+        <Modal show={showPopup} centered size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>Important Message</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {/* Display a link to open the PDF in a new window */}
+            <p>
+              To view the PDF, click{" "}
+              <a href={pdfLink} target="_blank" rel="noopener noreferrer">
+                here
+              </a>{" "}
+              to open it in a new window.
+            </p>
+            <p>
+              By accepting, you agree to the terms and conditions in the
+              document.
+            </p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button color="success" onClick={handleAccept}>
+              Accept
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </>
+    );
+  }
 
   return (
     <>
@@ -381,142 +496,68 @@ const HomeDoctor = () => {
                   backgroundColor: "#0C356A",
                 }}
               >
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-xmark mr-2"></i>
-                  Appointment cancelled
-                </ListGroupItem>
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-circle-info mr-2"></i>
-                  Appointment rescheduled
-                </ListGroupItem>
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-check mr-2"></i> Appointment
-                  schedueled
-                </ListGroupItem>
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-circle-info mr-2"></i>
-                  Appointment rescheduled
-                </ListGroupItem>
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-check mr-2"></i> Appointment
-                  schedueled
-                </ListGroupItem>
-              </ListGroup>
-              <div className="d-flex justify-content-center mt-3">
-                <nav aria-label="...">
-                  <Pagination
-                    className="pagination pagination-lg"
-                    listClassName="pagination-lg"
+                {currentNotifications.length === 0 ? (
+                  <ListGroupItem
+                    style={{
+                      backgroundColor: "#0C356A",
+                      color: "#ffffff",
+                    }}
                   >
-                    <PaginationItem>
+                    No notifications available.
+                  </ListGroupItem>
+                ) : (
+                  currentNotifications.map((notification) => (
+                    <ListGroupItem
+                      key={notification.id}
+                      style={{
+                        backgroundColor: "#0C356A",
+                        color: "#ffffff",
+                      }}
+                    >
+                      {notification.read ? (
+                        <i
+                          class="fa-solid fa-circle"
+                          style={{ color: "#e2e6ee" }}
+                        ></i>
+                      ) : (
+                        <i
+                          class="fa-solid fa-circle"
+                          style={{ color: "#BE3144" }}
+                        ></i>
+                      )}
+                      {notification.message}
+                    </ListGroupItem>
+                  ))
+                )}
+              </ListGroup>
+
+              <div className="d-flex justify-content-center mt-3">
+                <Pagination
+                  className="pagination pagination-lg"
+                  listClassName="pagination-lg"
+                >
+                  {Array.from({
+                    length: Math.ceil(
+                      notifications.length / notificationsPerPage
+                    ),
+                  }).map((_, index) => (
+                    <PaginationItem
+                      key={index}
+                      active={index + 1 === currentPage}
+                    >
                       <PaginationLink
                         href="#pablo"
-                        onClick={(e) => e.preventDefault()}
+                        onClick={() => paginate(index + 1)}
                       >
-                        1
+                        {index + 1}
                       </PaginationLink>
                     </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        2
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem className="disabled">
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        3
-                      </PaginationLink>
-                    </PaginationItem>
-                  </Pagination>
-                </nav>
+                  ))}
+                </Pagination>
               </div>
             </Card>
           </Col>
           <Col className="order-xl-2 mt-5" xl="2">
-            <Card
-              className="my-2 ml-1 "
-              inverse
-              style={{
-                width: "19rem",
-                backgroundColor: "#0C356A",
-              }}
-            >
-              <CardHeader
-                style={{
-                  backgroundColor: "#0C356A",
-                }}
-              >
-                Employment Contract
-              </CardHeader>
-              <CardBody>
-                <CardText>
-                  <div className="custom-control custom-control-alternative custom-checkbox">
-                    <Row>
-                      <Col xs="12">
-                        <input
-                          className="custom-control-input"
-                          id="customCheckRegister"
-                          type="checkbox"
-                        />
-                        <FormGroup check>
-                          <Input
-                            type="checkbox"
-                            onClick={(e) => {
-                              setAgree(!agree);
-                            }}
-                          />
-                          <Label check>
-                            <span className="text-muted">
-                              I agree with the Employment Contract
-                            </span>
-                          </Label>
-                        </FormGroup>
-                      </Col>
-                      <Col xs="12">
-                        <Button
-                          className="mt-3"
-                          color="secondary"
-                          onClick={() => showEmploymentContract()}
-                          size="sm"
-                        >
-                          View Employment Contract
-                        </Button>
-                      </Col>
-                    </Row>
-                  </div>
-                </CardText>
-              </CardBody>
-            </Card>
             <Card
               className="card-stats my-2 ml-1"
               style={{
@@ -552,6 +593,7 @@ const HomeDoctor = () => {
           </Col>
         </Row>
       </Container>
+      {/* Modal for the pop-up */}
     </>
   );
 };

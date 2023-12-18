@@ -46,6 +46,7 @@ import {
   getUserById,
   createAppointmentNotifications,
   getPatientNotifications,
+  markAllNotificationsAsRead,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
@@ -123,7 +124,11 @@ router.get("/viewAppointments/:id", viewAppointments);
 // sprint 3
 router.get("/downloadPrescriptionPDF/:id", downloadPrescriptionPDF);
 router.get("/getPatientNotifications/:id", getPatientNotifications);
-router.get("/getAppNotifications/:id", createAppointmentNotifications);
+router.get(
+  "/getAppNotifications/:patientid/:appointmentid",
+  createAppointmentNotifications
+);
+router.patch("/markNotificationsAsRead/:id", markAllNotificationsAsRead);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);

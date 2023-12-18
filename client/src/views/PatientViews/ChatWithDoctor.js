@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
 
-import { AuthContext } from "../../contexts/AuthContext";
+import { useAuthContext } from "../../hooks/useAuthContext";
 import "./Chat.css";
 import Conversations from "components/conversations/Conversation.js";
 import Message from "components/message/Message.js";
@@ -10,7 +10,7 @@ import io from "socket.io-client"; // Import io from socket.io-client
 
 const ChatWithDoctor = () => {
   // Use AuthContext to get user information, including the token
-  const { user } = useContext(AuthContext);
+  const { user } = useAuthContext();
   const userID = user.user._id;
 
   const [conversations, setConversations] = useState([]);
@@ -68,7 +68,6 @@ const ChatWithDoctor = () => {
     };
 
     getMessages();
-    // eslint-disable-next-line
   }, [currentChat, forceRerender]);
 
   useEffect(() => {
@@ -81,7 +80,6 @@ const ChatWithDoctor = () => {
     socket.current.emit("addUser", userID);
     console.log("userID", userID);
     socket.current.on("getUsers", (users) => {});
-    // eslint-disable-next-line
   }, [user.user]);
 
   const forceUpdate = useCallback(() => {
@@ -110,7 +108,6 @@ const ChatWithDoctor = () => {
   useEffect(() => {
     getConversations();
     forceUpdate();
-    // eslint-disable-next-line
   }, [userID]);
 
   useEffect(() => {
@@ -168,7 +165,6 @@ const ChatWithDoctor = () => {
     };
 
     fetchAndCreateConversations();
-    // eslint-disable-next-line
   }, [conversations, forceUpdate, patientId, user.token]);
 
   useEffect(() => {

@@ -9,11 +9,14 @@ import App from "./app.js";
 
 //contexts
 import { AuthContextProvider } from "./contexts/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <AuthContextProvider>
-    <App />
+    <NotificationProvider>
+      <App />
+    </NotificationProvider>
   </AuthContextProvider>
 );

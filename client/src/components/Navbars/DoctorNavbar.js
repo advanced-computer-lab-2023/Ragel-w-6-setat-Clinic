@@ -23,9 +23,13 @@ import {
   Button,
   Alert,
 } from "reactstrap";
+import { Badge } from "@mui/material";
 import { useAuthContext } from "../../hooks/useAuthContext.js";
+import { useNotificationContext } from "contexts/NotificationContext.js";
 
 const DoctorNavBar = () => {
+  const { hasNewNotifications } = useNotificationContext();
+
   const [visible, setVisible] = useState(false);
   const onDismiss = () => setVisible(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -137,8 +141,15 @@ const DoctorNavBar = () => {
               </NavItem>
               <NavItem>
                 <NavLink href="/doctor/home" className="mb-sm-1 mb-md-0">
-                  <i className="fa-solid fa-house"></i>
-                  Home
+                  {hasNewNotifications ? (
+                    <Badge color="error" variant="dot">
+                      <i className="fa-solid fa-house"></i> Home
+                    </Badge>
+                  ) : (
+                    <span>
+                      <i className="fa-solid fa-house"></i> Home
+                    </span>
+                  )}
                 </NavLink>
               </NavItem>
               <NavItem>

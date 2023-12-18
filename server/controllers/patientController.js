@@ -4,6 +4,7 @@ import Doctor from "../models/Doctor.js";
 import Admin from "../models/Admin.js";
 import Appointments from "../models/Appointments.js";
 import Package from "../models/Package.js";
+import Notification from "../models/Notifications.js";
 import stripe from "stripe";
 import PDFDocument from "pdfkit";
 import e from "express";
@@ -792,6 +793,25 @@ const downloadPrescriptionPDF = async (req, res) => {
   }
 };
 
+const markAllNotificationsAsRead = async (req, res) => {
+  const patientid = req.params.id;
+
+  try {
+    const patient = await Doctor.findById(patientid);
+
+    const notifications = await Notification.find({ patient: patientid });
+
+    notifications.forEach((notification) => {
+      notification.read = true;
+      notification.save();
+    });
+
+    res.status(200).json({ message: "All notifications marked as read" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
 const getPatientNotifications = async (req, res) => {
   try {
     const patientId = req.params.id;
@@ -804,7 +824,9 @@ const getPatientNotifications = async (req, res) => {
     }
 
     // Retrieve all notifications for the specific patient
-    const notifications = await Notification.find({ patient: patientId });
+    const notifications = await Notification.find({ patient: patientId })
+      .sort({ date: -1 }) // Sort by creation date in descending order
+      .limit(15); // Limit the result to 15 notifications
 
     res.status(200).json({ status: "success", notifications: notifications });
   } catch (error) {
@@ -846,8 +868,8 @@ const createAppointmentNotifications = async (req, res) => {
       notificationMessagePatient = `Your appointment with Dr. ${doctorName} on ${localDate} has been cancelled`;
       notificationMessageDoctor = `Your appointment with ${patientName} on ${localDate} has been cancelled`;
     } else if (appointment.status === "rescheduled") {
-      notificationMessagePatient = `Your appointment with Dr. ${doctorName} on ${localDate} has been rescheduled`;
-      notificationMessageDoctor = `Your appointment with ${patientName} on ${localDate} has been rescheduled`;
+      notificationMessagePatient = `Your appointment with Dr. ${doctorName} has been rescheduled to ${localDate}`;
+      notificationMessageDoctor = `Your appointment with ${patientName} has been rescheduled to ${localDate}`;
     } else if (appointment.status === "follow-up") {
       notificationMessagePatient = `Your follow-up appointment with Dr. ${doctorName} on ${localDate} has been scheduled`;
       notificationMessageDoctor = `Your follow-up appointment with ${patientName} on ${localDate} has been scheduled`;
@@ -1711,4 +1733,5 @@ export {
   getUserById,
   createAppointmentNotifications,
   getPatientNotifications,
+  markAllNotificationsAsRead,
 };

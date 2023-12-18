@@ -68,6 +68,10 @@ const doctorSchema = new Schema({
     type: String,
     required: true,
   },
+  employmentContractAccepted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Doctor = mongoose.model("Doctor", doctorSchema);

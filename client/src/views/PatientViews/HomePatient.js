@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 //components
 import {
@@ -25,14 +26,28 @@ import { useAuthContext } from "../../hooks/useAuthContext";
 
 const HomePatient = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { user } = useAuthContext();
 
   const [patientDetails, setPatientDetails] = useState("");
+  const [notifications, setNotifications] = useState([]);
   const [visible, setVisible] = useState(false);
   const onDismiss = () => setVisible(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertColor, setAlertColor] = useState("danger");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [notificationsPerPage] = useState(5); // Adjust the number of notifications per page as needed
+  const indexOfLastNotification = currentPage * notificationsPerPage;
+  const indexOfFirstNotification =
+    indexOfLastNotification - notificationsPerPage;
+  const currentNotifications = notifications.slice(
+    indexOfFirstNotification,
+    indexOfLastNotification
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
@@ -54,6 +69,42 @@ const HomePatient = () => {
 
     fetchPatientDetails();
   }, [user]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(
+          `/patients/getPatientNotifications/${user.user._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+
+        if (response.data.status === "success") {
+          setNotifications(response.data.notifications);
+        } else {
+          console.error("Failed to fetch notifications");
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, [user.user._id, user.token]);
+
+  useEffect(() => {
+    const changeNotificationsToRead = async () => {
+      await axios.patch(
+        `/patients/markNotificationsAsRead/${user.user._id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+    };
+    changeNotificationsToRead();
+  }, [location.pathname]);
 
   const cancelMyHealthPackage = async () => {
     try {
@@ -368,84 +419,64 @@ const HomePatient = () => {
                   backgroundColor: "#0C356A",
                 }}
               >
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-xmark mr-2"></i>
-                  Appointment cancelled
-                </ListGroupItem>
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-circle-info mr-2"></i>
-                  Appointment rescheduled
-                </ListGroupItem>
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-check mr-2"></i> Appointment
-                  schedueled
-                </ListGroupItem>
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-circle-info mr-2"></i>
-                  Appointment rescheduled
-                </ListGroupItem>
-                <ListGroupItem
-                  style={{
-                    backgroundColor: "#0C356A",
-                    color: "#ffffff",
-                  }}
-                >
-                  <i className="fa-solid fa-check mr-2"></i> Appointment
-                  schedueled
-                </ListGroupItem>
-              </ListGroup>
-              <div className="d-flex justify-content-center mt-3">
-                <nav aria-label="...">
-                  <Pagination
-                    className="pagination pagination-lg"
-                    listClassName="pagination-lg"
+                {currentNotifications.length === 0 ? (
+                  <ListGroupItem
+                    style={{
+                      backgroundColor: "#0C356A",
+                      color: "#ffffff",
+                    }}
                   >
-                    <PaginationItem>
+                    No notifications available.
+                  </ListGroupItem>
+                ) : (
+                  currentNotifications.map((notification) => (
+                    <ListGroupItem
+                      key={notification.id}
+                      style={{
+                        backgroundColor: "#0C356A",
+                        color: "#ffffff",
+                      }}
+                    >
+                      {notification.read ? (
+                        <i
+                          class="fa-solid fa-circle"
+                          style={{ color: "#e2e6ee" }}
+                        ></i>
+                      ) : (
+                        <i
+                          class="fa-solid fa-circle"
+                          style={{ color: "#BE3144" }}
+                        ></i>
+                      )}
+                      {notification.message}
+                    </ListGroupItem>
+                  ))
+                )}
+              </ListGroup>
+
+              <div className="d-flex justify-content-center mt-3">
+                <Pagination
+                  className="pagination pagination-lg"
+                  listClassName="pagination-lg"
+                >
+                  {Array.from({
+                    length: Math.ceil(
+                      notifications.length / notificationsPerPage
+                    ),
+                  }).map((_, index) => (
+                    <PaginationItem
+                      key={index}
+                      active={index + 1 === currentPage}
+                    >
                       <PaginationLink
                         href="#pablo"
-                        onClick={(e) => e.preventDefault()}
+                        onClick={() => paginate(index + 1)}
                       >
-                        1
+                        {index + 1}
                       </PaginationLink>
                     </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        2
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem className="disabled">
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        3
-                      </PaginationLink>
-                    </PaginationItem>
-                  </Pagination>
-                </nav>
+                  ))}
+                </Pagination>
               </div>
             </Card>
           </Col>

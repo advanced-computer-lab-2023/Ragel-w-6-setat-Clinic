@@ -36,6 +36,8 @@ import {
   getUserById,
   getDoctorNotifications,
   createAppointmentNotifications,
+  setEmploymentContract,
+  markAllNotificationsAsRead,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthDoctor } from "../middlewares/requireAuthDoctor.js";
@@ -86,6 +88,7 @@ router.get(
   "/patientMedicalHistory/:doctorid/:patientid",
   getMedicalHistoryForPatient
 );
+router.patch("/markNotificationsAsRead/:id", markAllNotificationsAsRead);
 
 // MARIAMS ROUTES
 
@@ -129,9 +132,10 @@ router.patch(
 router.post("/changeDoctorPassword", changeDoctorPassword);
 router.get("/getDoctorNotifications/:id", getDoctorNotifications);
 router.get(
-  "/getAppNotifications/:doctorid/:patientid",
+  "/getAppNotifications/:doctorid/:appointmentid",
   createAppointmentNotifications
 );
+router.post("/setEmploymentContract/:id", setEmploymentContract);
 
 // merging routes
 router.get("/getAllMedicines", getAllMedicines);
