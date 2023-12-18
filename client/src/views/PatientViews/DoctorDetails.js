@@ -197,6 +197,12 @@ const DoctorDetails = () => {
         }
       );
       if (response.data) {
+        await axios.get(
+          `/patients/getAppNotifications/${user.user._id}/${appointmentId}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
         window.location.href = response.data.url;
       }
     } catch (error) {
@@ -254,6 +260,12 @@ const DoctorDetails = () => {
         setAlertMessage(response.data.message);
         setAlertColor("success");
         setVisible(true);
+        await axios.get(
+          `/patients/getAppNotifications/${user.user._id}/${appointmentId}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
       }
     } catch (error) {
       if (error.response.status === 400) {
@@ -315,6 +327,12 @@ const DoctorDetails = () => {
         setAlertMessage(response.data.message);
         setAlertColor("success");
         setVisible(true);
+        await axios.get(
+          `/patients/getAppNotifications/${user.user._id}/${appointment._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
       }
       toggleAppointmentModal(availableAppointments.indexOf(appointment));
       setMemberEmail("");
@@ -379,6 +397,12 @@ const DoctorDetails = () => {
       );
       if (response.data) {
         window.location.href = response.data.url;
+        await axios.get(
+          `/patients/getAppNotifications/${user.user._id}/${appointment._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
       }
       setMemberEmail("");
     } catch (error) {

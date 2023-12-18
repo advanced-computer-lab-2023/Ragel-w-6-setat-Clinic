@@ -143,6 +143,12 @@ const DoctorAppointments = () => {
       if (response.status === 200) {
         toggleAppointmentModal2(allAppointments.indexOf(appointment));
         setAllAppointments(response.data.appointments);
+        await axios.get(
+          `/doctors/getAppNotifications/${user.user._id}/${response.data.followUpAppointment._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
       }
       setFollowupDate("");
     } catch (error) {
@@ -192,6 +198,12 @@ const DoctorAppointments = () => {
       );
       if (response.status === 200) {
         setAllAppointments(response.data.appointments);
+        await axios.get(
+          `/doctors/getAppNotifications/${user.user._id}/${appointment._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
       }
     } catch (error) {
       console.error(

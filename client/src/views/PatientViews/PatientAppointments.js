@@ -193,6 +193,12 @@ const PatientAppointments = () => {
       if (response.status === 200) {
         toggleAppointmentModal(allAppointments.indexOf(appointment));
         setRescheduleAppointment("");
+        await axios.get(
+          `/patients/getAppNotifications/${user.user._id}/${rescheduleAppointment.value}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
       } else {
         console.error("Request failed with status:", response.status);
       }
@@ -243,6 +249,12 @@ const PatientAppointments = () => {
           return app;
         });
         setAllAppointments(updatedAppointments);
+        await axios.get(
+          `/patients/getAppNotifications/${user.user._id}/${appointment._id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
       }
     } catch (error) {
       console.error(

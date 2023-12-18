@@ -405,13 +405,17 @@ const HomePatient = () => {
               >
                 <i className="fa-solid fa-bell mr-2"></i>
                 Notifications
-                <Badge
-                  className="ml-2"
-                  pill
-                  style={{ backgroundColor: "#BE3144" }}
-                >
-                  New
-                </Badge>
+                {currentNotifications.filter(
+                  (notification) => !notification.read
+                ).length > 0 && (
+                  <Badge
+                    className="ml-2"
+                    pill
+                    style={{ backgroundColor: "#BE3144" }}
+                  >
+                    New
+                  </Badge>
+                )}
               </CardHeader>
               <ListGroup
                 flush
@@ -439,12 +443,12 @@ const HomePatient = () => {
                     >
                       {notification.read ? (
                         <i
-                          class="fa-solid fa-circle"
+                          class="fa-solid fa-circle mr-1"
                           style={{ color: "#e2e6ee" }}
                         ></i>
                       ) : (
                         <i
-                          class="fa-solid fa-circle"
+                          class="fa-solid fa-circle mr-1"
                           style={{ color: "#BE3144" }}
                         ></i>
                       )}

@@ -7,6 +7,7 @@ import Medicine from "../models/Medicine.js";
 import nodemailer from "nodemailer";
 import Notification from "../models/Notifications.js";
 import PDFDocument from "pdfkit";
+import Package from "../models/Package.js";
 
 // HABIBAS REQS
 
@@ -156,6 +157,7 @@ const scheduleFollowUp = async (req, res) => {
     const doctorPrice = doctor.sessionPrice;
 
     const patientPackage = patient.subscribedPackage;
+
     let sessionDiscount = 0;
     if (patientPackage) {
       const packageOffered = await Package.findById({
@@ -199,6 +201,7 @@ const scheduleFollowUp = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Appointment created successfully.",
+      followUpAppointment: appointment,
       appointments: doctorAppointments,
     });
   } catch (error) {
@@ -537,7 +540,7 @@ const acceptRequest = async (req, res) => {
   try {
     const appointment = await Appointments.findById(appointmentId);
 
-    appointment.acceptance = "accepted";
+    appointment.appointment.acceptance = "accepted";
     await appointment.save();
 
     const pendingappointments = await Appointments.find({
@@ -564,9 +567,15 @@ const rejectRequest = async (req, res) => {
   const doctorID = req.params.doctorid;
 
   try {
+    const doctor = await Doctor.findById(doctorID);
     const appointment = await Appointments.findById(appointmentId);
 
-    appointment.acceptance = "rejected";
+    appointment.acceptance = "accepted";
+    appointment.status = "available";
+    appointment.isAvailable = true;
+    appointment.patient = null;
+    appointment.price = doctor.sessionPrice;
+    appointment.type = "general";
     await appointment.save();
 
     const pendingappointments = await Appointments.find({
@@ -970,10 +979,11 @@ const createAppointmentNotifications = async (req, res) => {
     } else if (appointment.status === "rescheduled") {
       notificationMessagePatient = `Your appointment with Dr. ${doctorName} has been rescheduled to ${localDate}`;
       notificationMessageDoctor = `Your appointment with ${patientName} has been rescheduled to ${localDate}`;
-    } else if (appointment.status === "follow-up") {
-      notificationMessagePatient = `Your follow-up appointment with Dr. ${doctorName} on ${localDate} has been scheduled`;
-      notificationMessageDoctor = `Your follow-up appointment with ${patientName} on ${localDate} has been scheduled`;
     }
+    //  else {
+    //   notificationMessagePatient = `Your appointment with Dr. ${doctorName} on ${localDate} has an update`;
+    //   notificationMessageDoctor = `Your appointment with ${patientName} on ${localDate} has an update`;
+    // }
 
     // Create a new notification
     const newNotificationDoctor = await Notification.create({

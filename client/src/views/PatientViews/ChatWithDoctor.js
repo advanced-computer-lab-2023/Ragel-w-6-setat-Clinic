@@ -34,7 +34,7 @@ const ChatWithDoctor = () => {
     }, 50);
 
     return () => {
-      // clearInterval(interval);
+      clearInterval(interval);
       socket.current.disconnect();
     };
   }, []);

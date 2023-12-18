@@ -837,11 +837,9 @@ const getPatientNotifications = async (req, res) => {
 
 const createAppointmentNotifications = async (req, res) => {
   try {
-    const patientId = req.params.patientid;
     const appointmentId = req.params.appointmentid;
-
-    const patient = await Patient.findById(patientId);
     const appointment = await Appointments.findById(appointmentId);
+    const patient = await Patient.findById(appointment.patient);
     const doctor = await Doctor.findById(appointment.doctor);
 
     let notificationMessagePatient = "";
@@ -870,9 +868,6 @@ const createAppointmentNotifications = async (req, res) => {
     } else if (appointment.status === "rescheduled") {
       notificationMessagePatient = `Your appointment with Dr. ${doctorName} has been rescheduled to ${localDate}`;
       notificationMessageDoctor = `Your appointment with ${patientName} has been rescheduled to ${localDate}`;
-    } else if (appointment.status === "follow-up") {
-      notificationMessagePatient = `Your follow-up appointment with Dr. ${doctorName} on ${localDate} has been scheduled`;
-      notificationMessageDoctor = `Your follow-up appointment with ${patientName} on ${localDate} has been scheduled`;
     }
 
     // Create a new notification

@@ -48,6 +48,12 @@ const AppointmentRequests = () => {
 
       if (response.status === 200) {
         setAllAppointments(response.data.pendingappointments);
+        await axois.get(
+          `/doctors/getAppNotifications/${user.user._id}/${appointmentId}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
       }
     } catch (error) {
       console.error("An error occurred:", error.response.data.message);
