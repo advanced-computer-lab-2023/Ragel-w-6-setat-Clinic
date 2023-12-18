@@ -40,6 +40,9 @@ const login = async (req, res) => {
       const token = createToken(admin.username);
       return res.status(200).json({ userType: "admin", user: admin, token });
     }
+    return res.status(400).json({
+      message: "Invalid credentials",
+    });
   } catch (error) {
     // Handle any errors
     console.log("Error during login:", error.message);
@@ -94,13 +97,6 @@ const registerPatient = async (req, res) => {
       password,
     } = req.body.patientFields;
 
-    const patient = await Patient.create({
-      ...req.body.patientFields,
-      emergencyContact: {
-        ...req.body.emergencyContact,
-      },
-    });
-
     const patientPharmacy = await PatientPharmacy.create({
       name: `${fName} ${lName}`,
       username,
@@ -122,8 +118,15 @@ const registerPatient = async (req, res) => {
       orders: [],
     });
 
+    const patient = await Patient.create({
+      ...req.body.patientFields,
+      emergencyContact: {
+        ...req.body.emergencyContact,
+      },
+    });
+
     const role = "patient";
-    const user = await User.create({ username, password, role });
+    const user = await User.create({ username, email, password, role });
 
     res.status(201).json({
       status: "success",

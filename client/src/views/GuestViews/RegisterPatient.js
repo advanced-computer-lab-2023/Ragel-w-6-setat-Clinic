@@ -74,6 +74,9 @@ const RegisterPatient = () => {
         }
       }
 
+      console.log(patientFields);
+      console.log(emergencyContact);
+
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(patientFields.email)) {

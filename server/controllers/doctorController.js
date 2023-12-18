@@ -642,6 +642,7 @@ const addAvailableAppointments = async (req, res) => {
     const doctor = await Doctor.findById(doctorId);
 
     // Create a new appointment
+
     const appointment = new Appointments({
       doctor: doctorId,
       patient: null,
