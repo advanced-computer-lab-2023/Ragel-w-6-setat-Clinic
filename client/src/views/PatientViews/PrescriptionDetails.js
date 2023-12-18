@@ -92,7 +92,13 @@ const PrescriptionDetails = () => {
         }
       );
       const data = await response.json();
-      console.log(data); // Log the response from the backend
+      console.log(data);
+      if (response.ok) {
+        setPrescription((prescription) => ({
+          ...prescription,
+          exported: true,
+        }));
+      }
 
       // You can also update the local state or perform any other necessary actions
     } catch (error) {
@@ -124,9 +130,12 @@ const PrescriptionDetails = () => {
                   <Button
                     color="secondary"
                     size="sm"
+                    disabled={prescription.exported}
                     onClick={markPrescriptionAsExported}
                   >
-                    Mark as Exported
+                    {prescription.exported
+                      ? `Prescription has been exported`
+                      : `Export to Pharmacy`}
                   </Button>
                 </Col>
               </Row>
