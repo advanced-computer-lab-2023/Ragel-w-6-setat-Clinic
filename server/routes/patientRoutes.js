@@ -48,6 +48,7 @@ import {
   getPatientNotifications,
   markAllNotificationsAsRead,
   markPrescriptionAsExported,
+  createVideoNotifications,
 } from "../controllers/patientController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthPatient } from "../middlewares/requireAuthPatient.js";
@@ -133,6 +134,11 @@ router.get(
   createAppointmentNotifications
 );
 router.patch("/markNotificationsAsRead/:id", markAllNotificationsAsRead);
+
+router.get(
+  "/createVideoNotifications/:doctorid/:patientid",
+  createVideoNotifications
+);
 
 // MARIAMS ROUTES
 router.get("/searchForDoctors/:id", searchForDoctor);

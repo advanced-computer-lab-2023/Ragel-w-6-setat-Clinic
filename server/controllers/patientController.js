@@ -1716,6 +1716,56 @@ const markPrescriptionAsExported = async (req, res) => {
   }
 };
 
+const createVideoNotifications = async (req, res) => {
+  try {
+    const doctorId = req.params.doctorid;
+    const patientId = req.params.patientid; // Retrieve patientId from URL parameters
+
+    const doctor = await Doctor.findById(doctorId);
+    const patient = await Patient.findById(patientId);
+
+    let notificationMessagePatient = "";
+    let notificationMessageDoctor = "";
+    const doctorName = `${doctor.fName} ${doctor.lName}`;
+    const patientName = `${patient.fName} ${patient.lName}`;
+
+    const uniqueId = Math.random().toString(36).substr(2, 10);
+
+    // Google Meet link structure
+    const meetLink = `https://meet.google.com/new?pli=1&authuser=1#video&xyz=${uniqueId}`;
+
+    notificationMessagePatient = `Your video call link with Dr. ${doctorName} is ${meetLink}`;
+    notificationMessageDoctor = `${patientName} video call invite: ${meetLink}`;
+
+    const newNotificationDoctor = await Notification.create({
+      doctor: doctorId,
+      title: "Video Chat",
+      message: notificationMessageDoctor,
+      date: new Date(),
+      read: false,
+    });
+
+    const newNotificationPatient = await Notification.create({
+      patient: patient._id,
+      title: "Video Chat",
+      message: notificationMessagePatient,
+      date: new Date(),
+      read: false,
+    });
+
+    await sendNotificationsByEmail(doctor.email, [newNotificationDoctor]);
+    await sendNotificationsByEmail(patient.email, [newNotificationPatient]);
+
+    res.status(200).json({
+      status: "success",
+      message: "Notification created successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export {
   registerPatient,
   viewPrescription,
@@ -1763,4 +1813,5 @@ export {
   getPatientNotifications,
   markAllNotificationsAsRead,
   markPrescriptionAsExported,
+  createVideoNotifications,
 };

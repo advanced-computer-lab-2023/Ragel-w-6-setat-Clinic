@@ -38,6 +38,7 @@ import {
   createAppointmentNotifications,
   setEmploymentContract,
   markAllNotificationsAsRead,
+  createVideoNotifications,
 } from "../controllers/doctorController.js";
 import { body, validationResult } from "express-validator";
 import { requireAuthDoctor } from "../middlewares/requireAuthDoctor.js";
@@ -135,6 +136,12 @@ router.get(
   "/getAppNotifications/:doctorid/:appointmentid",
   createAppointmentNotifications
 );
+
+router.get(
+  "/createVideoNotifications/:doctorid/:patientid",
+  createVideoNotifications
+);
+
 router.post("/setEmploymentContract/:id", setEmploymentContract);
 
 // merging routes

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Collapse,
@@ -37,9 +37,13 @@ const DoctorNavBar = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [username, setUsername] = useState(""); // Add username state
+  const [selectedPatient, setSelectedPatient] = useState(null); // Add state for selected patient
+  const [patients, setPatients] = useState([]);
 
   const toggle = () => setIsOpen(!isOpen);
   const toggleModal = () => {
@@ -106,6 +110,48 @@ const DoctorNavBar = () => {
       console.error(error.response.data.message);
     }
   };
+
+  const handleVideoCall = async () => {
+    setIsVideoModalOpen(true); // Open the video modal
+  };
+
+  const handlecreateNotif = async () => {
+    try {
+      // Make the axios GET request when the video link is clicked
+      await axios.get(
+        `/doctors/createVideoNotifications/${user.user._id}/${selectedPatient._id}`,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+    } catch (error) {
+      console.error("Error making axios GET request:", error);
+      // Handle error if needed
+    }
+  };
+
+  const fetchPatients = async () => {
+    try {
+      const response = await fetch(`/doctors/viewMyPatients/${user.user._id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const json = await response.json();
+      if (response.ok) {
+        setPatients(json);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.response.data.message);
+    }
+  };
+
+  useEffect(() => {
+    const loadPatients = async () => {
+      const patients = await fetchPatients();
+      // Set the patients in the state or perform any other actions
+    };
+
+    loadPatients();
+  }, [user.id, user.token]);
 
   return (
     <>
@@ -199,7 +245,7 @@ const DoctorNavBar = () => {
               </UncontrolledDropdown>
             </NavItem>
             <NavItem>
-              <NavLink className="rounded-circle">
+              <NavLink className="rounded-circle" onClick={handleVideoCall}>
                 <span className="nav-link-icon d-block">
                   <i className="fa-solid fa-video"></i>
                 </span>
@@ -270,6 +316,74 @@ const DoctorNavBar = () => {
             Change Password
           </Button>{" "}
           <Button color="secondary" onClick={toggleModal}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      {/* Video Modal */}
+      <Modal
+        isOpen={isVideoModalOpen}
+        toggle={() => setIsVideoModalOpen(!isVideoModalOpen)}
+      >
+        <ModalHeader>Have a video chat with your patient now</ModalHeader>
+        <ModalBody>
+          <FormGroup>
+            <Label for="patientDropdown">Pick your patient</Label>
+            <UncontrolledDropdown>
+              <DropdownToggle caret>
+                {selectedPatient?.name || "Select Patient"}
+              </DropdownToggle>
+              <DropdownMenu>
+                {patients.map((patient) => (
+                  <DropdownItem
+                    key={patient._id}
+                    onClick={() => setSelectedPatient(patient)}
+                  >
+                    {patient.fName} {patient.lName}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </UncontrolledDropdown>
+          </FormGroup>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            onClick={() => {
+              // Handle the video call and patient selection logic here
+
+              // Open the second modal
+              handlecreateNotif();
+              setIsSecondModalOpen(true);
+            }}
+          >
+            Next
+          </Button>{" "}
+          <Button color="secondary" onClick={() => setIsVideoModalOpen(false)}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal
+        isOpen={isSecondModalOpen}
+        toggle={() => setIsSecondModalOpen(!isSecondModalOpen)}
+      >
+        <ModalHeader>
+          {" "}
+          Go to your notifications to join the meeting!
+        </ModalHeader>
+        <ModalBody>
+          {/* Add the link or any other content for joining the meeting */}
+          <p>
+            You can now join the video call with your patient by clicking on the
+            notification that has been sent to you!
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          {/* You can add additional buttons or actions here if needed */}
+          <Button color="secondary" onClick={() => setIsSecondModalOpen(false)}>
             Cancel
           </Button>
         </ModalFooter>

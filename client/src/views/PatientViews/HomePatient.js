@@ -452,7 +452,18 @@ const HomePatient = () => {
                           style={{ color: "#BE3144" }}
                         ></i>
                       )}
-                      {notification.message}
+                      {notification.title === "Video Chat" ? (
+                        <a
+                          href={notification.message.substring(
+                            notification.message.indexOf("http"),
+                            notification.message.length
+                          )}
+                        >
+                          {notification.message}
+                        </a>
+                      ) : (
+                        notification.message
+                      )}
                     </ListGroupItem>
                   ))
                 )}
