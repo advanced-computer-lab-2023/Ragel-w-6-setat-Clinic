@@ -127,13 +127,14 @@ const ChatWithDoctor = () => {
         const uniqueDoctorSet = new Set(doctorsIHaveAppointmentsWithData);
 
         console.log("doctorsIHaveAppointmentsWithDataUnique?", uniqueDoctorSet);
-        const doctorsWithoutConversation = uniqueDoctorSet.filter((doctor) => {
-          return !conversations.some(
-            (conversation) =>
-              conversation.members.includes(doctor._id) &&
-              conversation.members.includes(patientId)
-          );
-        });
+        const doctorsWithoutConversation =
+          doctorsIHaveAppointmentsWithData.filter((doctor) => {
+            return !conversations.some(
+              (conversation) =>
+                conversation.members.includes(doctor._id) &&
+                conversation.members.includes(patientId)
+            );
+          });
 
         // Create conversations for pharmacists without existing conversations
         for (const doctor of doctorsWithoutConversation) {
